@@ -1,0 +1,11 @@
+//
+// Created by ruben on 22/11/23.
+//
+
+#ifndef FLOWBETWEENFLATPLATES_COMPUTERECTANGLEAREA_H
+#define FLOWBETWEENFLATPLATES_COMPUTERECTANGLEAREA_H
+
+
+double computeRectangleArea(double p1, double p2, double q1, double q2);
+
+#endif //FLOWBETWEENFLATPLATES_COMPUTERECTANGLEAREA_H
