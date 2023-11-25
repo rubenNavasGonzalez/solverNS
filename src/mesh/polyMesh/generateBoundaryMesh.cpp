@@ -49,8 +49,6 @@ void PolyMesh::generateBoundaryMesh(int Nx, int Ny, int Nz) {
             // It is assumed that the owner is the element with the lowest index
             auxFace.iOwner = Nx*i + Nx*Ny*k;
             auxFace.iNeighbour = nElements;
-            //faces[(Nx - 1)*i + (Nx - 1)*Ny*k].iOwnerFar = nElements;
-            //faces[(Nx - 1)*i + (Nx - 1)*Ny*k].iNeighbourFar = faces[(Nx - 1)*i + (Nx - 1)*Ny*k].iNeighbour + 1;
             auxFace.iPeriodicFace = nFaces + auxBoundary.nBoundaryFaces;
 
             if (Nx > 1) {
@@ -96,8 +94,6 @@ void PolyMesh::generateBoundaryMesh(int Nx, int Ny, int Nz) {
             // It is assumed that the owner is the element with the lowest index
             auxFace.iOwner = (Nx - 1) + Nx*i + Nx*Ny*k;
             auxFace.iNeighbour = nElements;
-            //faces[Nx - 2 + (Nx - 1)*i + (Nx - 1)*Ny*k].iOwnerFar = faces[Nx - 2 + (Nx - 1)*i + (Nx - 1)*Ny*k].iOwner - 1;
-            //faces[Nx - 2 + (Nx - 1)*i + (Nx - 1)*Ny*k].iNeighbourFar = nElements;
             auxFace.iPeriodicFace = nFaces - auxBoundary.nBoundaryFaces;
 
             if (Nx > 1) {
@@ -143,8 +139,6 @@ void PolyMesh::generateBoundaryMesh(int Nx, int Ny, int Nz) {
             // It is assumed that the owner is the element with the lowest index
             auxFace.iOwner = j + Nx*Ny*k;
             auxFace.iNeighbour = nElements;
-            //faces[(Nx - 1)*Ny*Nz + j + Nx*(Ny - 1)*k].iOwnerFar = nElements;
-            //faces[(Nx - 1)*Ny*Nz + j + Nx*(Ny - 1)*k].iNeighbourFar = faces[(Nx - 1)*Ny*Nz + j + Nx*(Ny - 1)*k].iNeighbour + Nx;
             auxFace.iPeriodicFace = nFaces + auxBoundary.nBoundaryFaces;
 
             if (Ny > 1) {
@@ -190,8 +184,6 @@ void PolyMesh::generateBoundaryMesh(int Nx, int Ny, int Nz) {
             // It is assumed that the owner is the element with the lowest index
             auxFace.iOwner = Nx*(Ny - 1) + j + Nx*Ny*k;
             auxFace.iNeighbour = nElements;
-            //faces[(Nx - 1)*Ny*Nz + Nx*(Ny - 2) + j + Nx*(Ny - 1)*k].iOwnerFar = faces[(Nx - 1)*Ny*Nz + Nx*(Ny - 2) + j + Nx*(Ny - 1)*k].iOwner - Nx;
-            //faces[(Nx - 1)*Ny*Nz + Nx*(Ny - 2) + j + Nx*(Ny - 1)*k].iNeighbourFar = nElements;
             auxFace.iPeriodicFace = nFaces - auxBoundary.nBoundaryFaces;
 
             if (Ny > 1) {
@@ -237,8 +229,6 @@ void PolyMesh::generateBoundaryMesh(int Nx, int Ny, int Nz) {
             // It is assumed that the owner is the element with the lowest index
             auxFace.iOwner = j + Nx*i;
             auxFace.iNeighbour = nElements;
-            //faces[(Nx - 1)*Ny*Nz + Nx*(Ny - 1)*Nz + j + Nx*i].iOwnerFar = nElements;
-            //faces[(Nx - 1)*Ny*Nz + Nx*(Ny - 1)*Nz + j + Nx*i].iNeighbourFar = faces[(Nx - 1)*Ny*Nz + Nx*(Ny - 1)*Nz + j + Nx*i].iNeighbour + Nx*Ny;
             auxFace.iPeriodicFace = nFaces + auxBoundary.nBoundaryFaces;
 
             if (Nz > 1) {
@@ -285,8 +275,6 @@ void PolyMesh::generateBoundaryMesh(int Nx, int Ny, int Nz) {
             // It is assumed that the owner is the element with the lowest index
             auxFace.iOwner = Nx*Ny*(Nz - 1) + j + Nx*i;
             auxFace.iNeighbour = nElements;
-            //faces[(Nx - 1)*Ny*Nz + Nx*(Ny - 1)*Nz + Nx*Ny*(Nz - 2) + j + Nx*i].iOwnerFar = faces[(Nx - 1)*Ny*Nz + Nx*(Ny - 1)*Nz + Nx*Ny*(Nz - 2) + j + Nx*i].iOwner - Nx*Ny;
-            //faces[(Nx - 1)*Ny*Nz + Nx*(Ny - 1)*Nz + Nx*Ny*(Nz - 2) + j + Nx*i].iNeighbourFar = nElements;
             auxFace.iPeriodicFace = nFaces - auxBoundary.nBoundaryFaces;
 
             if (Nz > 1) {
