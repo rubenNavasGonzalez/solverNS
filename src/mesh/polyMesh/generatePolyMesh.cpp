@@ -104,9 +104,12 @@ void PolyMesh::generatePolyMesh(double Lx, double Ly, double Lz, int Nx, int Ny,
                 // Computation of the owner and the neighbour element (face to element connectivity).
                 // It is assumed that the owner is the element with the lowest index
                 auxFace.iOwner = j + Nx*i + Nx*Ny*k;
-                auxFace.iOwnerFar = auxFace.iOwner - 1;
                 auxFace.iNeighbour = (j + 1) + Nx*i + Nx*Ny*k;
-                auxFace.iNeighbourFar = auxFace.iNeighbour + 1;
+
+                if (Nx > 1) {
+                    auxFace.iOwnerFar = auxFace.iOwner - 1;
+                    auxFace.iNeighbourFar = auxFace.iNeighbour + 1;
+                }
 
                 // Element to face connectivity
                 elements[auxFace.iOwner].iFaces.push_back(nFaces);
@@ -142,9 +145,12 @@ void PolyMesh::generatePolyMesh(double Lx, double Ly, double Lz, int Nx, int Ny,
                 // Computation of the owner and the neighbour element (face to element connectivity).
                 // It is assumed that the owner is the element with the lowest index
                 auxFace.iOwner = j + Nx*i + Nx*Ny*k;
-                auxFace.iOwnerFar = auxFace.iOwner - Nx;
                 auxFace.iNeighbour = j + Nx*(i + 1) + Nx*Ny*k;
-                auxFace.iNeighbourFar = auxFace.iNeighbour + Nx;
+
+                if (Ny > 1) {
+                    auxFace.iOwnerFar = auxFace.iOwner - Nx;
+                    auxFace.iNeighbourFar = auxFace.iNeighbour + Nx;
+                }
 
                 // Element to face connectivity
                 elements[auxFace.iOwner].iFaces.push_back(nFaces);
@@ -180,9 +186,13 @@ void PolyMesh::generatePolyMesh(double Lx, double Ly, double Lz, int Nx, int Ny,
                 // Computation of the owner and the neighbour element (face to element connectivity).
                 // It is assumed that the owner is the element with the lowest index
                 auxFace.iOwner = j + Nx*i + Nx*Ny*k;
-                auxFace.iOwnerFar = auxFace.iOwner - Nx*Ny;
                 auxFace.iNeighbour = j + Nx*i + Nx*Ny*(k + 1);
-                auxFace.iNeighbourFar = auxFace.iNeighbour + Nx*Ny;
+
+                if (Nz > 1) {
+                    auxFace.iOwnerFar = auxFace.iOwner - Nx*Ny;
+                    auxFace.iNeighbourFar = auxFace.iNeighbour + Nx*Ny;
+                }
+
 
                 // Element to face connectivity
                 elements[auxFace.iOwner].iFaces.push_back(nFaces);
