@@ -8,9 +8,11 @@ double sx = 0, sy = 0, sz = 0;
 
 int main() {
 
+    // Generation of the mesh
     PolyMesh theMesh;
     theMesh.generatePolyMesh(Lx, Ly, Lz, Nx, Ny, Nz, sx, sy, sz);
     theMesh.generateBoundaryMesh(Nx, Ny, Nz);
+    theMesh.writeMesh2VTK("simResults");
 
     return 0;
 }

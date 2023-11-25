@@ -15,6 +15,7 @@ public:
     std::vector<int> iElements;                 // Tag of the neighbour elements
     Node centroid;                              // Element centroid
     double Vf{};                                // Element volume
+    int elementType{};                          // Type of element
 
 
     // Element constructor and destructor

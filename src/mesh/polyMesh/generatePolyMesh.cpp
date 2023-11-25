@@ -34,21 +34,21 @@ void PolyMesh::generatePolyMesh(double Lx, double Ly, double Lz, int Nx, int Ny,
                 if (sx == 0) {
                     nodeX = Lx/Nx*j;
                 } else {
-                    nodeX = 0.5*(1 + tanh(sx*(double(j)/Nx - 0.5))/tanh(sx/2));
+                    nodeX = 0 + 0.5*(1 + tanh(sx*(double(j)/Nx - 0.5))/tanh(sx/2))*(Lx - 0);
                 }
 
                 // y component of the node
                 if (sy == 0) {
                     nodeY = Ly/Ny*i;
                 } else {
-                    nodeY = 0.5*(1 + tanh(sy*(double(i)/Ny - 0.5))/tanh(sy/2));
+                    nodeY = 0 + 0.5*(1 + tanh(sy*(double(i)/Ny - 0.5))/tanh(sy/2))*(Ly - 0);
                 }
 
                 // z component of the node
                 if (sz == 0) {
                     nodeZ = Lz/Nz*k;
                 } else {
-                    nodeZ = 0.5*(1 + tanh(sz*(double(k)/Nz - 0.5))/tanh(sz/2));
+                    nodeZ = 0 + 0.5*(1 + tanh(sz*(double(k)/Nz - 0.5))/tanh(sz/2))*(Lz - 0);
                 }
 
                 // Add the node to the mesh vector of nodes
@@ -78,6 +78,9 @@ void PolyMesh::generatePolyMesh(double Lx, double Ly, double Lz, int Nx, int Ny,
                 auxElement.Vf = computeHexahedronVolume(nodes[vertices[0]].x, nodes[vertices[1]].x,
                                                         nodes[vertices[0]].y, nodes[vertices[4]].y,
                                                         nodes[vertices[0]].z, nodes[vertices[3]].z);
+
+                // Set the element type to a quad element
+                auxElement.elementType = 12;
 
                 // Add the interior element to the mesh vector of elements
                 elements.push_back(auxElement);

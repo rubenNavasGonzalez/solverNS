@@ -5,6 +5,7 @@
 #ifndef FLOWBETWEENFLATPLATES_POLYMESH_H
 #define FLOWBETWEENFLATPLATES_POLYMESH_H
 
+#include <string>
 #include "../face/Face.h"
 #include "../element/Element.h"
 #include "../boundary/Boundary.h"
@@ -26,8 +27,14 @@ public:
     PolyMesh();
     ~PolyMesh();
 
+
+    // PolyMesh methods
+    // Generate internal mesh
     void generatePolyMesh(double Lx, double Ly, double Lz, int Nx, int Ny, int Nz, double sx, double sy, double sz);
+    // Generate boundary mesh (it must be used after the internal mesh generation)
     void generateBoundaryMesh(int Nx, int Ny, int Nz);
+    // Write the mesh to a .VTK file
+    void writeMesh2VTK(const std::string& filename);
 };
 
 
