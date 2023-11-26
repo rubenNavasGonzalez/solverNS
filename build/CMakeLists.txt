@@ -28,4 +28,11 @@ add_executable(flowBetweenFlatPlates ../app/main.cpp
         ../src/mesh/polyMesh/computeRectangleCentroid.cpp
         ../src/mesh/polyMesh/computeRectangleCentroid.h
         ../src/mesh/polyMesh/generateBoundaryMesh.cpp
-        ../src/mesh/polyMesh/writeMesh2VTK.cpp)
+        ../src/mesh/polyMesh/writeMesh2VTK.cpp
+        ../src/fields/vectorField/VectorField.cpp
+        ../src/fields/vectorField/VectorField.h
+        ../src/fields/vectorField/initialize.cpp
+        ../src/fields/scalarField/ScalarField.cpp
+        ../src/fields/scalarField/ScalarField.h
+        ../src/fields/scalarField/initialize.cpp
+)
