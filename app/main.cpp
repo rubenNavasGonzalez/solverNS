@@ -2,6 +2,7 @@
 #include "../src/fields/vectorField/VectorField.h"
 #include "../src/fields/scalarField/ScalarField.h"
 #include "../src/boundaryConditions/vectorBoundaryConditions/VectorBoundaryConditions.h"
+#include "../src/boundaryConditions/scalarBoundaryConditions/ScalarBoundaryConditions.h"
 
 //Mesh parameters
 double Lx = 1, Ly = 1.5, Lz = 1;
@@ -43,6 +44,15 @@ int main() {
     uBCs.addBC("fixedValue", {0,0,0});
     uBCs.addBC("periodic", {0,0,0});
     uBCs.addBC("periodic", {0,0,0});
+
+    ScalarBoundaryConditions pBCs;
+    pBCs.addBC("zeroGradient", 0);
+    pBCs.addBC("fixedValue", 0);
+    pBCs.addBC("zeroGradient", 0);
+    pBCs.addBC("zeroGradient", 0);
+    pBCs.addBC("periodic", 0);
+    pBCs.addBC("periodic", 0);
+
 
     return 0;
 }
