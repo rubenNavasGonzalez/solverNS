@@ -35,4 +35,7 @@ add_executable(flowBetweenFlatPlates ../app/main.cpp
         ../src/fields/scalarField/ScalarField.cpp
         ../src/fields/scalarField/ScalarField.h
         ../src/fields/scalarField/initialize.cpp
+        ../src/boundaryConditions/vectorBoundaryConditions/VectorBoundaryConditions.cpp
+        ../src/boundaryConditions/vectorBoundaryConditions/VectorBoundaryConditions.h
+        ../src/boundaryConditions/vectorBoundaryConditions/addBC.cpp
 )

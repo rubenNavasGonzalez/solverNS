@@ -1,6 +1,7 @@
 #include "../src/mesh/polyMesh/PolyMesh.h"
 #include "../src/fields/vectorField/VectorField.h"
 #include "../src/fields/scalarField/ScalarField.h"
+#include "../src/boundaryConditions/vectorBoundaryConditions/VectorBoundaryConditions.h"
 
 //Mesh parameters
 double Lx = 1, Ly = 1.5, Lz = 1;
@@ -33,6 +34,15 @@ int main() {
     ScalarField p;
     p.initialize(theMesh.nElements);
 
+
+    // Set boundary conditions
+    VectorBoundaryConditions uBCs;
+    uBCs.addBC("fixedValue", {1,0,0});
+    uBCs.addBC("zeroGradient", {0,0,0});
+    uBCs.addBC("fixedValue", {0,0,0});
+    uBCs.addBC("fixedValue", {0,0,0});
+    uBCs.addBC("periodic", {0,0,0});
+    uBCs.addBC("periodic", {0,0,0});
 
     return 0;
 }
