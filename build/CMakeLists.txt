@@ -38,4 +38,7 @@ add_executable(flowBetweenFlatPlates ../app/main.cpp
         ../src/boundaryConditions/vectorBoundaryConditions/VectorBoundaryConditions.cpp
         ../src/boundaryConditions/vectorBoundaryConditions/VectorBoundaryConditions.h
         ../src/boundaryConditions/vectorBoundaryConditions/addBC.cpp
+        ../src/boundaryConditions/scalarBoundaryConditions/ScalarBoundaryConditions.cpp
+        ../src/boundaryConditions/scalarBoundaryConditions/ScalarBoundaryConditions.h
+        ../src/boundaryConditions/scalarBoundaryConditions/addBC.cpp
 )

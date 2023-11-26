@@ -1,3 +1,0 @@
-/home/ruben/Dropbox/Ingeniería Aeroespacial/MQ4/TFM/Case1_flowBetweenFlatPlates/flowBetweenFlatPlates/build/cmake-build-release/CMakeFiles/flowBetweenFlatPlates.dir
-/home/ruben/Dropbox/Ingeniería Aeroespacial/MQ4/TFM/Case1_flowBetweenFlatPlates/flowBetweenFlatPlates/build/cmake-build-release/CMakeFiles/edit_cache.dir
-/home/ruben/Dropbox/Ingeniería Aeroespacial/MQ4/TFM/Case1_flowBetweenFlatPlates/flowBetweenFlatPlates/build/cmake-build-release/CMakeFiles/rebuild_cache.dir
