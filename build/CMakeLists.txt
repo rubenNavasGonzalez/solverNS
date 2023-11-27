@@ -41,4 +41,8 @@ add_executable(flowBetweenFlatPlates ../app/main.cpp
         ../src/boundaryConditions/scalarBoundaryConditions/ScalarBoundaryConditions.cpp
         ../src/boundaryConditions/scalarBoundaryConditions/ScalarBoundaryConditions.h
         ../src/boundaryConditions/scalarBoundaryConditions/addBC.cpp
+        ../src/finiteVolumeMethod/fvc/divergence.cpp
+        ../src/finiteVolumeMethod/fvc/divergence.h
+        ../src/finiteVolumeMethod/fvc/laplacian.cpp
+        ../src/finiteVolumeMethod/fvc/laplacian.h
 )
