@@ -85,7 +85,6 @@ VectorField fvc::laplacianOrthogonal(const VectorField& Phi, const PolyMesh& the
         laplacian.field[i] /= theMesh.elements[i].Vf;
     }
 
-
     // Loop over all the boundary faces
     for (int i = theMesh.nInteriorFaces; i < theMesh.nFaces; ++i) {
 

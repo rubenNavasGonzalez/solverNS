@@ -74,4 +74,5 @@ GeometricVector &GeometricVector::operator/=(const double& k) {
     this->x = this->x/k;
     this->y = this->y/k;
     this->z = this->z/k;
+    return *this;
 }

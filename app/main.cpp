@@ -8,7 +8,7 @@
 
 //Mesh parameters
 double Lx = 1, Ly = 1, Lz = 1;
-int Nx = 32, Ny = 32, Nz = 1;
+int Nx = 256, Ny = 256, Nz = 1;
 double sx = 0, sy = 0, sz = 0;
 
 
@@ -56,8 +56,8 @@ int main() {
     pBCs.addBC("periodic", 0);*/
 
 
-    // Verification of the diffusive term
-    double laplacianUDifferenceX, laplacianUDifferenceY;
+    // Verification of the convective term
+    double divUDifferenceX, divUDifferenceY;
     double maxX{}, maxY{};
 
     VectorField u;
@@ -82,14 +82,14 @@ int main() {
 
     for (int i = 0; i < theMesh.nInteriorElements; ++i) {
 
-        laplacianUDifferenceX = fabs(laplacianU.field[i].x - (-8*pow(M_PI,2)*cos(2*M_PI*theMesh.elements[i].centroid.x)*sin(2*M_PI*theMesh.elements[i].centroid.y)));
-        laplacianUDifferenceY = fabs(laplacianU.field[i].y - 8*pow(M_PI,2)*sin(2*M_PI*theMesh.elements[i].centroid.x)*cos(2*M_PI*theMesh.elements[i].centroid.y));
+        divUDifferenceX = fabs(laplacianU.field[i].x - (-8*pow(M_PI,2)*cos(2*M_PI*theMesh.elements[i].centroid.x)*sin(2*M_PI*theMesh.elements[i].centroid.y)));
+        divUDifferenceY = fabs(laplacianU.field[i].y - 8*pow(M_PI,2)*sin(2*M_PI*theMesh.elements[i].centroid.x)*cos(2*M_PI*theMesh.elements[i].centroid.y));
 
-        if (laplacianUDifferenceX > maxX) {
-            maxX = laplacianUDifferenceX;
+        if (divUDifferenceX > maxX) {
+            maxX = divUDifferenceX;
         }
-        if (laplacianUDifferenceY > maxY) {
-            maxY = laplacianUDifferenceY;
+        if (divUDifferenceY > maxY) {
+            maxY = divUDifferenceY;
         }
     }
 
