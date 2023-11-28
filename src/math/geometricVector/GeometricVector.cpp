@@ -25,6 +25,13 @@ double GeometricVector::mag() {
 
 
 // Geometric vector operator overloading functions
+GeometricVector &GeometricVector::operator=(const GeometricVector &v) {
+    this->x = v.x;
+    this->y = v.y;
+    this->z = v.z;
+    return *this;
+}
+
 GeometricVector operator+(const GeometricVector &v1, const GeometricVector &v2) {
     return { v1.x + v2.x, v1.y + v2.y, v1.z + v2.z };
 }
@@ -34,6 +41,10 @@ GeometricVector &GeometricVector::operator+=(const GeometricVector &v) {
     this->y += v.y;
     this->z += v.z;
     return *this;
+}
+
+GeometricVector operator-(const GeometricVector &v1, const GeometricVector &v2) {
+    return { v1.x - v2.x, v1.y - v2.y, v1.z - v2.z };
 }
 
 GeometricVector &GeometricVector::operator-=(const GeometricVector &v) {
@@ -53,6 +64,10 @@ GeometricVector operator*(const double& k, const GeometricVector& v) {
 
 GeometricVector operator*(const GeometricVector &v, const double &k) {
     return { v.x * k, v.y * k, v.z * k };
+}
+
+GeometricVector operator/(const GeometricVector &v, const double &k) {
+    return { v.x / k, v.y / k, v.z / k };
 }
 
 GeometricVector &GeometricVector::operator/=(const double& k) {

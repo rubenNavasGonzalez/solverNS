@@ -20,12 +20,15 @@ public:
 
     // GeometricVector methods
     double mag();
+    GeometricVector& operator=(const GeometricVector& v);
     friend GeometricVector operator+(const GeometricVector& v1, const GeometricVector& v2);
     GeometricVector& operator+=(const GeometricVector& v);
+    friend GeometricVector operator-(const GeometricVector& v1, const GeometricVector& v2);
     GeometricVector& operator-=(const GeometricVector& v);
     friend double operator*(const GeometricVector& v1, const GeometricVector& v2);
     friend GeometricVector operator*(const double& k, const GeometricVector& v);
     friend GeometricVector operator*(const GeometricVector& v, const double& k);
+    friend GeometricVector operator/(const GeometricVector& v, const double& k);
     GeometricVector& operator/=(const double& k);
 };
 

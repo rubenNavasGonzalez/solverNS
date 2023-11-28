@@ -4,11 +4,11 @@
 #include "../src/fields/scalarField/ScalarField.h"
 #include "../src/boundaryConditions/vectorBoundaryConditions/VectorBoundaryConditions.h"
 #include "../src/boundaryConditions/scalarBoundaryConditions/ScalarBoundaryConditions.h"
-#include "../src/finiteVolumeMethod/fvc/laplacian.h"
+#include "../src/finiteVolumeMethod/fvc/laplacianOrthogonal.h"
 
 //Mesh parameters
 double Lx = 1, Ly = 1, Lz = 1;
-int Nx = 16, Ny = 16, Nz = 1;
+int Nx = 32, Ny = 32, Nz = 1;
 double sx = 0, sy = 0, sz = 0;
 
 
@@ -78,9 +78,9 @@ int main() {
         u.field[i].z = 0;
     }
 
-    VectorField laplacianU = fvc::laplacian(u, theMesh, uBCs);
+    VectorField laplacianU = fvc::laplacianOrthogonal(u, theMesh, uBCs);
 
-    for (int i = 0; i < theMesh.nElements; ++i) {
+    for (int i = 0; i < theMesh.nInteriorElements; ++i) {
 
         laplacianUDifferenceX = fabs(laplacianU.field[i].x - (-8*pow(M_PI,2)*cos(2*M_PI*theMesh.elements[i].centroid.x)*sin(2*M_PI*theMesh.elements[i].centroid.y)));
         laplacianUDifferenceY = fabs(laplacianU.field[i].y - 8*pow(M_PI,2)*sin(2*M_PI*theMesh.elements[i].centroid.x)*cos(2*M_PI*theMesh.elements[i].centroid.y));
