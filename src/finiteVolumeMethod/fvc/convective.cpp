@@ -2,21 +2,21 @@
 // Created by ruben on 26/11/23.
 //
 
-#include "divergence.h"
+#include "convective.h"
 
 
-ScalarField fvc::divergence(const VectorField& Phi, const PolyMesh& theMesh, const VectorBoundaryConditions& PhiBCs) {
+VectorField fvc::convective(const ScalarField& mDot, const VectorField& Phi, const PolyMesh& theMesh, const VectorBoundaryConditions& PhiBCs, const std:: string& scheme) {
 
     // Auxiliary variables
     int iOwner, iNeighbour, iPeriodicFace;
-    double gf;
+    double gf, mDotVal;
     GeometricVector PhiF, PhiOwner, PhiNeighbour, Sf, BCValue;
     std::string BCType;
 
 
     // Preallocate the divergence field
-    ScalarField divergence;
-    divergence.initialize(theMesh.nElements);
+    VectorField convective;
+    convective.initialize(theMesh.nElements);
 
 
     // Loop over all the interior faces
@@ -32,9 +32,10 @@ ScalarField fvc::divergence(const VectorField& Phi, const PolyMesh& theMesh, con
         PhiNeighbour = Phi.field[iNeighbour];
 
         PhiF = gf*PhiOwner + (1 - gf)*PhiNeighbour;
+        mDotVal = 1*PhiF*Sf;
 
-        divergence.field[iOwner] += PhiF*Sf;
-        divergence.field[iNeighbour] -= PhiF*Sf;
+        convective.field[iOwner] += mDotVal*PhiF;
+        convective.field[iNeighbour] -= mDotVal*PhiF;
     }
 
 
@@ -56,21 +57,25 @@ ScalarField fvc::divergence(const VectorField& Phi, const PolyMesh& theMesh, con
             if (BCType == "fixedValue") {
 
                 PhiF = BCValue;
+                mDotVal = 1*PhiF*Sf;
             } else if (BCType == "zeroGradient") {
 
-                PhiF = Phi.field[iNeighbour];
+                PhiF = Phi.field[iOwner];
+                mDotVal = 1*PhiF*Sf;
             } else if (BCType == "periodic") {
 
                 PhiOwner = Phi.field[iNeighbour];
                 PhiNeighbour = Phi.field[theMesh.faces[iPeriodicFace].iNeighbour];
 
                 PhiF = 0.5*(PhiOwner + PhiNeighbour);
+                mDotVal = 1*PhiF*Sf;
             } else {
 
                 PhiF = {0,0,0};
+                mDotVal = 0;
             }
 
-            divergence.field[iOwner] += PhiF*Sf;
+            convective.field[iOwner] += mDotVal*PhiF;
         }
     }
 
@@ -78,7 +83,7 @@ ScalarField fvc::divergence(const VectorField& Phi, const PolyMesh& theMesh, con
     // Loop over all the interior elements
     for (int i = 0; i < theMesh.nInteriorElements; ++i) {
 
-        divergence.field[i] /= theMesh.elements[i].Vf;
+        convective.field[i] /= theMesh.elements[i].Vf;
     }
 
 
@@ -88,8 +93,9 @@ ScalarField fvc::divergence(const VectorField& Phi, const PolyMesh& theMesh, con
         iOwner = theMesh.faces[i].iOwner;
         iNeighbour = theMesh.faces[i].iNeighbour;
 
-        divergence.field[iNeighbour] = divergence.field[iOwner];
+        convective.field[iNeighbour] = convective.field[iOwner];
     }
 
-    return divergence;
+
+    return convective;
 }

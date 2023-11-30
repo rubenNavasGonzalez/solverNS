@@ -6,9 +6,10 @@
 #include "../src/boundaryConditions/scalarBoundaryConditions/ScalarBoundaryConditions.h"
 #include "../src/finiteVolumeMethod/fvc/laplacianOrthogonal.h"
 
+
 //Mesh parameters
 double Lx = 1, Ly = 1, Lz = 1;
-int Nx = 256, Ny = 256, Nz = 1;
+int Nx = 32, Ny = 32, Nz = 32;
 double sx = 0, sy = 0, sz = 0;
 
 
@@ -56,9 +57,9 @@ int main() {
     pBCs.addBC("periodic", 0);*/
 
 
-    // Verification of the convective term
-    double divUDifferenceX, divUDifferenceY;
-    double maxX{}, maxY{};
+    // Verification of the diffusive term
+    double differenceX, differenceY, differenceZ;
+    double maxX{}, maxY{}, maxZ{};
 
     VectorField u;
     u.initialize(theMesh.nElements);
@@ -68,13 +69,13 @@ int main() {
     uBCs.addBC("periodic", {0,0,0});
     uBCs.addBC("periodic", {0,0,0});
     uBCs.addBC("periodic", {0,0,0});
-    uBCs.addBC("empty", {0,0,0});
-    uBCs.addBC("empty", {0,0,0});
+    uBCs.addBC("periodic", {0,0,0});
+    uBCs.addBC("periodic", {0,0,0});
 
     for (int i = 0; i < theMesh.nElements; ++i) {
 
-        u.field[i].x = cos(2*M_PI*theMesh.elements[i].centroid.x)*sin(2*M_PI*theMesh.elements[i].centroid.y);
-        u.field[i].y = -sin(2*M_PI*theMesh.elements[i].centroid.x)*cos(2*M_PI*theMesh.elements[i].centroid.y);
+        u.field[i].x = cos(2*M_PI*theMesh.elements[i].centroid.x)*sin(2*M_PI*theMesh.elements[i].centroid.y)*cos(2*M_PI*theMesh.elements[i].centroid.z);
+        u.field[i].y = -sin(2*M_PI*theMesh.elements[i].centroid.x)*cos(2*M_PI*theMesh.elements[i].centroid.y)*cos(2*M_PI*theMesh.elements[i].centroid.z);
         u.field[i].z = 0;
     }
 
@@ -82,20 +83,25 @@ int main() {
 
     for (int i = 0; i < theMesh.nInteriorElements; ++i) {
 
-        divUDifferenceX = fabs(laplacianU.field[i].x - (-8*pow(M_PI,2)*cos(2*M_PI*theMesh.elements[i].centroid.x)*sin(2*M_PI*theMesh.elements[i].centroid.y)));
-        divUDifferenceY = fabs(laplacianU.field[i].y - 8*pow(M_PI,2)*sin(2*M_PI*theMesh.elements[i].centroid.x)*cos(2*M_PI*theMesh.elements[i].centroid.y));
+        differenceX = fabs(laplacianU.field[i].x - (-12*pow(M_PI,2)*u.field[i].x));
+        differenceY = fabs(laplacianU.field[i].y + 12*pow(M_PI,2)*u.field[i].y);
+        differenceZ = fabs(laplacianU.field[i].z - 0);
 
-        if (divUDifferenceX > maxX) {
-            maxX = divUDifferenceX;
+        if (differenceX > maxX) {
+            maxX = differenceX;
         }
-        if (divUDifferenceY > maxY) {
-            maxY = divUDifferenceY;
+        if (differenceY > maxY) {
+            maxY = differenceY;
+        }
+        if (differenceZ > maxZ) {
+            maxZ = differenceZ;
         }
     }
 
     printf("The element size is: %f\n", Lx/Nx);
     printf("The maximum x error is: %f\n", maxX);
     printf("The maximum y error is: %f\n", maxY);
+    printf("The maximum z error is: %f\n", maxZ);
 
     return 0;
 }
