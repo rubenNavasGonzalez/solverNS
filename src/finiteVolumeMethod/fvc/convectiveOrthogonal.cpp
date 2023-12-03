@@ -124,16 +124,6 @@ VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField
                 mDotVal = 0;
             }
 
-            /*if (BCType != "empty") {
-
-                PhiF = Phi.field[iNeighbour];
-                mDotVal = 1*PhiF*Sf;
-            } else {
-
-                PhiF = {0,0,0};
-                mDotVal = 0;
-            }*/
-
             convective.field[iOwner] += mDotVal*PhiF;
         }
     }

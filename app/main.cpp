@@ -10,7 +10,7 @@
 
 //Mesh parameters
 double Lx = 1, Ly = 1, Lz = 1;
-int Nx = 128, Ny = 128, Nz = 128;
+int Nx = 3, Ny = 3, Nz = 2;
 double sx = 0, sy = 0, sz = 0;
 
 

@@ -332,5 +332,40 @@ void PolyMesh::generateBoundaryMesh(int Nx, int Ny, int Nz) {
     }
 
 
+    // Loop over all the boundary faces
+    for (int k = 0; k < nBoundaries; ++k) {
+
+        // Loop over all the boundary faces of the k_th boundary
+        for (int i = boundaries[k].startFace; i < boundaries[k].startFace + boundaries[k].nBoundaryFaces; ++i) {
+
+            if (k == 0) {
+
+                faces[i].iOwnerFar = faces[i].iOwner + 1;
+                faces[i].iNeighbourFar = faces[faces[i].iPeriodicFace].iOwner - 1;
+            } else if (k == 1) {
+
+                faces[i].iOwnerFar = faces[i].iOwner - 1;
+                faces[i].iNeighbourFar = faces[faces[i].iPeriodicFace].iOwner + 1;
+            } else if (k == 2) {
+
+                faces[i].iOwnerFar = faces[i].iOwner + Nx;
+                faces[i].iNeighbourFar = faces[faces[i].iPeriodicFace].iOwner - Nx;
+            } else if (k == 3) {
+
+                faces[i].iOwnerFar = faces[i].iOwner - Nx;
+                faces[i].iNeighbourFar = faces[faces[i].iPeriodicFace].iOwner + Nx;
+            } else if (k == 4) {
+
+                faces[i].iOwnerFar = faces[i].iOwner + Nx*Ny;
+                faces[i].iNeighbourFar = faces[faces[i].iPeriodicFace].iOwner - Nx*Ny;
+            } else {
+
+                faces[i].iOwnerFar = faces[i].iOwner - Nx*Ny;
+                faces[i].iNeighbourFar = faces[faces[i].iPeriodicFace].iOwner + Nx*Ny;
+            }
+        }
+    }
+
+
     printf("Boundary mesh generated successfully!!\n");
 }
