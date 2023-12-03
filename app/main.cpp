@@ -5,11 +5,12 @@
 #include "../src/boundaryConditions/vectorBoundaryConditions/VectorBoundaryConditions.h"
 #include "../src/boundaryConditions/scalarBoundaryConditions/ScalarBoundaryConditions.h"
 #include "../src/finiteVolumeMethod/fvc/laplacianOrthogonal.h"
+#include "../src/finiteVolumeMethod/fvc/convectiveOrthogonal.h"
 
 
 //Mesh parameters
 double Lx = 1, Ly = 1, Lz = 1;
-int Nx = 32, Ny = 32, Nz = 32;
+int Nx = 128, Ny = 128, Nz = 128;
 double sx = 0, sy = 0, sz = 0;
 
 
@@ -62,7 +63,6 @@ int main() {
     double maxX{}, maxY{}, maxZ{};
 
     VectorField u;
-    u.initialize(theMesh.nElements);
 
     VectorBoundaryConditions uBCs;
     uBCs.addBC("periodic", {0,0,0});
@@ -72,12 +72,15 @@ int main() {
     uBCs.addBC("periodic", {0,0,0});
     uBCs.addBC("periodic", {0,0,0});
 
+    u.initialize(theMesh.nElements);
+
     for (int i = 0; i < theMesh.nElements; ++i) {
 
         u.field[i].x = cos(2*M_PI*theMesh.elements[i].centroid.x)*sin(2*M_PI*theMesh.elements[i].centroid.y)*cos(2*M_PI*theMesh.elements[i].centroid.z);
         u.field[i].y = -sin(2*M_PI*theMesh.elements[i].centroid.x)*cos(2*M_PI*theMesh.elements[i].centroid.y)*cos(2*M_PI*theMesh.elements[i].centroid.z);
         u.field[i].z = 0;
     }
+    //u.applyBCs(theMesh, uBCs);
 
     VectorField laplacianU = fvc::laplacianOrthogonal(u, theMesh, uBCs);
 
@@ -98,10 +101,48 @@ int main() {
         }
     }
 
-    printf("The element size is: %f\n", Lx/Nx);
-    printf("The maximum x error is: %f\n", maxX);
-    printf("The maximum y error is: %f\n", maxY);
-    printf("The maximum z error is: %f\n", maxZ);
+    printf("\nThe number of elements is: %ix%ix%i \n\n", Nx, Ny, Nz);
+    printf("Diffusive term verification: \n");
+    printf("\tThe maximum x error is: %f \n", maxX);
+    printf("\tThe maximum y error is: %f \n", maxY);
+    printf("\tThe maximum z error is: %f \n\n", maxZ);
+
+
+    // Verification of the convective term
+    maxX = 0; maxY = 0; maxZ = 0;
+
+     for (int i = 0; i < theMesh.nElements; ++i) {
+
+         u.field[i].x = cos(2*M_PI*theMesh.elements[i].centroid.x)*sin(2*M_PI*theMesh.elements[i].centroid.y)*cos(2*M_PI*theMesh.elements[i].centroid.z);
+         u.field[i].y = -sin(2*M_PI*theMesh.elements[i].centroid.x)*cos(2*M_PI*theMesh.elements[i].centroid.y)*cos(2*M_PI*theMesh.elements[i].centroid.z);
+         u.field[i].z = 0;
+     }
+
+     ScalarField mDot;
+     VectorField convU = fvc::convectiveOrthogonal(mDot, u, theMesh, uBCs, "UDS");
+
+     for (int i = 0; i < theMesh.nInteriorElements; ++i) {
+
+         differenceX = fabs(convU.field[i].x + M_PI*sin(4*M_PI*theMesh.elements[i].centroid.x)*pow(cos(2*M_PI*theMesh.elements[i].centroid.z),2));
+         differenceY = fabs(convU.field[i].y + M_PI*sin(4*M_PI*theMesh.elements[i].centroid.y)*pow(cos(2*M_PI*theMesh.elements[i].centroid.z),2));
+         differenceZ = fabs(convU.field[i].z - 0);
+
+         if (differenceX > maxX) {
+             maxX = differenceX;
+         }
+         if (differenceY > maxY) {
+             maxY = differenceY;
+         }
+         if (differenceZ > maxZ) {
+             maxZ = differenceZ;
+         }
+     }
+
+     printf("Convective term verification: \n\n");
+     printf("\tThe maximum x error is: %f \n", maxX);
+     printf("\tThe maximum y error is: %f\n", maxY);
+     printf("\tThe maximum z error is: %f\n", maxZ);
+
 
     return 0;
 }

@@ -48,23 +48,25 @@ VectorField fvc::laplacianOrthogonal(const VectorField& Phi, const PolyMesh& the
         // Loop over all the boundary faces of the k_th boundary
         for (int i = theMesh.boundaries[k].startFace; i < theMesh.boundaries[k].startFace + theMesh.boundaries[k].nBoundaryFaces; ++i) {
 
+            dONMag = theMesh.faces[i].dONMag;
+            SfMag = theMesh.faces[i].SfMag;
+
+            iOwner = theMesh.faces[i].iOwner;
+            iNeighbour = theMesh.faces[i].iNeighbour;
+
+            PhiOwner = Phi.field[iOwner];
+            PhiNeighbour = Phi.field[iNeighbour];
 
             if (BCType == "fixedValue") {
 
-                DivPhiF = BCValue;
+                DivPhiF = (BCValue - PhiOwner)/dONMag;
             } else if (BCType == "zeroGradient" || BCType == "empty") {
 
                 DivPhiF = {0,0,0};
             } else if (BCType == "periodic") {
 
-                dONMag = theMesh.faces[i].dONMag;
-                SfMag = theMesh.faces[i].SfMag;
-
                 iPeriodicFace = theMesh.faces[i].iPeriodicFace;
-                iOwner = theMesh.faces[i].iOwner;
                 iHalo = theMesh.faces[iPeriodicFace].iOwner;
-
-                PhiOwner = Phi.field[iOwner];
                 PhiHalo = Phi.field[iHalo];
 
                 DivPhiF = (PhiHalo - PhiOwner)/(2*dONMag);

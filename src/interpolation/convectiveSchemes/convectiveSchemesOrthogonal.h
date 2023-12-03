@@ -13,4 +13,7 @@ GeometricVector convectiveSchemesOrthogonal(const GeometricVector& PhiOwner, dou
                                             const GeometricVector& PhiNeighbour, double xNeighbour, const GeometricVector& PhiNeighbourFar,
                                             double xNeighbourFar, double xF, double mDot, const std::string& scheme);
 
+GeometricVector interpolateUDS(const GeometricVector& PhiU);
+GeometricVector interpolateDDS(const GeometricVector& PhiD);
+
 #endif //FLOWBETWEENFLATPLATES_CONVECTIVESCHEMESORTHOGONAL_H

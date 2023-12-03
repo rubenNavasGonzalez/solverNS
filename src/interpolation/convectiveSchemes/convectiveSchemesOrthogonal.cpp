@@ -35,14 +35,16 @@ GeometricVector convectiveSchemesOrthogonal(const GeometricVector& PhiOwner, dou
 
     if (scheme == "UDS") {
 
-        PhiF = PhiU;
+        PhiF = interpolateUDS(PhiC);
     } else if (scheme == "DDS") {
 
-        PhiF = PhiD;
+        PhiF = interpolateDDS(PhiD);
     } else if (scheme == "CDS") {
 
+        PhiF = PhiC + (xF - xC)/(xD - xC)*(PhiD - PhiC);
     } else if (scheme == "SUDS") {
 
+        PhiF = PhiU + (xF - xU)/(xC - xU)*(PhiC - PhiU);
     } else if (scheme == "QUICK") {
 
     } else if (scheme == "SMART") {

@@ -7,6 +7,8 @@
 
 #include <vector>
 #include "../../math/geometricVector/GeometricVector.h"
+#include "../../mesh/polyMesh/PolyMesh.h"
+#include "../../boundaryConditions/vectorBoundaryConditions/VectorBoundaryConditions.h"
 
 
 class VectorField {
@@ -22,6 +24,7 @@ public:
 
     // VectorField methods
     void initialize(int length);
+    void applyBCs(const PolyMesh& theMesh, const VectorBoundaryConditions& PhiBCs);
 };
 
 
