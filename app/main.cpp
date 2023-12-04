@@ -6,11 +6,12 @@
 #include "../src/boundaryConditions/scalarBoundaryConditions/ScalarBoundaryConditions.h"
 #include "../src/finiteVolumeMethod/fvc/laplacianOrthogonal.h"
 #include "../src/finiteVolumeMethod/fvc/convectiveOrthogonal.h"
+#include "../src/finiteVolumeMethod/fvc/divergence.h"
 
 
 //Mesh parameters
 double Lx = 1, Ly = 1, Lz = 1;
-int Nx = 128, Ny = 128, Nz = 128;
+int Nx = 64, Ny = 64, Nz = 64;
 double sx = 0, sy = 0, sz = 0;
 
 
@@ -59,7 +60,7 @@ int main() {
 
 
     // Verification of the diffusive term
-    double differenceX, differenceY, differenceZ;
+    /*double differenceX, differenceY, differenceZ;
     double maxX{}, maxY{}, maxZ{};
 
     VectorField u;
@@ -105,11 +106,11 @@ int main() {
     printf("Diffusive term verification: \n");
     printf("\tThe maximum x error is: %f \n", maxX);
     printf("\tThe maximum y error is: %f \n", maxY);
-    printf("\tThe maximum z error is: %f \n\n", maxZ);
+    printf("\tThe maximum z error is: %f \n\n", maxZ);*/
 
 
     // Verification of the convective term
-    maxX = 0; maxY = 0; maxZ = 0;
+    /*maxX = 0; maxY = 0; maxZ = 0;
     double errorAvg = 0;
 
      for (int i = 0; i < theMesh.nElements; ++i) {
@@ -145,7 +146,40 @@ int main() {
      printf("\tThe maximum x error is: %f \n", maxX);
      printf("\tThe maximum y error is: %f\n", maxY);
      printf("\tThe maximum z error is: %f\n", maxZ);
-     printf("\tThe average error in xy is: %f\n", errorAvg);
+     printf("\tThe average error in xy is: %f\n", errorAvg);*/
+
+
+    // Implementation and verification of the pressure solver
+    VectorField u, uPred;
+    ScalarField divU, mDot;
+
+    VectorBoundaryConditions uBCs;
+    uBCs.addBC("periodic", {0,0,0});
+    uBCs.addBC("periodic", {0,0,0});
+    uBCs.addBC("periodic", {0,0,0});
+    uBCs.addBC("periodic", {0,0,0});
+    uBCs.addBC("periodic", {0,0,0});
+    uBCs.addBC("periodic", {0,0,0});
+
+    u.initialize(theMesh.nElements);
+
+    for (int i = 0; i < theMesh.nElements; ++i) {
+
+        u.field[i].x = cos(2*M_PI*theMesh.elements[i].centroid.x)*sin(2*M_PI*theMesh.elements[i].centroid.y)*cos(2*M_PI*theMesh.elements[i].centroid.z) + theMesh.elements[i].centroid.x;
+        u.field[i].y = -sin(2*M_PI*theMesh.elements[i].centroid.x)*cos(2*M_PI*theMesh.elements[i].centroid.y)*cos(2*M_PI*theMesh.elements[i].centroid.z) + theMesh.elements[i].centroid.y;
+        u.field[i].z = 0 + theMesh.elements[i].centroid.z;
+    }
+
+    divU = fvc::divergence(u, theMesh, uBCs);
+    printf("\nThe maximum value of divU for the initial field is: %f \n", divU.max());
+
+    VectorField convU = fvc::convectiveOrthogonal(mDot, u, theMesh, uBCs, "CDS");
+    VectorField diffU = fvc::laplacianOrthogonal(u, theMesh, uBCs);
+
+    uPred = u + (diffU - convU);
+    uPred.applyBCs(theMesh, uBCs);
+
+    ScalarField divUPred = fvc::divergence(uPred, theMesh, uBCs);
 
 
     return 0;

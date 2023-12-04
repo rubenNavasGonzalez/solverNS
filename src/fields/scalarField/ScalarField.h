@@ -21,6 +21,7 @@ public:
 
     // ScalarField methods
     void initialize(int length);
+    double max();
 };
 
 

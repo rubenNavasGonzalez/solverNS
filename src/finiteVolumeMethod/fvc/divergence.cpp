@@ -1,24 +1,22 @@
 //
-// Created by ruben on 26/11/23.
+// Created by ruben on 4/12/23.
 //
 
-#include "convectiveOrthogonal.h"
-#include "../../interpolation/convectiveSchemes/convectiveSchemesOrthogonal.h"
+#include "divergence.h"
 
 
-VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField& Phi, const PolyMesh& theMesh, const VectorBoundaryConditions& PhiBCs, const std:: string& scheme) {
+ScalarField fvc::divergence(const VectorField& Phi, const PolyMesh& theMesh, const VectorBoundaryConditions& PhiBCs) {
 
     // Auxiliary variables
-    int iOwner, iNeighbour, iOwnerFar, iNeighbourFar, iPeriodicFace, iHalo;
-    double gf, mDotVal;
-    Node pOwner, pNeighbour, pOwnerFar, pNeighbourFar, pF;
-    GeometricVector PhiF, PhiOwner, PhiNeighbour, PhiOwnerFar, PhiNeighbourFar, PhiHalo, Sf, BCValue;
+    int iOwner, iNeighbour, iPeriodicFace, iHalo;
+    double gf;
+    GeometricVector PhiF, PhiOwner, PhiNeighbour, PhiHalo, Sf, BCValue;
     std::string BCType;
 
 
     // Preallocate the divergence field
-    VectorField convective;
-    convective.initialize(theMesh.nElements);
+    ScalarField divergence;
+    divergence.initialize(theMesh.nElements);
 
 
     // Loop over all the interior faces
@@ -29,28 +27,14 @@ VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField
 
         iOwner = theMesh.faces[i].iOwner;
         iNeighbour = theMesh.faces[i].iNeighbour;
-        iOwnerFar = theMesh.faces[i].iOwnerFar;
-        iNeighbourFar = theMesh.faces[i].iNeighbourFar;
-
-        pOwner = theMesh.elements[iOwner].centroid;
-        pNeighbour = theMesh.elements[iNeighbour].centroid;
-        pOwnerFar = theMesh.elements[iOwnerFar].centroid;
-        pNeighbourFar = theMesh.elements[iNeighbourFar].centroid;
-        pF = theMesh.faces[i].centroid;
 
         PhiOwner = Phi.field[iOwner];
         PhiNeighbour = Phi.field[iNeighbour];
-        PhiOwnerFar = Phi.field[iOwnerFar];
-        PhiNeighbourFar = Phi.field[iNeighbourFar];
 
         PhiF = gf*PhiOwner + (1 - gf)*PhiNeighbour;
-        mDotVal = 1*PhiF*Sf;
 
-        PhiF = convectiveSchemesOrthogonal(PhiOwner, pOwner, PhiOwnerFar, pOwnerFar, PhiNeighbour, pNeighbour, PhiNeighbourFar,
-                                            pNeighbourFar, pF, mDotVal, Sf, scheme);
-
-        convective.field[iOwner] += mDotVal*PhiF;
-        convective.field[iNeighbour] -= mDotVal*PhiF;
+        divergence.field[iOwner] += PhiF*Sf;
+        divergence.field[iNeighbour] -= PhiF*Sf;
     }
 
 
@@ -69,11 +53,9 @@ VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField
             if (BCType == "fixedValue") {
 
                 PhiF = BCValue;
-                mDotVal = 1*PhiF*Sf;
             } else if (BCType == "zeroGradient") {
 
                 PhiF = Phi.field[iOwner];
-                mDotVal = 1*PhiF*Sf;
             } else if (BCType == "periodic") {
 
                 iPeriodicFace = theMesh.faces[i].iPeriodicFace;
@@ -83,15 +65,13 @@ VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField
                 PhiHalo = Phi.field[iHalo];
 
                 PhiF = 0.5*(PhiOwner + PhiHalo);
-                mDotVal = 1*PhiF*Sf;
 
             } else {
 
                 PhiF = {0,0,0};
-                mDotVal = 0;
             }
 
-            convective.field[iOwner] += mDotVal*PhiF;
+            divergence.field[iOwner] += PhiF*Sf;
         }
     }
 
@@ -99,7 +79,7 @@ VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField
     // Loop over all the interior elements
     for (int i = 0; i < theMesh.nInteriorElements; ++i) {
 
-        convective.field[i] /= theMesh.elements[i].Vf;
+        divergence.field[i] /= theMesh.elements[i].Vf;
     }
 
 
@@ -109,9 +89,9 @@ VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField
         iOwner = theMesh.faces[i].iOwner;
         iNeighbour = theMesh.faces[i].iNeighbour;
 
-        convective.field[iNeighbour] = convective.field[iOwner];
+        divergence.field[iNeighbour] = divergence.field[iOwner];
     }
 
 
-    return convective;
+    return divergence;
 }

@@ -25,6 +25,8 @@ public:
     // VectorField methods
     void initialize(int length);
     void applyBCs(const PolyMesh& theMesh, const VectorBoundaryConditions& PhiBCs);
+    friend VectorField operator+(const VectorField& field1, const VectorField& field2);
+    friend VectorField operator-(const VectorField& field1, const VectorField& field2);
 };
 
 

@@ -65,4 +65,7 @@ add_executable(flowBetweenFlatPlates app/main.cpp
         src/interpolation/convectiveSchemes/interpolateQUICK_Orthogonal.cpp
         src/interpolation/convectiveSchemes/interpolateSMART_Orthogonal.cpp
         src/interpolation/convectiveSchemes/interpolateSP.cpp
+        src/finiteVolumeMethod/fvc/divergence.cpp
+        src/finiteVolumeMethod/fvc/divergence.h
+        src/fields/scalarField/max.cpp
 )
