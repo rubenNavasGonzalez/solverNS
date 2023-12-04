@@ -10,7 +10,8 @@ VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField
 
     // Auxiliary variables
     int iOwner, iNeighbour, iOwnerFar, iNeighbourFar, iPeriodicFace, iHalo;
-    double gf, mDotVal, pOwner, pNeighbour, pOwnerFar, pNeighbourFar, pFace;
+    double gf, mDotVal;
+    Node pOwner, pNeighbour, pOwnerFar, pNeighbourFar, pF;
     GeometricVector PhiF, PhiFAvg, PhiOwner, PhiNeighbour, PhiOwnerFar, PhiNeighbourFar, PhiHalo, Sf, BCValue;
     std::string BCType;
 
@@ -31,6 +32,12 @@ VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField
         iOwnerFar = theMesh.faces[i].iOwnerFar;
         iNeighbourFar = theMesh.faces[i].iNeighbourFar;
 
+        pOwner = theMesh.elements[iOwner].centroid;
+        pNeighbour = theMesh.elements[iNeighbour].centroid;
+        pOwnerFar = theMesh.elements[iOwnerFar].centroid;
+        pNeighbourFar = theMesh.elements[iNeighbourFar].centroid;
+        pF = theMesh.faces[i].centroid;
+
         PhiOwner = Phi.field[iOwner];
         PhiNeighbour = Phi.field[iNeighbour];
         PhiOwnerFar = Phi.field[iOwnerFar];
@@ -39,40 +46,8 @@ VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField
         PhiF = gf*PhiOwner + (1 - gf)*PhiNeighbour;
         mDotVal = 1*PhiF*Sf;
 
-        if (Sf.x != 0) {
-
-            pOwner = theMesh.elements[iOwner].centroid.x;
-            pNeighbour = theMesh.elements[iNeighbour].centroid.x;
-            pOwnerFar = theMesh.elements[iOwnerFar].centroid.x;
-            pNeighbourFar = theMesh.elements[iNeighbourFar].centroid.x;
-            pFace = theMesh.faces[i].centroid.x;
-
-            PhiF = convectiveSchemesOrthogonal(PhiOwner, pOwner, PhiOwnerFar, pOwnerFar, PhiNeighbour,
-                                               pNeighbour, PhiNeighbourFar, pNeighbourFar, pFace, mDotVal, scheme);
-
-        } else if (Sf.y != 0) {
-
-            pOwner = theMesh.elements[iOwner].centroid.y;
-            pNeighbour = theMesh.elements[iNeighbour].centroid.y;
-            pOwnerFar = theMesh.elements[iOwnerFar].centroid.y;
-            pNeighbourFar = theMesh.elements[iNeighbourFar].centroid.y;
-            pFace = theMesh.faces[i].centroid.y;
-
-            PhiF = convectiveSchemesOrthogonal(PhiOwner, pOwner, PhiOwnerFar, pOwnerFar, PhiNeighbour,
-                                               pNeighbour, PhiNeighbourFar, pNeighbourFar, pFace, mDotVal, scheme);
-
-        } else {
-
-            pOwner = theMesh.elements[iOwner].centroid.z;
-            pNeighbour = theMesh.elements[iNeighbour].centroid.z;
-            pOwnerFar = theMesh.elements[iOwnerFar].centroid.z;
-            pNeighbourFar = theMesh.elements[iNeighbourFar].centroid.z;
-            pFace = theMesh.faces[i].centroid.z;
-
-            PhiF = convectiveSchemesOrthogonal(PhiOwner, pOwner, PhiOwnerFar, pOwnerFar, PhiNeighbour,
-                                               pNeighbour, PhiNeighbourFar, pNeighbourFar, pFace, mDotVal, scheme);
-
-        }
+        PhiF = convectiveSchemesOrthogonal(PhiOwner, pOwner, PhiOwnerFar, pOwnerFar, PhiNeighbour, pNeighbour, PhiNeighbourFar,
+                                            pNeighbourFar, pF, mDotVal, Sf, scheme);
 
         convective.field[iOwner] += mDotVal*PhiF;
         convective.field[iNeighbour] -= mDotVal*PhiF;
@@ -92,8 +67,6 @@ VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField
 
             iOwner = theMesh.faces[i].iOwner;
             iNeighbour = theMesh.faces[i].iNeighbour;
-            iPeriodicFace = theMesh.faces[i].iPeriodicFace;
-            iHalo = theMesh.faces[iPeriodicFace].iOwner;
 
             if (BCType == "fixedValue") {
 
@@ -105,19 +78,18 @@ VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField
                 mDotVal = 1*PhiF*Sf;
             } else if (BCType == "periodic") {
 
+                iPeriodicFace = theMesh.faces[i].iPeriodicFace;
+                iHalo = theMesh.faces[iPeriodicFace].iOwner;
+                iOwnerFar = theMesh.faces[i].iOwnerFar;
+                iNeighbour = iHalo;
+                iNeighbourFar = theMesh.faces[i].iNeighbourFar;
+
                 PhiOwner = Phi.field[iOwner];
                 PhiHalo = Phi.field[iHalo];
 
                 PhiF = 0.5*(PhiOwner + PhiHalo);
                 mDotVal = 1*PhiF*Sf;
 
-                if (mDotVal >= 0) {
-
-                    PhiF = PhiOwner;
-                } else {
-
-                    PhiF = PhiHalo;
-                }
             } else {
 
                 PhiF = {0,0,0};

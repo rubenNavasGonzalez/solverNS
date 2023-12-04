@@ -29,6 +29,7 @@ public:
     friend GeometricVector operator*(const double& k, const GeometricVector& v);
     friend GeometricVector operator*(const GeometricVector& v, const double& k);
     friend GeometricVector operator/(const GeometricVector& v, const double& k);
+    friend GeometricVector operator/(const GeometricVector& v1, const GeometricVector& v2);
     GeometricVector& operator/=(const double& k);
 };
 

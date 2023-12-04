@@ -10,7 +10,7 @@
 
 //Mesh parameters
 double Lx = 1, Ly = 1, Lz = 1;
-int Nx = 3, Ny = 3, Nz = 2;
+int Nx = 128, Ny = 128, Nz = 128;
 double sx = 0, sy = 0, sz = 0;
 
 
@@ -110,6 +110,7 @@ int main() {
 
     // Verification of the convective term
     maxX = 0; maxY = 0; maxZ = 0;
+    double errorAvg = 0;
 
      for (int i = 0; i < theMesh.nElements; ++i) {
 
@@ -119,13 +120,14 @@ int main() {
      }
 
      ScalarField mDot;
-     VectorField convU = fvc::convectiveOrthogonal(mDot, u, theMesh, uBCs, "UDS");
+     VectorField convU = fvc::convectiveOrthogonal(mDot, u, theMesh, uBCs, "CDS");
 
      for (int i = 0; i < theMesh.nInteriorElements; ++i) {
 
          differenceX = fabs(convU.field[i].x + M_PI*sin(4*M_PI*theMesh.elements[i].centroid.x)*pow(cos(2*M_PI*theMesh.elements[i].centroid.z),2));
          differenceY = fabs(convU.field[i].y + M_PI*sin(4*M_PI*theMesh.elements[i].centroid.y)*pow(cos(2*M_PI*theMesh.elements[i].centroid.z),2));
          differenceZ = fabs(convU.field[i].z - 0);
+         errorAvg += differenceX;
 
          if (differenceX > maxX) {
              maxX = differenceX;
@@ -137,11 +139,13 @@ int main() {
              maxZ = differenceZ;
          }
      }
+     errorAvg /= theMesh.nInteriorElements;
 
      printf("Convective term verification: \n\n");
      printf("\tThe maximum x error is: %f \n", maxX);
      printf("\tThe maximum y error is: %f\n", maxY);
      printf("\tThe maximum z error is: %f\n", maxZ);
+     printf("\tThe average error in xy is: %f\n", errorAvg);
 
 
     return 0;

@@ -11,7 +11,7 @@ if (NOT CMAKE_BUILD_TYPE)
 endif ()
 
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/app)
-SET(CMAKE_CXX_FLAGS "-O3")
+#SET(CMAKE_CXX_FLAGS "-O3")
 
 add_executable(flowBetweenFlatPlates app/main.cpp
         src/mesh/node/Node.cpp
@@ -60,4 +60,9 @@ add_executable(flowBetweenFlatPlates app/main.cpp
         src/interpolation/convectiveSchemes/interpolateUDS.cpp
         src/interpolation/convectiveSchemes/interpolateDDS.cpp
         src/fields/vectorField/applyBCs.cpp
+        src/interpolation/convectiveSchemes/interpolateCDS_Orthogonal.cpp
+        src/interpolation/convectiveSchemes/interpolateSUDS_Orthogonal.cpp
+        src/interpolation/convectiveSchemes/interpolateQUICK_Orthogonal.cpp
+        src/interpolation/convectiveSchemes/interpolateSMART_Orthogonal.cpp
+        src/interpolation/convectiveSchemes/interpolateSP.cpp
 )
