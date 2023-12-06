@@ -7,11 +7,15 @@
 #include "../src/finiteVolumeMethod/fvc/laplacianOrthogonal.h"
 #include "../src/finiteVolumeMethod/fvc/convectiveOrthogonal.h"
 #include "../src/finiteVolumeMethod/fvc/divergence.h"
+#include "../src/math/sparseMatrix/SparseMatrix.h"
+#include "../src/finiteVolumeMethod/fvm/laplacianOrthogonal.h"
+#include "../src/finiteVolumeMethod/fvScalarEquation/FvScalarEquation.h"
+#include "../src/math/linearSolver/linearSolverConfig/LinearSolverConfig.h"
 
 
 //Mesh parameters
 double Lx = 1, Ly = 1, Lz = 1;
-int Nx = 64, Ny = 64, Nz = 64;
+int Nx = 4, Ny = 4, Nz = 4;
 double sx = 0, sy = 0, sz = 0;
 
 
@@ -87,9 +91,9 @@ int main() {
 
     for (int i = 0; i < theMesh.nInteriorElements; ++i) {
 
-        differenceX = fabs(laplacianU.field[i].x - (-12*pow(M_PI,2)*u.field[i].x));
-        differenceY = fabs(laplacianU.field[i].y + 12*pow(M_PI,2)*u.field[i].y);
-        differenceZ = fabs(laplacianU.field[i].z - 0);
+        differenceX = fabs(laplacianU[i].x - (-12*pow(M_PI,2)*u[i].x));
+        differenceY = fabs(laplacianU[i].y + 12*pow(M_PI,2)*u[i].y);
+        differenceZ = fabs(laplacianU[i].z - 0);
 
         if (differenceX > maxX) {
             maxX = differenceX;
@@ -125,9 +129,9 @@ int main() {
 
      for (int i = 0; i < theMesh.nInteriorElements; ++i) {
 
-         differenceX = fabs(convU.field[i].x + M_PI*sin(4*M_PI*theMesh.elements[i].centroid.x)*pow(cos(2*M_PI*theMesh.elements[i].centroid.z),2));
-         differenceY = fabs(convU.field[i].y + M_PI*sin(4*M_PI*theMesh.elements[i].centroid.y)*pow(cos(2*M_PI*theMesh.elements[i].centroid.z),2));
-         differenceZ = fabs(convU.field[i].z - 0);
+         differenceX = fabs(convU[i].x + M_PI*sin(4*M_PI*theMesh.elements[i].centroid.x)*pow(cos(2*M_PI*theMesh.elements[i].centroid.z),2));
+         differenceY = fabs(convU[i].y + M_PI*sin(4*M_PI*theMesh.elements[i].centroid.y)*pow(cos(2*M_PI*theMesh.elements[i].centroid.z),2));
+         differenceZ = fabs(convU[i].z - 0);
          errorAvg += differenceX;
 
          if (differenceX > maxX) {
@@ -151,7 +155,7 @@ int main() {
 
     // Implementation and verification of the pressure solver
     VectorField u, uPred;
-    ScalarField divU, mDot;
+    ScalarField mDot;
 
     VectorBoundaryConditions uBCs;
     uBCs.addBC("periodic", {0,0,0});
@@ -163,6 +167,19 @@ int main() {
 
     u.initialize(theMesh.nElements);
 
+    ScalarField p, pOld;
+    pOld.initialize(theMesh.nElements);
+
+    ScalarBoundaryConditions pBCs;
+    pBCs.addBC("periodic", 0);
+    pBCs.addBC("periodic", 0);
+    pBCs.addBC("periodic", 0);
+    pBCs.addBC("periodic", 0);
+    pBCs.addBC("periodic", 0);
+    pBCs.addBC("periodic", 0);
+
+    LinearSolverConfig pSolver("BiCGSTAB", "L2", 1e-6, 1e6);
+
     for (int i = 0; i < theMesh.nElements; ++i) {
 
         u.field[i].x = cos(2*M_PI*theMesh.elements[i].centroid.x)*sin(2*M_PI*theMesh.elements[i].centroid.y)*cos(2*M_PI*theMesh.elements[i].centroid.z) + theMesh.elements[i].centroid.x;
@@ -170,7 +187,7 @@ int main() {
         u.field[i].z = 0 + theMesh.elements[i].centroid.z;
     }
 
-    divU = fvc::divergence(u, theMesh, uBCs);
+    ScalarField divU = fvc::divergence(u, theMesh, uBCs);
     printf("\nThe maximum value of divU for the initial field is: %f \n", divU.max());
 
     VectorField convU = fvc::convectiveOrthogonal(mDot, u, theMesh, uBCs, "CDS");
@@ -180,6 +197,11 @@ int main() {
     uPred.applyBCs(theMesh, uBCs);
 
     ScalarField divUPred = fvc::divergence(uPred, theMesh, uBCs);
+    SparseMatrix laplacianP = fvm::laplacianOrthogonal(theMesh);
+
+    FvScalarEquation pEqn  =  laplacianP == divUPred;
+    pEqn.constrain(theMesh, pBCs);
+    p = pEqn.solve(pSolver, pOld);
 
 
     return 0;

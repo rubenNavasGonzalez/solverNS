@@ -28,8 +28,8 @@ VectorField fvc::laplacianOrthogonal(const VectorField& Phi, const PolyMesh& the
         iOwner = theMesh.faces[i].iOwner;
         iNeighbour = theMesh.faces[i].iNeighbour;
 
-        PhiOwner = Phi.field[iOwner];
-        PhiNeighbour = Phi.field[iNeighbour];
+        PhiOwner = Phi[iOwner];
+        PhiNeighbour = Phi[iNeighbour];
 
         DivPhiF = (PhiNeighbour - PhiOwner)/dONMag;
 
@@ -52,10 +52,7 @@ VectorField fvc::laplacianOrthogonal(const VectorField& Phi, const PolyMesh& the
             SfMag = theMesh.faces[i].SfMag;
 
             iOwner = theMesh.faces[i].iOwner;
-            iNeighbour = theMesh.faces[i].iNeighbour;
-
-            PhiOwner = Phi.field[iOwner];
-            PhiNeighbour = Phi.field[iNeighbour];
+            PhiOwner = Phi[iOwner];
 
             if (BCType == "fixedValue") {
 
@@ -67,7 +64,7 @@ VectorField fvc::laplacianOrthogonal(const VectorField& Phi, const PolyMesh& the
 
                 iPeriodicFace = theMesh.faces[i].iPeriodicFace;
                 iHalo = theMesh.faces[iPeriodicFace].iOwner;
-                PhiHalo = Phi.field[iHalo];
+                PhiHalo = Phi[iHalo];
 
                 DivPhiF = (PhiHalo - PhiOwner)/(2*dONMag);
 
@@ -93,7 +90,7 @@ VectorField fvc::laplacianOrthogonal(const VectorField& Phi, const PolyMesh& the
         iOwner = theMesh.faces[i].iOwner;
         iNeighbour = theMesh.faces[i].iNeighbour;
 
-        laplacian.field[iNeighbour] = laplacian.field[iOwner];
+        laplacian.field[iNeighbour] = laplacian[iOwner];
     }
 
 

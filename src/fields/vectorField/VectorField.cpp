@@ -31,3 +31,8 @@ VectorField operator-(const VectorField &field1, const VectorField &field2) {
     }
     return result;
 }
+
+GeometricVector VectorField::operator[](int index) const {
+
+    return field[index];
+}

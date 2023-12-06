@@ -38,10 +38,10 @@ VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField
         pNeighbourFar = theMesh.elements[iNeighbourFar].centroid;
         pF = theMesh.faces[i].centroid;
 
-        PhiOwner = Phi.field[iOwner];
-        PhiNeighbour = Phi.field[iNeighbour];
-        PhiOwnerFar = Phi.field[iOwnerFar];
-        PhiNeighbourFar = Phi.field[iNeighbourFar];
+        PhiOwner = Phi[iOwner];
+        PhiNeighbour = Phi[iNeighbour];
+        PhiOwnerFar = Phi[iOwnerFar];
+        PhiNeighbourFar = Phi[iNeighbourFar];
 
         PhiF = gf*PhiOwner + (1 - gf)*PhiNeighbour;
         mDotVal = 1*PhiF*Sf;
@@ -72,15 +72,15 @@ VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField
                 mDotVal = 1*PhiF*Sf;
             } else if (BCType == "zeroGradient") {
 
-                PhiF = Phi.field[iOwner];
+                PhiF = Phi[iOwner];
                 mDotVal = 1*PhiF*Sf;
             } else if (BCType == "periodic") {
 
                 iPeriodicFace = theMesh.faces[i].iPeriodicFace;
                 iHalo = theMesh.faces[iPeriodicFace].iOwner;
 
-                PhiOwner = Phi.field[iOwner];
-                PhiHalo = Phi.field[iHalo];
+                PhiOwner = Phi[iOwner];
+                PhiHalo = Phi[iHalo];
 
                 PhiF = 0.5*(PhiOwner + PhiHalo);
                 mDotVal = 1*PhiF*Sf;
@@ -109,7 +109,7 @@ VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField
         iOwner = theMesh.faces[i].iOwner;
         iNeighbour = theMesh.faces[i].iNeighbour;
 
-        convective.field[iNeighbour] = convective.field[iOwner];
+        convective.field[iNeighbour] = convective[iOwner];
     }
 
 

@@ -68,4 +68,18 @@ add_executable(flowBetweenFlatPlates app/main.cpp
         src/finiteVolumeMethod/fvc/divergence.cpp
         src/finiteVolumeMethod/fvc/divergence.h
         src/fields/scalarField/max.cpp
+        src/math/sparseMatrix/SparseMatrix.cpp
+        src/math/sparseMatrix/SparseMatrix.h
+        src/math/sparseMatrix/getValue.cpp
+        src/math/sparseMatrix/addValue.cpp
+        src/finiteVolumeMethod/fvScalarEquation/FvScalarEquation.cpp
+        src/finiteVolumeMethod/fvScalarEquation/FvScalarEquation.h
+        src/finiteVolumeMethod/fvm/laplacianOrthogonal.cpp
+        src/finiteVolumeMethod/fvm/laplacianOrthogonal.h
+        src/finiteVolumeMethod/fvScalarEquation/constrain.cpp
+        src/finiteVolumeMethod/fvScalarEquation/solve.cpp
+        src/math/linearSolver/BiCGSTAB/solveBiCGSTAB.cpp
+        src/math/linearSolver/BiCGSTAB/solveBiCGSTAB.h
+        src/math/linearSolver/linearSolverConfig/LinearSolverConfig.cpp
+        src/math/linearSolver/linearSolverConfig/LinearSolverConfig.h
 )
