@@ -22,7 +22,7 @@ int main() {
 
 
     double t = 0;
-    double DeltaT = 0.0001;
+    double DeltaT = 0.00075;
     double nu = 0.01;
 
     VectorField u;
@@ -68,7 +68,7 @@ int main() {
     uNodeValue.field.push_back(u[50]);
     DeltaPValue.field.push_back(p[50] - p[0]);
 
-    while (t <= 3) {
+    while (t < 3) {
 
         t += DeltaT;
         printf("\nTime = %f s \n", t);
