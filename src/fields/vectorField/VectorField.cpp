@@ -16,7 +16,7 @@ VectorField operator+(const VectorField &field1, const VectorField &field2) {
     result.initialize(field1.field.size());
 
     for (int i = 0; i < field1.field.size(); ++i) {
-        result.field[i] = field1.field[i] - field2.field[i];
+        result.field[i] = field1.field[i] + field2.field[i];
     }
     return result;
 }
@@ -28,6 +28,15 @@ VectorField operator-(const VectorField &field1, const VectorField &field2) {
 
     for (int i = 0; i < field1.field.size(); ++i) {
         result.field[i] = field1.field[i] - field2.field[i];
+    }
+    return result;
+}
+
+VectorField operator*(const double &k, const VectorField &field) {
+    VectorField result;
+
+    for (int i = 0; i < field.field.size(); ++i) {
+        result.field.push_back( k*field[i] );
     }
     return result;
 }

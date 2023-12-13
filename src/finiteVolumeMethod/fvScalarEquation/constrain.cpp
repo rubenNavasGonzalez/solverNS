@@ -8,7 +8,7 @@
 void FvScalarEquation::constrain(const PolyMesh& theMesh, const ScalarBoundaryConditions& PhiBCs) {
 
     // Auxiliary variables declaration
-    double BCValue;
+    double BCValue, dONMag, SfMag, coeffValue, Vf;
     int iOwner, iNeighbour, iPeriodicFace, iHalo;
     std::string BCType;
 
@@ -23,27 +23,31 @@ void FvScalarEquation::constrain(const PolyMesh& theMesh, const ScalarBoundaryCo
         // Loop over all the boundary faces of the k_th boundary
         for (int i = theMesh.boundaries[k].startFace; i < theMesh.boundaries[k].startFace + theMesh.boundaries[k].nBoundaryFaces; ++i) {
 
+            dONMag = theMesh.faces[i].dONMag;
+            SfMag = theMesh.faces[i].SfMag;
+
             iOwner = theMesh.faces[i].iOwner;
             iNeighbour = theMesh.faces[i].iNeighbour;
             iPeriodicFace = theMesh.faces[i].iPeriodicFace;
             iHalo = theMesh.faces[iPeriodicFace].iOwner;
 
+            Vf = theMesh.elements[iOwner].Vf;
+
             if (BCType == "fixedValue") {
 
-                A.addValue(1, {iNeighbour, iNeighbour});
-                b.field[iNeighbour] = BCValue;
+                coeffValue = SfMag/dONMag;
+
+                A.diagValue[iOwner] -= coeffValue/Vf;
+                b.field[iNeighbour] += BCValue;
 
             } else if (BCType == "zeroGradient" || BCType == "empty") {
 
-                A.addValue(1, {iNeighbour, iNeighbour});
-                A.addValue(-1, {iNeighbour, iOwner});
-                b.field[iNeighbour] = 0;
-
             } else if (BCType == "periodic") {
 
-                A.addValue(0.5, {iNeighbour, iNeighbour});
-                A.addValue(-0.5, {iNeighbour, iHalo});
-                b.field[iNeighbour] = 0;
+                coeffValue = SfMag/(2*dONMag);
+
+                A.diagValue[iOwner] -= coeffValue/Vf;
+                A.addValue(coeffValue/Vf, {iOwner, iHalo});
 
             } else {
 
@@ -51,4 +55,6 @@ void FvScalarEquation::constrain(const PolyMesh& theMesh, const ScalarBoundaryCo
             }
         }
     }
+
+    A.diagValue[0] = 1.1*A.diagValue[0];
 }

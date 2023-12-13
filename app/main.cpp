@@ -1,21 +1,14 @@
 #include <cmath>
-#include "../src/mesh/polyMesh/PolyMesh.h"
-#include "../src/fields/vectorField/VectorField.h"
-#include "../src/fields/scalarField/ScalarField.h"
-#include "../src/boundaryConditions/vectorBoundaryConditions/VectorBoundaryConditions.h"
-#include "../src/boundaryConditions/scalarBoundaryConditions/ScalarBoundaryConditions.h"
-#include "../src/finiteVolumeMethod/fvc/laplacianOrthogonal.h"
-#include "../src/finiteVolumeMethod/fvc/convectiveOrthogonal.h"
-#include "../src/finiteVolumeMethod/fvc/divergence.h"
-#include "../src/math/sparseMatrix/SparseMatrix.h"
-#include "../src/finiteVolumeMethod/fvm/laplacianOrthogonal.h"
+#include <fstream>
+#include "../src/finiteVolumeMethod/fvc/fvc.h"
+#include "../src/finiteVolumeMethod/fvm/fvm.h"
 #include "../src/finiteVolumeMethod/fvScalarEquation/FvScalarEquation.h"
-#include "../src/math/linearSolver/linearSolverConfig/LinearSolverConfig.h"
+#include "../src/interpolation/interpolateMDotFromElements2Faces/RhieChowInterpolation.h"
 
 
 //Mesh parameters
 double Lx = 1, Ly = 1, Lz = 1;
-int Nx = 4, Ny = 4, Nz = 4;
+int Nx = 128, Ny = 128, Nz = 1;
 double sx = 0, sy = 0, sz = 0;
 
 
@@ -25,184 +18,104 @@ int main() {
     PolyMesh theMesh;
     theMesh.generatePolyMesh(Lx, Ly, Lz, Nx, Ny, Nz, sx, sy, sz);
     theMesh.generateBoundaryMesh(Nx, Ny, Nz);
-    //theMesh.writeMesh2VTK("simResults");
+    theMesh.writeMesh2VTK("simResults");
 
 
-    /*// Preallocation of the fields
-    VectorField u, uPred, uFuture;
-    u.initialize(theMesh.nElements);
-    uPred.initialize(theMesh.nElements);
-    uFuture.initialize(theMesh.nElements);
-
-    VectorField R, RPrev;
-    R.initialize(theMesh.nElements);
-    RPrev.initialize(theMesh.nElements);
-
-    ScalarField mDot;
-    mDot.initialize(theMesh.nFaces);
-
-    ScalarField p;
-    p.initialize(theMesh.nElements);
-
-
-    // Set boundary conditions
-    VectorBoundaryConditions uBCs;
-    uBCs.addBC("fixedValue", {1,0,0});
-    uBCs.addBC("zeroGradient", {0,0,0});
-    uBCs.addBC("fixedValue", {0,0,0});
-    uBCs.addBC("fixedValue", {0,0,0});
-    uBCs.addBC("periodic", {0,0,0});
-    uBCs.addBC("periodic", {0,0,0});
-
-    ScalarBoundaryConditions pBCs;
-    pBCs.addBC("zeroGradient", 0);
-    pBCs.addBC("fixedValue", 0);
-    pBCs.addBC("zeroGradient", 0);
-    pBCs.addBC("zeroGradient", 0);
-    pBCs.addBC("periodic", 0);
-    pBCs.addBC("periodic", 0);*/
-
-
-    // Verification of the diffusive term
-    /*double differenceX, differenceY, differenceZ;
-    double maxX{}, maxY{}, maxZ{};
+    double t = 0;
+    double DeltaT = 0.0001;
+    double nu = 0.01;
 
     VectorField u;
+    u.initialize(theMesh.nInteriorElements);
 
     VectorBoundaryConditions uBCs;
     uBCs.addBC("periodic", {0,0,0});
     uBCs.addBC("periodic", {0,0,0});
     uBCs.addBC("periodic", {0,0,0});
     uBCs.addBC("periodic", {0,0,0});
-    uBCs.addBC("periodic", {0,0,0});
-    uBCs.addBC("periodic", {0,0,0});
-
-    u.initialize(theMesh.nElements);
-
-    for (int i = 0; i < theMesh.nElements; ++i) {
-
-        u.field[i].x = cos(2*M_PI*theMesh.elements[i].centroid.x)*sin(2*M_PI*theMesh.elements[i].centroid.y)*cos(2*M_PI*theMesh.elements[i].centroid.z);
-        u.field[i].y = -sin(2*M_PI*theMesh.elements[i].centroid.x)*cos(2*M_PI*theMesh.elements[i].centroid.y)*cos(2*M_PI*theMesh.elements[i].centroid.z);
-        u.field[i].z = 0;
-    }
-    //u.applyBCs(theMesh, uBCs);
-
-    VectorField laplacianU = fvc::laplacianOrthogonal(u, theMesh, uBCs);
+    uBCs.addBC("empty", {0,0,0});
+    uBCs.addBC("empty", {0,0,0});
 
     for (int i = 0; i < theMesh.nInteriorElements; ++i) {
 
-        differenceX = fabs(laplacianU[i].x - (-12*pow(M_PI,2)*u[i].x));
-        differenceY = fabs(laplacianU[i].y + 12*pow(M_PI,2)*u[i].y);
-        differenceZ = fabs(laplacianU[i].z - 0);
-
-        if (differenceX > maxX) {
-            maxX = differenceX;
-        }
-        if (differenceY > maxY) {
-            maxY = differenceY;
-        }
-        if (differenceZ > maxZ) {
-            maxZ = differenceZ;
-        }
+        u.field[i].x = cos(2*M_PI*theMesh.elements[i].centroid.x)*sin(2*M_PI*theMesh.elements[i].centroid.y);
+        u.field[i].y = -sin(2*M_PI*theMesh.elements[i].centroid.x)*cos(2*M_PI*theMesh.elements[i].centroid.y);
+        u.field[i].z = 0;
     }
 
-    printf("\nThe number of elements is: %ix%ix%i \n\n", Nx, Ny, Nz);
-    printf("Diffusive term verification: \n");
-    printf("\tThe maximum x error is: %f \n", maxX);
-    printf("\tThe maximum y error is: %f \n", maxY);
-    printf("\tThe maximum z error is: %f \n\n", maxZ);*/
-
-
-    // Verification of the convective term
-    /*maxX = 0; maxY = 0; maxZ = 0;
-    double errorAvg = 0;
-
-     for (int i = 0; i < theMesh.nElements; ++i) {
-
-         u.field[i].x = cos(2*M_PI*theMesh.elements[i].centroid.x)*sin(2*M_PI*theMesh.elements[i].centroid.y)*cos(2*M_PI*theMesh.elements[i].centroid.z);
-         u.field[i].y = -sin(2*M_PI*theMesh.elements[i].centroid.x)*cos(2*M_PI*theMesh.elements[i].centroid.y)*cos(2*M_PI*theMesh.elements[i].centroid.z);
-         u.field[i].z = 0;
-     }
-
-     ScalarField mDot;
-     VectorField convU = fvc::convectiveOrthogonal(mDot, u, theMesh, uBCs, "CDS");
-
-     for (int i = 0; i < theMesh.nInteriorElements; ++i) {
-
-         differenceX = fabs(convU[i].x + M_PI*sin(4*M_PI*theMesh.elements[i].centroid.x)*pow(cos(2*M_PI*theMesh.elements[i].centroid.z),2));
-         differenceY = fabs(convU[i].y + M_PI*sin(4*M_PI*theMesh.elements[i].centroid.y)*pow(cos(2*M_PI*theMesh.elements[i].centroid.z),2));
-         differenceZ = fabs(convU[i].z - 0);
-         errorAvg += differenceX;
-
-         if (differenceX > maxX) {
-             maxX = differenceX;
-         }
-         if (differenceY > maxY) {
-             maxY = differenceY;
-         }
-         if (differenceZ > maxZ) {
-             maxZ = differenceZ;
-         }
-     }
-     errorAvg /= theMesh.nInteriorElements;
-
-     printf("Convective term verification: \n\n");
-     printf("\tThe maximum x error is: %f \n", maxX);
-     printf("\tThe maximum y error is: %f\n", maxY);
-     printf("\tThe maximum z error is: %f\n", maxZ);
-     printf("\tThe average error in xy is: %f\n", errorAvg);*/
-
-
-    // Implementation and verification of the pressure solver
-    VectorField u, uPred;
-    ScalarField mDot;
-
-    VectorBoundaryConditions uBCs;
-    uBCs.addBC("periodic", {0,0,0});
-    uBCs.addBC("periodic", {0,0,0});
-    uBCs.addBC("periodic", {0,0,0});
-    uBCs.addBC("periodic", {0,0,0});
-    uBCs.addBC("periodic", {0,0,0});
-    uBCs.addBC("periodic", {0,0,0});
-
-    u.initialize(theMesh.nElements);
-
-    ScalarField p, pOld;
-    pOld.initialize(theMesh.nElements);
+    ScalarField p;
+    p.initialize(theMesh.nInteriorElements);
 
     ScalarBoundaryConditions pBCs;
     pBCs.addBC("periodic", 0);
     pBCs.addBC("periodic", 0);
     pBCs.addBC("periodic", 0);
     pBCs.addBC("periodic", 0);
-    pBCs.addBC("periodic", 0);
-    pBCs.addBC("periodic", 0);
+    pBCs.addBC("empty", 0);
+    pBCs.addBC("empty", 0);
+
+    for (int i = 0; i < theMesh.nInteriorElements; ++i) {
+
+        p.field[i] = -0.5*(pow(cos(2*M_PI*theMesh.elements[i].centroid.x),2) + pow(cos(2*M_PI*theMesh.elements[i].centroid.y),2));
+    }
 
     LinearSolverConfig pSolver("BiCGSTAB", "L2", 1e-6, 1e6);
 
-    for (int i = 0; i < theMesh.nElements; ++i) {
+    VectorField RPrev;
+    VectorField uNodeValue;
+    ScalarField DeltaPValue;
 
-        u.field[i].x = cos(2*M_PI*theMesh.elements[i].centroid.x)*sin(2*M_PI*theMesh.elements[i].centroid.y)*cos(2*M_PI*theMesh.elements[i].centroid.z) + theMesh.elements[i].centroid.x;
-        u.field[i].y = -sin(2*M_PI*theMesh.elements[i].centroid.x)*cos(2*M_PI*theMesh.elements[i].centroid.y)*cos(2*M_PI*theMesh.elements[i].centroid.z) + theMesh.elements[i].centroid.y;
-        u.field[i].z = 0 + theMesh.elements[i].centroid.z;
+    uNodeValue.field.push_back(u[50]);
+    DeltaPValue.field.push_back(p[50] - p[0]);
+
+    while (t <= 3) {
+
+        t += DeltaT;
+        printf("\nTime = %f s \n", t);
+
+        ScalarField mDot = RhieChowInterpolation(u, p, theMesh, DeltaT, uBCs, pBCs);
+        VectorField convU = fvc::convectiveOrthogonal(mDot, u, theMesh, uBCs, "CDS");
+        VectorField diffU = fvc::laplacianOrthogonal(u, theMesh, uBCs);
+
+        VectorField R = nu*diffU - convU;
+
+        if (t == DeltaT) {
+
+            RPrev = R;
+        }
+
+        VectorField uPred = u + (DeltaT/1)*(1.5*R - 0.5*RPrev);
+
+        ScalarField divUPred = fvc::divergence(uPred, theMesh, uBCs);
+        SparseMatrix laplacianMatrixU = fvm::laplacianOrthogonal(theMesh);
+
+        FvScalarEquation pEqn  =  laplacianMatrixU == (1/DeltaT)*divUPred;
+        pEqn.constrain(theMesh, pBCs);
+        printf("\tSolving Poisson Equation...\n");
+        ScalarField pNew = pEqn.solve(pSolver, p);
+        DeltaPValue.field.push_back(pNew[50] - pNew[0]);
+
+        VectorField gradP = fvc::gradient(pNew, theMesh, pBCs);
+
+        VectorField uNew = uPred - (DeltaT/1)*gradP;
+        uNodeValue.field.push_back(uNew[50]);
+
+        ScalarField divUNew = fvc::divergence(uNew, theMesh, uBCs);
+        printf("\n\tThe maximum value of divUNew is: %E \n", divUNew.maxAbs());
+
+        u = uNew;
+        p = pNew;
+        RPrev = R;
     }
 
-    ScalarField divU = fvc::divergence(u, theMesh, uBCs);
-    printf("\nThe maximum value of divU for the initial field is: %f \n", divU.max());
 
-    VectorField convU = fvc::convectiveOrthogonal(mDot, u, theMesh, uBCs, "CDS");
-    VectorField diffU = fvc::laplacianOrthogonal(u, theMesh, uBCs);
+    std::ofstream output;
+    output.open ("data.txt");
+    for (int i = 0; i < uNodeValue.field.size(); ++i) {
 
-    uPred = u + (diffU - convU);
-    uPred.applyBCs(theMesh, uBCs);
-
-    ScalarField divUPred = fvc::divergence(uPred, theMesh, uBCs);
-    SparseMatrix laplacianP = fvm::laplacianOrthogonal(theMesh);
-
-    FvScalarEquation pEqn  =  laplacianP == divUPred;
-    pEqn.constrain(theMesh, pBCs);
-    p = pEqn.solve(pSolver, pOld);
-
+        output << uNodeValue[i].x << "\t" << uNodeValue[i].y << "\t" << DeltaPValue[i] << "\n";
+    }
+    output.close();
 
     return 0;
 }

@@ -22,7 +22,13 @@ public:
     // ScalarField methods
     void initialize(int length);
     double max();
+    double maxAbs();
+    double mag();
     friend ScalarField operator-(const ScalarField& field1, const ScalarField& field2);
+    friend ScalarField operator+(const ScalarField& field1, const ScalarField& field2);
+    friend double operator*(const ScalarField& field1, const ScalarField& field2);
+    friend ScalarField operator*(const double& k, const ScalarField& field);
+    double operator[](int index) const;
 };
 
 

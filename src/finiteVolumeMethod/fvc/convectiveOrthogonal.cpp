@@ -2,7 +2,7 @@
 // Created by ruben on 26/11/23.
 //
 
-#include "convectiveOrthogonal.h"
+#include "fvc.h"
 #include "../../interpolation/convectiveSchemes/convectiveSchemesOrthogonal.h"
 
 
@@ -10,7 +10,6 @@ VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField
 
     // Auxiliary variables
     int iOwner, iNeighbour, iOwnerFar, iNeighbourFar, iPeriodicFace, iHalo;
-    double gf, mDotVal;
     Node pOwner, pNeighbour, pOwnerFar, pNeighbourFar, pF;
     GeometricVector PhiF, PhiOwner, PhiNeighbour, PhiOwnerFar, PhiNeighbourFar, PhiHalo, Sf, BCValue;
     std::string BCType;
@@ -24,7 +23,6 @@ VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField
     // Loop over all the interior faces
     for (int i = 0; i < theMesh.nInteriorFaces; ++i) {
 
-        gf = theMesh.faces[i].gf;
         Sf = theMesh.faces[i].Sf;
 
         iOwner = theMesh.faces[i].iOwner;
@@ -43,14 +41,11 @@ VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField
         PhiOwnerFar = Phi[iOwnerFar];
         PhiNeighbourFar = Phi[iNeighbourFar];
 
-        PhiF = gf*PhiOwner + (1 - gf)*PhiNeighbour;
-        mDotVal = 1*PhiF*Sf;
-
         PhiF = convectiveSchemesOrthogonal(PhiOwner, pOwner, PhiOwnerFar, pOwnerFar, PhiNeighbour, pNeighbour, PhiNeighbourFar,
-                                            pNeighbourFar, pF, mDotVal, Sf, scheme);
+                                            pNeighbourFar, pF, mDot[i], Sf, scheme);
 
-        convective.field[iOwner] += mDotVal*PhiF;
-        convective.field[iNeighbour] -= mDotVal*PhiF;
+        convective.field[iOwner] += mDot[i]*PhiF;
+        convective.field[iNeighbour] -= mDot[i]*PhiF;
     }
 
 
@@ -63,19 +58,15 @@ VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField
         // Loop over all the boundary faces of the k boundary
         for (int i = theMesh.boundaries[k].startFace; i < theMesh.boundaries[k].startFace + theMesh.boundaries[k].nBoundaryFaces; ++i) {
 
-            Sf = theMesh.faces[i].Sf;
-            iOwner = theMesh.faces[i].iOwner;
-
             if (BCType == "fixedValue") {
 
                 PhiF = BCValue;
-                mDotVal = 1*PhiF*Sf;
             } else if (BCType == "zeroGradient") {
 
                 PhiF = Phi[iOwner];
-                mDotVal = 1*PhiF*Sf;
             } else if (BCType == "periodic") {
 
+                iOwner = theMesh.faces[i].iOwner;
                 iPeriodicFace = theMesh.faces[i].iPeriodicFace;
                 iHalo = theMesh.faces[iPeriodicFace].iOwner;
 
@@ -83,15 +74,12 @@ VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField
                 PhiHalo = Phi[iHalo];
 
                 PhiF = 0.5*(PhiOwner + PhiHalo);
-                mDotVal = 1*PhiF*Sf;
-
             } else {
 
                 PhiF = {0,0,0};
-                mDotVal = 0;
             }
 
-            convective.field[iOwner] += mDotVal*PhiF;
+            convective.field[iOwner] += mDot[i]*PhiF;
         }
     }
 

@@ -4,6 +4,8 @@
 
 #include "FvScalarEquation.h"
 #include "../../math/linearSolver/BiCGSTAB/solveBiCGSTAB.h"
+#include "../../math/linearSolver/SOR/solveSOR.h"
+
 
 
 ScalarField FvScalarEquation::solve(const LinearSolverConfig& theLinearSolverConfig, const ScalarField& PhiOld) {
@@ -11,6 +13,9 @@ ScalarField FvScalarEquation::solve(const LinearSolverConfig& theLinearSolverCon
     if (theLinearSolverConfig.solver == "BiCGSTAB") {
 
         return solveBiCGSTAB(A, b, theLinearSolverConfig, PhiOld);
+    } else if (theLinearSolverConfig.solver == "SOR") {
+
+        return solveSOR(A, b, theLinearSolverConfig, PhiOld);
     } else {
 
         printf("ERROR. Incorrect solver selected!! \n");

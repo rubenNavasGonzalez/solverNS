@@ -2,7 +2,7 @@
 // Created by ruben on 27/11/23.
 //
 
-#include "laplacianOrthogonal.h"
+#include "fvc.h"
 
 
 VectorField fvc::laplacianOrthogonal(const VectorField& Phi, const PolyMesh& theMesh, const VectorBoundaryConditions& PhiBCs) {

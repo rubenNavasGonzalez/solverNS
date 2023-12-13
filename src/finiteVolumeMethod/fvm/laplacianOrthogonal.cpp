@@ -2,7 +2,7 @@
 // Created by ruben on 6/12/23.
 //
 
-#include "laplacianOrthogonal.h"
+#include "fvm.h"
 
 
 SparseMatrix fvm::laplacianOrthogonal(const PolyMesh& theMesh) {
@@ -14,8 +14,10 @@ SparseMatrix fvm::laplacianOrthogonal(const PolyMesh& theMesh) {
 
     // Preallocate the laplacian field
     SparseMatrix laplacian;
-    laplacian.nRows = theMesh.nElements;
-    laplacian.nCols = theMesh.nElements;
+    /*laplacian.nRows = theMesh.nElements;
+    laplacian.nCols = theMesh.nElements;*/
+    laplacian.nRows = theMesh.nInteriorElements;
+    laplacian.nCols = theMesh.nInteriorElements;
     laplacian.diagIndex.resize(theMesh.nInteriorElements);
     laplacian.diagValue.resize(theMesh.nInteriorElements);
 
@@ -32,11 +34,11 @@ SparseMatrix fvm::laplacianOrthogonal(const PolyMesh& theMesh) {
         coeffValue = SfMag/dONMag;
 
         laplacian.diagIndex[iOwner] = {iOwner, iOwner};
-        laplacian.diagValue[iOwner] += coeffValue;
+        laplacian.diagValue[iOwner] -= coeffValue;
         laplacian.addValue(coeffValue, {iOwner, iNeighbour});
 
         laplacian.diagIndex[iNeighbour] = {iNeighbour, iNeighbour};
-        laplacian.diagValue[iNeighbour] += coeffValue;
+        laplacian.diagValue[iNeighbour] -= coeffValue;
         laplacian.addValue(coeffValue, {iNeighbour, iOwner});
     }
 

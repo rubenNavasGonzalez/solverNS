@@ -11,7 +11,7 @@ if (NOT CMAKE_BUILD_TYPE)
 endif ()
 
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/app)
-#SET(CMAKE_CXX_FLAGS "-O3")
+#SET(CMAKE_CXX_FLAGS "-Ofast")
 
 add_executable(flowBetweenFlatPlates app/main.cpp
         src/mesh/node/Node.cpp
@@ -52,9 +52,7 @@ add_executable(flowBetweenFlatPlates app/main.cpp
         src/boundaryConditions/scalarBoundaryConditions/ScalarBoundaryConditions.h
         src/boundaryConditions/scalarBoundaryConditions/addBC.cpp
         src/finiteVolumeMethod/fvc/convectiveOrthogonal.cpp
-        src/finiteVolumeMethod/fvc/convectiveOrthogonal.h
         src/finiteVolumeMethod/fvc/laplacianOrthogonal.cpp
-        src/finiteVolumeMethod/fvc/laplacianOrthogonal.h
         src/interpolation/convectiveSchemes/convectiveSchemesOrthogonal.cpp
         src/interpolation/convectiveSchemes/convectiveSchemesOrthogonal.h
         src/interpolation/convectiveSchemes/interpolateUDS.cpp
@@ -66,7 +64,6 @@ add_executable(flowBetweenFlatPlates app/main.cpp
         src/interpolation/convectiveSchemes/interpolateSMART_Orthogonal.cpp
         src/interpolation/convectiveSchemes/interpolateSP.cpp
         src/finiteVolumeMethod/fvc/divergence.cpp
-        src/finiteVolumeMethod/fvc/divergence.h
         src/fields/scalarField/max.cpp
         src/math/sparseMatrix/SparseMatrix.cpp
         src/math/sparseMatrix/SparseMatrix.h
@@ -75,11 +72,19 @@ add_executable(flowBetweenFlatPlates app/main.cpp
         src/finiteVolumeMethod/fvScalarEquation/FvScalarEquation.cpp
         src/finiteVolumeMethod/fvScalarEquation/FvScalarEquation.h
         src/finiteVolumeMethod/fvm/laplacianOrthogonal.cpp
-        src/finiteVolumeMethod/fvm/laplacianOrthogonal.h
         src/finiteVolumeMethod/fvScalarEquation/constrain.cpp
         src/finiteVolumeMethod/fvScalarEquation/solve.cpp
         src/math/linearSolver/BiCGSTAB/solveBiCGSTAB.cpp
         src/math/linearSolver/BiCGSTAB/solveBiCGSTAB.h
         src/math/linearSolver/linearSolverConfig/LinearSolverConfig.cpp
         src/math/linearSolver/linearSolverConfig/LinearSolverConfig.h
+        src/fields/scalarField/maxAbs.cpp
+        src/finiteVolumeMethod/fvc/gradient.cpp
+        src/finiteVolumeMethod/fvm/fvm.h
+        src/finiteVolumeMethod/fvc/fvc.h
+        src/interpolation/interpolateMDotFromElements2Faces/RhieChowInterpolation.cpp
+        src/interpolation/interpolateMDotFromElements2Faces/RhieChowInterpolation.h
+        src/math/linearSolver/SOR/solveSOR.cpp
+        src/math/linearSolver/SOR/solveSOR.h
+        src/fields/scalarField/mag.cpp
 )

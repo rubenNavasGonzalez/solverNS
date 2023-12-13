@@ -1,9 +1,9 @@
 //
-// Created by ruben on 6/12/23.
+// Created by ruben on 7/12/23.
 //
 
-//#ifndef FLOWBETWEENFLATPLATES_LAPLACIANORTHOGONAL_H
-//#define FLOWBETWEENFLATPLATES_LAPLACIANORTHOGONAL_H
+#ifndef FLOWBETWEENFLATPLATES_FVM_H
+#define FLOWBETWEENFLATPLATES_FVM_H
 
 #include "../../math/sparseMatrix/SparseMatrix.h"
 #include "../../mesh/polyMesh/PolyMesh.h"
@@ -15,4 +15,4 @@ namespace fvm {
     SparseMatrix laplacianOrthogonal(const PolyMesh& theMesh);
 }
 
-//#endif //FLOWBETWEENFLATPLATES_LAPLACIANORTHOGONAL_H
+#endif //FLOWBETWEENFLATPLATES_FVM_H
