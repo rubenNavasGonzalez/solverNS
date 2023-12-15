@@ -22,6 +22,7 @@ public:
     // ScalarField methods
     void initialize(int length);
     double max();
+    double min();
     double maxAbs();
     double mag();
     friend ScalarField operator-(const ScalarField& field1, const ScalarField& field2);

@@ -87,4 +87,7 @@ add_executable(flowBetweenFlatPlates app/main.cpp
         src/math/linearSolver/SOR/solveSOR.cpp
         src/math/linearSolver/SOR/solveSOR.h
         src/fields/scalarField/mag.cpp
+        src/interpolation/temporalAdvancement/computeTimeStepOrthogonal.cpp
+        src/interpolation/temporalAdvancement/computeTimeStepOrthogonal.h
+        src/fields/scalarField/min.cpp
 )

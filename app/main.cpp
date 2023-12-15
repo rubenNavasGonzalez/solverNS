@@ -1,5 +1,6 @@
 #include <cmath>
 #include <fstream>
+#include "../src/interpolation/temporalAdvancement/computeTimeStepOrthogonal.h"
 #include "../src/finiteVolumeMethod/fvc/fvc.h"
 #include "../src/finiteVolumeMethod/fvm/fvm.h"
 #include "../src/finiteVolumeMethod/fvScalarEquation/FvScalarEquation.h"
@@ -7,8 +8,8 @@
 
 
 //Mesh parameters
-double Lx = 1, Ly = 1, Lz = 1;
-int Nx = 128, Ny = 128, Nz = 1;
+double Lx = 10, Ly = 1, Lz = 1;
+int Nx = 32, Ny = 32, Nz = 1;
 double sx = 0, sy = 0, sz = 0;
 
 
@@ -22,7 +23,7 @@ int main() {
 
 
     double t = 0;
-    double DeltaT = 0.00075;
+    double DeltaT;
     double nu = 0.01;
 
     VectorField u;
@@ -59,7 +60,7 @@ int main() {
         p.field[i] = -0.5*(pow(cos(2*M_PI*theMesh.elements[i].centroid.x),2) + pow(cos(2*M_PI*theMesh.elements[i].centroid.y),2));
     }
 
-    LinearSolverConfig pSolver("BiCGSTAB", "L2", 1e-6, 1e6);
+    LinearSolverConfig pSolver("BiCGSTAB", "L2", 1e-9, 1e6);
 
     VectorField RPrev;
     VectorField uNodeValue;
@@ -70,6 +71,7 @@ int main() {
 
     while (t < 3) {
 
+        DeltaT = computeTimeStepOrthogonal(theMesh, u, nu);
         t += DeltaT;
         printf("\nTime = %f s \n", t);
 
