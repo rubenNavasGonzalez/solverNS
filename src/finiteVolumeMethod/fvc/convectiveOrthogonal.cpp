@@ -58,6 +58,8 @@ VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField
         // Loop over all the boundary faces of the k boundary
         for (int i = theMesh.boundaries[k].startFace; i < theMesh.boundaries[k].startFace + theMesh.boundaries[k].nBoundaryFaces; ++i) {
 
+            iOwner = theMesh.faces[i].iOwner;
+
             if (BCType == "fixedValue") {
 
                 PhiF = BCValue;
@@ -66,7 +68,6 @@ VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField
                 PhiF = Phi[iOwner];
             } else if (BCType == "periodic") {
 
-                iOwner = theMesh.faces[i].iOwner;
                 iPeriodicFace = theMesh.faces[i].iPeriodicFace;
                 iHalo = theMesh.faces[iPeriodicFace].iOwner;
 

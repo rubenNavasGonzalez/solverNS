@@ -13,6 +13,7 @@ double computeTimeStepOrthogonal(const PolyMesh& theMesh, const VectorField& u, 
     int iOwner, iNeighbour;
     double SfMag, Vf, DeltaX, uMod;
 
+
     // Preallocate the time-step fields
     ScalarField DeltaT_c, DeltaT_d;
 
@@ -35,10 +36,10 @@ double computeTimeStepOrthogonal(const PolyMesh& theMesh, const VectorField& u, 
         DeltaX = Vf/SfMag;
         uMod = u[iNeighbour].mag();
 
-        DeltaT_c.field.push_back( 0.35*DeltaX/uMod );
-        DeltaT_d.field.push_back( 0.2*pow(DeltaX,2)/nu );
+        DeltaT_c.field.push_back( DeltaX/uMod );
+        DeltaT_d.field.push_back( 0.5*pow(DeltaX,2)/nu );
     }
 
 
-    return std::min(DeltaT_c.min(), DeltaT_d.min());
+    return 0.5*std::min(DeltaT_c.min(), DeltaT_d.min());
 }

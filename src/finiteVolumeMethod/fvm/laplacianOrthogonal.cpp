@@ -14,8 +14,6 @@ SparseMatrix fvm::laplacianOrthogonal(const PolyMesh& theMesh) {
 
     // Preallocate the laplacian field
     SparseMatrix laplacian;
-    /*laplacian.nRows = theMesh.nElements;
-    laplacian.nCols = theMesh.nElements;*/
     laplacian.nRows = theMesh.nInteriorElements;
     laplacian.nCols = theMesh.nInteriorElements;
     laplacian.diagIndex.resize(theMesh.nInteriorElements);

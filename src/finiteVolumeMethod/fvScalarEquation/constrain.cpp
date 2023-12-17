@@ -38,7 +38,7 @@ void FvScalarEquation::constrain(const PolyMesh& theMesh, const ScalarBoundaryCo
                 coeffValue = SfMag/dONMag;
 
                 A.diagValue[iOwner] -= coeffValue/Vf;
-                b.field[iNeighbour] += BCValue;
+                b.field[iNeighbour] -= BCValue;
 
             } else if (BCType == "zeroGradient" || BCType == "empty") {
 
@@ -56,5 +56,5 @@ void FvScalarEquation::constrain(const PolyMesh& theMesh, const ScalarBoundaryCo
         }
     }
 
-    A.diagValue[0] = 1.1*A.diagValue[0];
+    //A.diagValue[0] = 2*A.diagValue[0];
 }
