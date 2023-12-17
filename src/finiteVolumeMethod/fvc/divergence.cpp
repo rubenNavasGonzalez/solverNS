@@ -16,7 +16,7 @@ ScalarField fvc::divergence(const VectorField& Phi, const PolyMesh& theMesh, con
 
     // Preallocate the divergence field
     ScalarField divergence;
-    divergence.initialize(theMesh.nInteriorElements);
+    divergence.assign(theMesh.nInteriorElements, 0);
 
 
     // Loop over all the interior faces
@@ -28,13 +28,13 @@ ScalarField fvc::divergence(const VectorField& Phi, const PolyMesh& theMesh, con
         iOwner = theMesh.faces[i].iOwner;
         iNeighbour = theMesh.faces[i].iNeighbour;
 
-        PhiOwner = Phi.field[iOwner];
-        PhiNeighbour = Phi.field[iNeighbour];
+        PhiOwner = Phi[iOwner];
+        PhiNeighbour = Phi[iNeighbour];
 
         PhiF = gf*PhiOwner + (1 - gf)*PhiNeighbour;
 
-        divergence.field[iOwner] += PhiF*Sf;
-        divergence.field[iNeighbour] -= PhiF*Sf;
+        divergence[iOwner] += PhiF*Sf;
+        divergence[iNeighbour] -= PhiF*Sf;
     }
 
 
@@ -55,14 +55,14 @@ ScalarField fvc::divergence(const VectorField& Phi, const PolyMesh& theMesh, con
                 PhiF = BCValue;
             } else if (BCType == "zeroGradient") {
 
-                PhiF = Phi.field[iOwner];
+                PhiF = Phi[iOwner];
             } else if (BCType == "periodic") {
 
                 iPeriodicFace = theMesh.faces[i].iPeriodicFace;
                 iHalo = theMesh.faces[iPeriodicFace].iOwner;
 
-                PhiOwner = Phi.field[iOwner];
-                PhiHalo = Phi.field[iHalo];
+                PhiOwner = Phi[iOwner];
+                PhiHalo = Phi[iHalo];
 
                 PhiF = 0.5*(PhiOwner + PhiHalo);
 
@@ -71,7 +71,7 @@ ScalarField fvc::divergence(const VectorField& Phi, const PolyMesh& theMesh, con
                 PhiF = {0,0,0};
             }
 
-            divergence.field[iOwner] += PhiF*Sf;
+            divergence[iOwner] += PhiF*Sf;
         }
     }
 
@@ -79,7 +79,7 @@ ScalarField fvc::divergence(const VectorField& Phi, const PolyMesh& theMesh, con
     // Loop over all the interior elements
     for (int i = 0; i < theMesh.nInteriorElements; ++i) {
 
-        divergence.field[i] /= theMesh.elements[i].Vf;
+        divergence[i] /= theMesh.elements[i].Vf;
     }
 
 

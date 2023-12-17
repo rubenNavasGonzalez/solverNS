@@ -8,5 +8,5 @@
 
 double ScalarField::max() {
 
-    return *std::max_element(field.begin(), field.end());
+    return *std::max_element(begin(), end());
 }

@@ -17,7 +17,7 @@ VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField
 
     // Preallocate the divergence field
     VectorField convective;
-    convective.initialize(theMesh.nElements);
+    convective.assign(theMesh.nInteriorElements, {0,0,0});
 
 
     // Loop over all the interior faces
@@ -44,8 +44,8 @@ VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField
         PhiF = convectiveSchemesOrthogonal(PhiOwner, pOwner, PhiOwnerFar, pOwnerFar, PhiNeighbour, pNeighbour, PhiNeighbourFar,
                                             pNeighbourFar, pF, mDot[i], Sf, scheme);
 
-        convective.field[iOwner] += mDot[i]*PhiF;
-        convective.field[iNeighbour] -= mDot[i]*PhiF;
+        convective[iOwner] += mDot[i]*PhiF;
+        convective[iNeighbour] -= mDot[i]*PhiF;
     }
 
 
@@ -80,7 +80,7 @@ VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField
                 PhiF = {0,0,0};
             }
 
-            convective.field[iOwner] += mDot[i]*PhiF;
+            convective[iOwner] += mDot[i]*PhiF;
         }
     }
 
@@ -88,17 +88,7 @@ VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField
     // Loop over all the interior elements
     for (int i = 0; i < theMesh.nInteriorElements; ++i) {
 
-        convective.field[i] /= theMesh.elements[i].Vf;
-    }
-
-
-    // Loop over all the boundary faces
-    for (int i = theMesh.nInteriorFaces; i < theMesh.nFaces; ++i) {
-
-        iOwner = theMesh.faces[i].iOwner;
-        iNeighbour = theMesh.faces[i].iNeighbour;
-
-        convective.field[iNeighbour] = convective[iOwner];
+        convective[i] /= theMesh.elements[i].Vf;
     }
 
 

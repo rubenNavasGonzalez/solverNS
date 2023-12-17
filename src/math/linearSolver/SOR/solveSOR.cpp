@@ -18,12 +18,12 @@ ScalarField solveSOR(const SparseMatrix& A, const ScalarField& b, const LinearSo
 
     bool iterate = true;
     while (iterate) {
-        for (int i = 0; i < x.field.size(); ++i) {
+        for (int i = 0; i < x.size(); ++i) {
             xi = 0;
             if ( !A.upperValue.empty() ) {
                 for (int j = 0; j < A.upperValue.size(); ++j) {
                     if ( A.upperIndex[j][0] == i ) {
-                        xi += A.upperValue[j]*x.field[ A.upperIndex[j][1] ];
+                        xi += A.upperValue[j]*x[ A.upperIndex[j][1] ];
                     }
                 }
             }
@@ -37,13 +37,13 @@ ScalarField solveSOR(const SparseMatrix& A, const ScalarField& b, const LinearSo
             if ( !A.lowerValue.empty() ) {
                 for (int j = 0; j < A.lowerValue.size(); ++j) {
                     if ( A.lowerIndex[j][0] == i ) {
-                        xi += A.lowerValue[j]*x.field[ A.lowerIndex[j][1] ];
+                        xi += A.lowerValue[j]*x[ A.lowerIndex[j][1] ];
                     }
                 }
             }
 
-            xi = 1/aii*(b.field[i] - xi);
-            x.field[i] = xi;
+            xi = 1/aii*(b[i] - xi);
+            x[i] = xi;
         }
         numberOfIterations++;
 
@@ -64,6 +64,7 @@ ScalarField solveSOR(const SparseMatrix& A, const ScalarField& b, const LinearSo
             x0 = x;
         }
     }
+
 
     return x;
 }

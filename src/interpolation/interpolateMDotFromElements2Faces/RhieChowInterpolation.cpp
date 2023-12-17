@@ -17,7 +17,7 @@ ScalarField RhieChowInterpolation(const VectorField& u, const ScalarField& p, co
 
     // Preallocate mass flow field
     ScalarField mDot;
-    mDot.initialize(theMesh.nFaces);
+    mDot.assign(theMesh.nFaces, 0);
 
 
     // Compute the pressure gradient
@@ -40,7 +40,7 @@ ScalarField RhieChowInterpolation(const VectorField& u, const ScalarField& p, co
         gradPF = gf*gradP[iOwner] + (1 - gf)*gradP[iNeighbour];
         mDotCorr = DeltaT*(gradPF*Sf - (p[iNeighbour] - p[iOwner])/dONMag*Sf.mag());
 
-        mDot.field[i] = mDotAvg + mDotCorr;
+        mDot[i] = mDotAvg + mDotCorr;
     }
 
 
@@ -59,10 +59,10 @@ ScalarField RhieChowInterpolation(const VectorField& u, const ScalarField& p, co
 
             if (BCType == "fixedValue") {
 
-                mDot.field[i] = 1*BCValue*Sf;
+                mDot[i] = 1*BCValue*Sf;
             } else if (BCType == "zeroGradient") {
 
-                mDot.field[i] = 1*u[iOwner]*Sf;
+                mDot[i] = 1*u[iOwner]*Sf;
             } else if (BCType == "periodic") {
 
                 iPeriodicFace = theMesh.faces[i].iPeriodicFace;
@@ -74,11 +74,11 @@ ScalarField RhieChowInterpolation(const VectorField& u, const ScalarField& p, co
                 gradPF = 0.5*(gradP[iOwner] + gradP[iHalo]);
                 mDotCorr = DeltaT*(gradPF*Sf - (p[iHalo] - p[iOwner])/(2*dONMag)*Sf.mag());
 
-                mDot.field[i] = mDotAvg + mDotCorr;
+                mDot[i] = mDotAvg + mDotCorr;
 
             } else {
 
-                mDot.field[i] = 0;
+                mDot[i] = 0;
             }
         }
     }

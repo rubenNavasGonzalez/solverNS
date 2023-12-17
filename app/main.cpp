@@ -26,7 +26,7 @@ int main() {
     double nu = 0.01;
 
     VectorField u;
-    u.initialize(theMesh.nInteriorElements);
+    u.assign(theMesh.nInteriorElements, {0,0,0});
 
     VectorBoundaryConditions uBCs;
     uBCs.addBC("fixedValue", {1,0,0});
@@ -36,15 +36,8 @@ int main() {
     uBCs.addBC("periodic", {0,0,0});
     uBCs.addBC("periodic", {0,0,0});
 
-    /*for (int i = 0; i < theMesh.nInteriorElements; ++i) {
-
-        u.field[i].x = cos(2*M_PI*theMesh.elements[i].centroid.x)*sin(2*M_PI*theMesh.elements[i].centroid.y);
-        u.field[i].y = -sin(2*M_PI*theMesh.elements[i].centroid.x)*cos(2*M_PI*theMesh.elements[i].centroid.y);
-        u.field[i].z = 0;
-    }*/
-
     ScalarField p;
-    p.initialize(theMesh.nInteriorElements);
+    p.assign(theMesh.nInteriorElements, 0);
 
     ScalarBoundaryConditions pBCs;
     pBCs.addBC("zeroGradient", 0);
@@ -54,10 +47,6 @@ int main() {
     pBCs.addBC("periodic", 0);
     pBCs.addBC("periodic", 0);
 
-    /*for (int i = 0; i < theMesh.nInteriorElements; ++i) {
-
-        p.field[i] = -0.5*(pow(cos(2*M_PI*theMesh.elements[i].centroid.x),2) + pow(cos(2*M_PI*theMesh.elements[i].centroid.y),2));
-    }*/
 
     LinearSolverConfig pSolver("BiCGSTAB", "L2", 1e-6, 1e6);
 
@@ -105,12 +94,22 @@ int main() {
 
 
     int NxHalf = Nx/2;
+    int NyHalf = Ny/2;
     int NzHalf = Nz/2;
+
     std::ofstream output;
-    output.open ("data.txt");
+    output.open ("dataU.txt");
     for (int i = 0; i < Ny; ++i) {
 
         output << u[Nx*Ny*NzHalf + Nx*i + NxHalf - 1].x << "\n";
+    }
+    output.close();
+
+    std::ofstream output2;
+    output.open ("dataP.txt");
+    for (int i = 0; i < Ny; ++i) {
+
+        output << p[Nx*Ny*NzHalf + Nx*NyHalf + i - 1] << "\n";
     }
     output.close();
 

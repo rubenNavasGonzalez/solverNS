@@ -16,8 +16,7 @@ VectorField fvc::gradient(const ScalarField& Phi, const PolyMesh& theMesh, const
 
     // Preallocate the gradient field
     VectorField gradient;
-    //gradient.initialize(theMesh.nElements);
-    gradient.initialize(theMesh.nInteriorElements);
+    gradient.assign(theMesh.nInteriorElements, {0,0,0});
 
 
     // Loop over all the interior faces
@@ -34,8 +33,8 @@ VectorField fvc::gradient(const ScalarField& Phi, const PolyMesh& theMesh, const
 
         PhiF = gf*PhiOwner + (1 - gf)*PhiNeighbour;
 
-        gradient.field[iOwner] += PhiF*Sf;
-        gradient.field[iNeighbour] -= PhiF*Sf;
+        gradient[iOwner] += PhiF*Sf;
+        gradient[iNeighbour] -= PhiF*Sf;
     }
 
 
@@ -72,7 +71,7 @@ VectorField fvc::gradient(const ScalarField& Phi, const PolyMesh& theMesh, const
                 PhiF = 0;
             }
 
-            gradient.field[iOwner] += PhiF*Sf;
+            gradient[iOwner] += PhiF*Sf;
         }
     }
 
@@ -80,18 +79,8 @@ VectorField fvc::gradient(const ScalarField& Phi, const PolyMesh& theMesh, const
     // Loop over all the interior elements
     for (int i = 0; i < theMesh.nInteriorElements; ++i) {
 
-        gradient.field[i] /= theMesh.elements[i].Vf;
+        gradient[i] /= theMesh.elements[i].Vf;
     }
-
-
-    // Loop over all the boundary faces
-    /*for (int i = theMesh.nInteriorFaces; i < theMesh.nFaces; ++i) {
-
-        iOwner = theMesh.faces[i].iOwner;
-        iNeighbour = theMesh.faces[i].iNeighbour;
-
-        gradient.field[iNeighbour] = gradient[iOwner];
-    }*/
 
 
     return gradient;

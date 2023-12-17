@@ -20,6 +20,7 @@ GeometricVector::GeometricVector(double x_, double y_, double z_) {
 
 // GeometricVector magnitude
 double GeometricVector::mag() {
+
     return sqrt(x*x + y*y + z*z);
 }
 

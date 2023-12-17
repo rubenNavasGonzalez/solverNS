@@ -10,9 +10,9 @@ double ScalarField::mag() {
 
     double sum = 0;
 
-    for (int i = 0; i < field.size(); ++i) {
+    for (int i = 0; i < size(); ++i) {
 
-        sum += pow(field[i],2);
+        sum += pow(at(i),2);
     }
 
 

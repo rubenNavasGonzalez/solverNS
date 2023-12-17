@@ -16,7 +16,7 @@ VectorField fvc::laplacianOrthogonal(const VectorField& Phi, const PolyMesh& the
 
     // Preallocate the laplacian field
     VectorField laplacian;
-    laplacian.initialize(theMesh.nElements);
+    laplacian.assign(theMesh.nInteriorElements, {0,0,0});
 
 
     // Loop over all the interior faces
@@ -33,8 +33,8 @@ VectorField fvc::laplacianOrthogonal(const VectorField& Phi, const PolyMesh& the
 
         DivPhiF = (PhiNeighbour - PhiOwner)/dONMag;
 
-        laplacian.field[iOwner] += DivPhiF*SfMag;
-        laplacian.field[iNeighbour] -= DivPhiF*SfMag;
+        laplacian[iOwner] += DivPhiF*SfMag;
+        laplacian[iNeighbour] -= DivPhiF*SfMag;
     }
 
 
@@ -73,7 +73,7 @@ VectorField fvc::laplacianOrthogonal(const VectorField& Phi, const PolyMesh& the
                 printf("ERROR. No correct boundary condition type selected !!\n");
             }
 
-            laplacian.field[iOwner] += DivPhiF*SfMag;
+            laplacian[iOwner] += DivPhiF*SfMag;
         }
     }
 
@@ -81,16 +81,7 @@ VectorField fvc::laplacianOrthogonal(const VectorField& Phi, const PolyMesh& the
     // Loop over all the interior elements
     for (int i = 0; i < theMesh.nInteriorElements; ++i) {
 
-        laplacian.field[i] /= theMesh.elements[i].Vf;
-    }
-
-    // Loop over all the boundary faces
-    for (int i = theMesh.nInteriorFaces; i < theMesh.nFaces; ++i) {
-
-        iOwner = theMesh.faces[i].iOwner;
-        iNeighbour = theMesh.faces[i].iNeighbour;
-
-        laplacian.field[iNeighbour] = laplacian[iOwner];
+        laplacian[i] /= theMesh.elements[i].Vf;
     }
 
 

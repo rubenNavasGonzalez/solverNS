@@ -11,6 +11,7 @@ double computeTimeStepOrthogonal(const PolyMesh& theMesh, const VectorField& u, 
 
     // Auxiliary variables
     int iOwner, iNeighbour;
+    GeometricVector uElement;
     double SfMag, Vf, DeltaX, uMod;
 
 
@@ -27,17 +28,19 @@ double computeTimeStepOrthogonal(const PolyMesh& theMesh, const VectorField& u, 
         SfMag = theMesh.faces[i].SfMag;
         Vf = theMesh.elements[iOwner].Vf;
         DeltaX = Vf/SfMag;
-        uMod = u[iOwner].mag();
+        uElement = u[iOwner];
+        uMod = uElement.mag();
 
-        DeltaT_c.field.push_back( 0.35*DeltaX/uMod );
-        DeltaT_d.field.push_back( 0.2*pow(DeltaX,2)/nu );
+        DeltaT_c.push_back( 0.35*DeltaX/uMod );
+        DeltaT_d.push_back( 0.2*pow(DeltaX,2)/nu );
 
         Vf = theMesh.elements[iNeighbour].Vf;
         DeltaX = Vf/SfMag;
-        uMod = u[iNeighbour].mag();
+        uElement = u[iNeighbour];
+        uMod = uElement.mag();
 
-        DeltaT_c.field.push_back( DeltaX/uMod );
-        DeltaT_d.field.push_back( 0.5*pow(DeltaX,2)/nu );
+        DeltaT_c.push_back( DeltaX/uMod );
+        DeltaT_d.push_back( 0.5*pow(DeltaX,2)/nu );
     }
 
 

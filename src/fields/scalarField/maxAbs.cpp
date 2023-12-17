@@ -10,13 +10,14 @@ double ScalarField::maxAbs() {
 
     double max = 0;
 
-    for (int i = 0; i < field.size(); ++i) {
+    for (int i = 0; i < size(); ++i) {
 
-        if ( max < fabs(field[i]) ) {
+        if ( max < fabs(at(i)) ) {
 
-            max = fabs(field[i]);
+            max = fabs(at(i));
         }
     }
+
 
     return max;
 }

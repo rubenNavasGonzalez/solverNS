@@ -19,6 +19,7 @@ public:
 
 
     // GeometricVector methods
+public:
     double mag();
     GeometricVector& operator=(const GeometricVector& v);
     friend GeometricVector operator+(const GeometricVector& v1, const GeometricVector& v2);

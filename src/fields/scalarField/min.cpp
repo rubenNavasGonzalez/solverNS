@@ -8,5 +8,5 @@
 
 double ScalarField::min() {
 
-    return *std::min_element(field.begin(), field.end());
+    return *std::min_element(begin(), end());
 }

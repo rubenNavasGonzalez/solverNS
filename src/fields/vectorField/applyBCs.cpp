@@ -5,6 +5,7 @@
 #include "VectorField.h"
 
 
+/*
 void VectorField::applyBCs(const PolyMesh& theMesh, const VectorBoundaryConditions& PhiBCs) {
 
     // Variables preallocation
@@ -51,4 +52,4 @@ void VectorField::applyBCs(const PolyMesh& theMesh, const VectorBoundaryConditio
             }
         }
     }
-}
+}*/
