@@ -7,8 +7,8 @@
 
 
 // Mesh parameters
-double Lx = 5, Ly = 1, Lz = 1;
-int Nx = 128, Ny = 16, Nz = 4;
+double Lx = 10, Ly = 1, Lz = 1;
+int Nx = 128, Ny = 32, Nz = 8;
 double sx = 0, sy = 0, sz = 0;
 
 
@@ -23,7 +23,7 @@ int main() {
 
     double t = 0;
     double DeltaT;
-    double nu = 0.01;
+    double nu = 0.05;
 
     VectorField u;
     u.assign(theMesh.nInteriorElements, {0,0,0});
@@ -87,6 +87,7 @@ int main() {
         ScalarField divUNew = fvc::divergence(uNew, theMesh, uBCs);
         printf("\n\tThe maximum value of divUNew is: %E \n", divUNew.max());
 
+
         u = uNew;
         p = pNew;
         RPrev = R;
@@ -101,15 +102,15 @@ int main() {
     output.open ("dataU.txt");
     for (int i = 0; i < Ny; ++i) {
 
-        output << u[Nx*Ny*NzHalf + Nx*i + NxHalf - 1].x << "\n";
+        output << u[Nx*Ny*NzHalf + Nx*i + NxHalf].x << "\n";
     }
     output.close();
 
     std::ofstream output2;
     output.open ("dataP.txt");
-    for (int i = 0; i < Ny; ++i) {
+    for (int i = 0; i < Nx; ++i) {
 
-        output << p[Nx*Ny*NzHalf + Nx*NyHalf + i - 1] << "\n";
+        output << p[Nx*Ny*NzHalf + Nx*NyHalf + i] << "\n";
     }
     output.close();
 
