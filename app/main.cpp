@@ -8,7 +8,7 @@
 
 // Mesh parameters
 double Lx = 10, Ly = 1, Lz = 1;
-int Nx = 128, Ny = 32, Nz = 8;
+int Nx = 128, Ny = 16, Nz = 8;
 double sx = 0, sy = 0, sz = 0;
 
 
@@ -18,7 +18,6 @@ int main() {
     PolyMesh theMesh;
     theMesh.generatePolyMesh(Lx, Ly, Lz, Nx, Ny, Nz, sx, sy, sz);
     theMesh.generateBoundaryMesh(Nx, Ny, Nz);
-    theMesh.writeMesh2VTK("simResults");
 
 
     double t = 0;
@@ -93,24 +92,25 @@ int main() {
         RPrev = R;
     }
 
+    u.writeVectorField2VTK("U", theMesh, uBCs);
 
-    int NxHalf = Nx/2;
-    int NyHalf = Ny/2;
-    int NzHalf = Nz/2;
+    int NxHalf = Nx / 2;
+    int NyHalf = Ny / 2;
+    int NzHalf = Nz / 2;
 
     std::ofstream output;
-    output.open ("dataU.txt");
+    output.open("dataU.txt");
     for (int i = 0; i < Ny; ++i) {
 
-        output << u[Nx*Ny*NzHalf + Nx*i + NxHalf].x << "\n";
+        output << u[Nx * Ny * NzHalf + Nx * i + NxHalf].x << "\n";
     }
     output.close();
 
     std::ofstream output2;
-    output.open ("dataP.txt");
+    output.open("dataP.txt");
     for (int i = 0; i < Nx; ++i) {
 
-        output << p[Nx*Ny*NzHalf + Nx*NyHalf + i] << "\n";
+        output << p[Nx * Ny * NzHalf + Nx * NyHalf + i] << "\n";
     }
     output.close();
 

@@ -90,4 +90,7 @@ add_executable(flowBetweenFlatPlates app/main.cpp
         src/interpolation/temporalAdvancement/computeTimeStepOrthogonal.cpp
         src/interpolation/temporalAdvancement/computeTimeStepOrthogonal.h
         src/fields/scalarField/min.cpp
+        src/interpolation/interpolateFromElements2Nodes/interpolateVectorFieldFromElements2Nodes.cpp
+        src/interpolation/interpolateFromElements2Nodes/interpolateVectorFieldFromElements2Nodes.h
+        src/fields/vectorField/writeVectorField2VTK.cpp
 )

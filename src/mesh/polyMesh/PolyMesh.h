@@ -34,7 +34,7 @@ public:
     // Generate boundary mesh (it must be used after the internal mesh generation)
     void generateBoundaryMesh(int Nx, int Ny, int Nz);
     // Write the mesh to a .VTK file
-    void writeMesh2VTK(const std::string& filename);
+    void writeMesh2VTK(const std::string& filename) const;
 };
 
 

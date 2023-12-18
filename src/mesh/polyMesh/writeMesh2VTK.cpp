@@ -7,7 +7,7 @@
 #include "PolyMesh.h"
 
 
-void PolyMesh::writeMesh2VTK(const std::string& filename) {
+void PolyMesh::writeMesh2VTK(const std::string& filename) const {
 
     std::ofstream outfile;
     outfile.open(filename + ".vtk");
