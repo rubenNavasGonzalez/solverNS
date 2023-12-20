@@ -6,30 +6,29 @@
 #define FLOWBETWEENFLATPLATES_SCALARFIELD_H
 
 #include <vector>
+#include <string>
+#include "../../boundaryConditions/scalarBoundaryConditions/ScalarBoundaryConditions.h"
+#include "../../mesh/polyMesh/PolyMesh.h"
 
 
 class ScalarField : public std::vector<double> {
 public:
-    // Scalar field
-    //std::vector<double> field;
-
-
     // ScalarField constructor and destructor
     ScalarField();
     ~ScalarField();
 
 
     // ScalarField methods
-    //void initialize(int length);
     double max();
     double min();
     double maxAbs();
     double mag();
+    void writeScalarField2VTK(const std::string& filename, const PolyMesh& theMesh, const ScalarBoundaryConditions& PhiBCs);
     friend ScalarField operator-(const ScalarField& field1, const ScalarField& field2);
     friend ScalarField operator+(const ScalarField& field1, const ScalarField& field2);
     friend double operator*(const ScalarField& field1, const ScalarField& field2);
     friend ScalarField operator*(const double& k, const ScalarField& field);
-    //double operator[](int index) const;
+    friend ScalarField operator/(const ScalarField& field, const double& k);
 };
 
 

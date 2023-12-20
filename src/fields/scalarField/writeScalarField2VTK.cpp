@@ -4,11 +4,11 @@
 
 #include <fstream>
 #include <iostream>
-#include "VectorField.h"
-#include "../../interpolation/interpolateFromElements2Nodes/interpolateVectorFieldFromElements2Nodes.h"
+#include "ScalarField.h"
+#include "../../interpolation/interpolateFromElements2Nodes/interpolateScalarFieldFromElements2Nodes.h"
 
 
-void VectorField::writeVectorField2VTK(const std::string& filename, const PolyMesh& theMesh, const VectorBoundaryConditions& PhiBCs) {
+void ScalarField::writeScalarField2VTK(const std::string &filename, const PolyMesh &theMesh, const ScalarBoundaryConditions &PhiBCs) {
 
     // Write the Mesh into .VTK format
     theMesh.writeMesh2VTK(filename);
@@ -20,23 +20,25 @@ void VectorField::writeVectorField2VTK(const std::string& filename, const PolyMe
 
 
     // Interpolate the values from the elements to the nodes
-    VectorField nodeField = interpolateVectorFieldFromElements2Nodes(*this, theMesh, PhiBCs);
+    ScalarField nodeField = interpolateScalarFieldFromElements2Nodes(*this, theMesh, PhiBCs);
 
 
     // Write cell based and point based fields
     if (outfile.is_open()) {
         // Write the scalar field (cell based)
         /*outfile << "CELL_DATA " << mesh.nElements << "\n";
-        outfile << "VECTORS " + filename + " float" << "\n";
+        outfile << "SCALARS " + filename + " float 1" << "\n";
+        outfile << "LOOKUP_TABLE default" << "\n";
         for (int i = 0; i < mesh.nElements; i++) {
             outfile << field.field[i] << "\n";
         }*/
 
         // Write the scalar field (point based)
         outfile << "POINT_DATA " << theMesh.nNodes << "\n";
-        outfile << "VECTORS " + filename + " float" << "\n";
+        outfile << "SCALARS " + filename + " float 1" << "\n";
+        outfile << "LOOKUP_TABLE default" << "\n";
         for (int i = 0; i < theMesh.nNodes; i++) {
-            outfile << nodeField[i].x << "\t" << nodeField[i].y << "\t" << nodeField[i].z << "\n";
+            outfile << nodeField[i] << "\n";
         }
 
         // Close the file

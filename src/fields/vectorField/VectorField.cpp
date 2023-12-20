@@ -52,3 +52,17 @@ VectorField operator*(const double &k, const VectorField &field) {
 
     return result;
 }
+
+
+VectorField operator/(const VectorField& field, const double& k) {
+
+    VectorField result = field;
+
+    for (int i = 0; i < field.size(); ++i) {
+
+        result[i] = result[i]/k;
+    }
+
+
+    return result;
+}

@@ -12,14 +12,13 @@ class LinearSolverConfig {
 public:
     // Linear solver attributes
     std::string solver;
-    std::string residualNorm;
     double tolerance{};
     int maxIter{};
 
 
     // LinearSolverConfig constructors and destructor
     LinearSolverConfig();
-    LinearSolverConfig(std::string _solver, std::string _residualNorm, double _tolerance, int _maxIter);
+    LinearSolverConfig(std::string _solver, double _tolerance, int _maxIter);
     ~LinearSolverConfig();
 };
 

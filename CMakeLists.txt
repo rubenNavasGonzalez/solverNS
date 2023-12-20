@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(flowBetweenFlatPlates
+project(solverNS
         VERSION 0.0.1
         DESCRIPTION "Incompressible 3D laminar flow passed two parallel flat plates."
         LANGUAGES CXX)
@@ -11,9 +11,9 @@ if (NOT CMAKE_BUILD_TYPE)
 endif ()
 
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/app)
-#SET(CMAKE_CXX_FLAGS "-Ofast")
+SET(CMAKE_CXX_FLAGS "-O3")
 
-add_executable(flowBetweenFlatPlates app/main.cpp
+add_executable(solverNS app/main.cpp
         src/mesh/node/Node.cpp
         src/mesh/node/Node.h
         src/mesh/face/Face.cpp
@@ -44,7 +44,6 @@ add_executable(flowBetweenFlatPlates app/main.cpp
         src/fields/vectorField/initialize.cpp
         src/fields/scalarField/ScalarField.cpp
         src/fields/scalarField/ScalarField.h
-        src/fields/scalarField/initialize.cpp
         src/boundaryConditions/vectorBoundaryConditions/VectorBoundaryConditions.cpp
         src/boundaryConditions/vectorBoundaryConditions/VectorBoundaryConditions.h
         src/boundaryConditions/vectorBoundaryConditions/addBC.cpp
@@ -93,4 +92,8 @@ add_executable(flowBetweenFlatPlates app/main.cpp
         src/interpolation/interpolateFromElements2Nodes/interpolateVectorFieldFromElements2Nodes.cpp
         src/interpolation/interpolateFromElements2Nodes/interpolateVectorFieldFromElements2Nodes.h
         src/fields/vectorField/writeVectorField2VTK.cpp
+        src/interpolation/interpolateFromElements2Nodes/interpolateScalarFieldFromElements2Nodes.cpp
+        src/interpolation/interpolateFromElements2Nodes/interpolateScalarFieldFromElements2Nodes.h
+        src/fields/scalarField/writeScalarField2VTK.cpp
+        src/fields/vectorField/maxAbs.cpp
 )

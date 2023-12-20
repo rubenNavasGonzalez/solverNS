@@ -1,4 +1,4 @@
-#include <fstream>
+#include <cmath>
 #include "../src/interpolation/temporalAdvancement/computeTimeStepOrthogonal.h"
 #include "../src/finiteVolumeMethod/fvc/fvc.h"
 #include "../src/finiteVolumeMethod/fvm/fvm.h"
@@ -6,24 +6,25 @@
 #include "../src/interpolation/interpolateMDotFromElements2Faces/RhieChowInterpolation.h"
 
 
-// Mesh parameters
-double Lx = 10, Ly = 1, Lz = 1;
-int Nx = 128, Ny = 16, Nz = 8;
-double sx = 0, sy = 0, sz = 0;
+int main(int argc, char *argv[]) {
+
+    // Mesh parameters
+    double Lx = 10, Ly = 1, Lz = 1;                                     // Domain size
+    int Nx = 128, Ny = 16, Nz = 8;                                      // Number of elements in each direction
+    double sx = 0, sy = 2, sz = 0;                                      // Hyperbolic tangent mesh spacing
 
 
-int main() {
-
-    // Generation of the mesh
+    // Mesh generation
     PolyMesh theMesh;
-    theMesh.generatePolyMesh(Lx, Ly, Lz, Nx, Ny, Nz, sx, sy, sz);
-    theMesh.generateBoundaryMesh(Nx, Ny, Nz);
+    theMesh.generatePolyMesh(Lx, Ly, Lz, Nx, Ny, Nz, sx, sy, sz);       // Generate internal mesh
+    theMesh.generateBoundaryMesh(Nx, Ny, Nz);                           // Generate boundary mesh
 
 
-    double t = 0;
-    double DeltaT;
-    double nu = 0.05;
+    // Flow properties
+    double nu = 0.05;                                                   // Viscosity
 
+
+    // Velocity field initialization (field and BCs)
     VectorField u;
     u.assign(theMesh.nInteriorElements, {0,0,0});
 
@@ -35,6 +36,8 @@ int main() {
     uBCs.addBC("periodic", {0,0,0});
     uBCs.addBC("periodic", {0,0,0});
 
+
+    // Pressure field initialization (field and BCs)
     ScalarField p;
     p.assign(theMesh.nInteriorElements, 0);
 
@@ -47,72 +50,108 @@ int main() {
     pBCs.addBC("periodic", 0);
 
 
-    LinearSolverConfig pSolver("BiCGSTAB", "L2", 1e-6, 1e6);
+    // Linear solver parameters initialization
+    LinearSolverConfig pSolver("BiCGSTAB", 1e-6, 1e6);
 
-    VectorField RPrev;
+
+    // Transient parameters
+    double t = 0;
+    double tFinal = 10;
+    double DeltaT;
+    double steadyStateCriterion = 1e-3;
 
 
-    while (t < 10) {
+    // Pre-definitions
+    ScalarField mDot, divUPred, pNew, divUNew;
+    VectorField convU, diffU, R, RPrev, uPred, gradP, uNew;
+    SparseMatrix laplacianMatrixP;
+    FvScalarEquation pEqn;
+    double uConvergence, pConvergence;
+    bool temporalIterate = true;
 
+
+
+    // Time loop FSM algorithm
+    while (temporalIterate) {
+
+        // Compute time-step and update time
         DeltaT = computeTimeStepOrthogonal(theMesh, u, nu);
         t += DeltaT;
         printf("\nTime = %f s \n", t);
 
-        ScalarField mDot = RhieChowInterpolation(u, p, theMesh, DeltaT, uBCs, pBCs);
-        VectorField convU = fvc::convectiveOrthogonal(mDot, u, theMesh, uBCs, "CDS");
-        VectorField diffU = fvc::laplacianOrthogonal(u, theMesh, uBCs);
 
-        VectorField R = nu*diffU - convU;
+        // Compute convective and diffusive term explicitly
+        mDot = RhieChowInterpolation(u, p, theMesh, DeltaT, uBCs, pBCs);
+        convU = fvc::convectiveOrthogonal(mDot, u, theMesh, uBCs, "CDS");
+        diffU = fvc::laplacianOrthogonal(u, theMesh, uBCs);
+
+
+        // Compute R field and RPrev field (if first time iteration)
+        R = nu*diffU - convU;
 
         if (t == DeltaT) {
 
             RPrev = R;
         }
 
-        VectorField uPred = u + (DeltaT/1)*(1.5*R - 0.5*RPrev);
 
-        ScalarField divUPred = fvc::divergence(uPred, theMesh, uBCs);
-        SparseMatrix laplacianMatrixU = fvm::laplacianOrthogonal(theMesh);
+        // Compute predictor velocity
+        uPred = u + (DeltaT/1)*(1.5*R - 0.5*RPrev);
 
-        FvScalarEquation pEqn  =  laplacianMatrixU == (1/DeltaT)*divUPred;
+
+        // Compute the divergence of UPred explicitly and the laplacian of the pressure field implicitly
+        divUPred = fvc::divergence(uPred, theMesh, uBCs);
+        laplacianMatrixP = fvm::laplacianOrthogonal(theMesh);
+
+
+        // Assemble and constrain (apply BCs) the Poisson Equation
+        pEqn  =  laplacianMatrixP == (1/DeltaT)*divUPred;
         pEqn.constrain(theMesh, pBCs);
+
+
+        // Solve the Poisson Equation with a linear solver to get the new pressure
         printf("\tSolving Poisson Equation...\n");
-        ScalarField pNew = pEqn.solve(pSolver, p);
-
-        VectorField gradP = fvc::gradient(pNew, theMesh, pBCs);
-
-        VectorField uNew = uPred - (DeltaT/1)*gradP;
-
-        ScalarField divUNew = fvc::divergence(uNew, theMesh, uBCs);
-        printf("\n\tThe maximum value of divUNew is: %E \n", divUNew.max());
+        pNew = pEqn.solve(pSolver, p);
 
 
-        u = uNew;
-        p = pNew;
-        RPrev = R;
+        // Compute the gradient of the new pressure
+        gradP = fvc::gradient(pNew, theMesh, pBCs);
+
+
+        // Compute the new velocity
+        uNew = uPred - (DeltaT/1)*gradP;
+
+
+        // Compute the divergence of the new velocity explicitly and get its maximum-absolute value (to ensure continuity)
+        divUNew = fvc::divergence(uNew, theMesh, uBCs);
+        printf("\tThe maximum value of divUNew is: %E \n", divUNew.max());
+
+
+        // Compute the difference between the new and old maps and get its maximum-absolute value (to ensure temporal convergence)
+        uConvergence = ((uNew - u)/DeltaT).maxAbs();
+        pConvergence = ((pNew - p)/DeltaT).maxAbs();
+        printf("\tThe steady-state convergence parameter is: %E \n", fmax(uConvergence, pConvergence));
+
+
+        // Check if new time iteration is needed
+        if (t > tFinal || fmax(uConvergence, pConvergence) < steadyStateCriterion) {
+
+            temporalIterate = false;
+        } else {
+
+            u = uNew;
+            p = pNew;
+            RPrev = R;
+        }
     }
 
+
+    // Write velocity and pressure fields to a .vtk file
     u.writeVectorField2VTK("U", theMesh, uBCs);
+    p.writeScalarField2VTK("p", theMesh, pBCs);
 
-    int NxHalf = Nx / 2;
-    int NyHalf = Ny / 2;
-    int NzHalf = Nz / 2;
+    printf("Simulation completed!");
 
-    std::ofstream output;
-    output.open("dataU.txt");
-    for (int i = 0; i < Ny; ++i) {
-
-        output << u[Nx * Ny * NzHalf + Nx * i + NxHalf].x << "\n";
-    }
-    output.close();
-
-    std::ofstream output2;
-    output.open("dataP.txt");
-    for (int i = 0; i < Nx; ++i) {
-
-        output << p[Nx * Ny * NzHalf + Nx * NyHalf + i] << "\n";
-    }
-    output.close();
 
     return 0;
 }

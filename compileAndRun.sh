@@ -5,4 +5,4 @@ make
 
 cd ..
 cd app/
-./flowBetweenFlatPlates
+./solverNS

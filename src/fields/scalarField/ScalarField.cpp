@@ -67,9 +67,15 @@ ScalarField operator*(const double &k, const ScalarField &field) {
 }
 
 
-// Operator [] overload
-/*
-double ScalarField::operator[](int index) const {
+ScalarField operator/(const ScalarField& field, const double& k) {
 
-    return field[index];
-}*/
+    ScalarField result = field;
+
+    for (int i = 0; i < field.size(); ++i) {
+
+        result[i] = result[i]/k;
+    }
+
+
+    return result;
+}
