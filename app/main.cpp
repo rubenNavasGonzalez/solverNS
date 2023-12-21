@@ -10,8 +10,8 @@ int main(int argc, char *argv[]) {
 
     // Mesh parameters
     double Lx = 10, Ly = 1, Lz = 1;                                     // Domain size
-    int Nx = 128, Ny = 16, Nz = 8;                                      // Number of elements in each direction
-    double sx = 0, sy = 2, sz = 0;                                      // Hyperbolic tangent mesh spacing
+    int Nx = 128, Ny = 32, Nz = 8;                                      // Number of elements in each direction
+    double sx = 0, sy = 2.5, sz = 0;                                    // Hyperbolic tangent mesh spacing
 
 
     // Mesh generation
