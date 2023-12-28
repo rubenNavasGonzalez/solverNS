@@ -19,6 +19,8 @@ namespace fvc {
     VectorField gradient(const ScalarField& Phi, const PolyMesh& theMesh, const ScalarBoundaryConditions& PhiBCs);
 
     VectorField laplacianOrthogonal(const VectorField& Phi, const PolyMesh& theMesh, const VectorBoundaryConditions& PhiBCs);
+
+    VectorField forcingTerm(const GeometricVector& Fe, const PolyMesh& theMesh);
 }
 
 #endif //FLOWBETWEENFLATPLATES_FVC_H

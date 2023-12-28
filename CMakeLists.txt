@@ -11,7 +11,7 @@ if (NOT CMAKE_BUILD_TYPE)
 endif ()
 
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/app)
-SET(CMAKE_CXX_FLAGS "-O3")
+#SET(CMAKE_CXX_FLAGS "-O3")
 
 add_executable(solverNS app/main.cpp
         src/mesh/node/Node.cpp
@@ -96,4 +96,9 @@ add_executable(solverNS app/main.cpp
         src/interpolation/interpolateFromElements2Nodes/interpolateScalarFieldFromElements2Nodes.h
         src/fields/scalarField/writeScalarField2VTK.cpp
         src/fields/vectorField/maxAbs.cpp
+        src/finiteVolumeMethod/fvc/forcingTerm.cpp
+        src/functionObjects/computeBulkVelocity/computeBulkVelocity.cpp
+        src/functionObjects/computeBulkVelocity/computeBulkVelocity.h
+        src/IO/writePressureVelocity2VTK.cpp
+        src/IO/writePressureVelocity2VTK.h
 )

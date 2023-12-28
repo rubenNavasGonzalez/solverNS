@@ -1,17 +1,20 @@
 #include <cmath>
+#include <random>
 #include "../src/interpolation/temporalAdvancement/computeTimeStepOrthogonal.h"
 #include "../src/finiteVolumeMethod/fvc/fvc.h"
 #include "../src/finiteVolumeMethod/fvm/fvm.h"
 #include "../src/finiteVolumeMethod/fvScalarEquation/FvScalarEquation.h"
 #include "../src/interpolation/interpolateMDotFromElements2Faces/RhieChowInterpolation.h"
+#include "../src/IO/writePressureVelocity2VTK.h"
 
 
 int main(int argc, char *argv[]) {
 
     // Mesh parameters
-    double Lx = 10, Ly = 1, Lz = 1;                                     // Domain size
-    int Nx = 128, Ny = 32, Nz = 8;                                      // Number of elements in each direction
-    double sx = 0, sy = 2.5, sz = 0;                                    // Hyperbolic tangent mesh spacing
+    double delta = 1;
+    double Lx = 4*M_PI*delta, Ly = 2*delta, Lz = 4./3.*M_PI*delta;      // Domain size
+    int Nx = 48, Ny = 48, Nz = 48;                                      // Number of elements in each direction
+    double sx = 0, sy = 2, sz = 0;                                      // Hyperbolic tangent mesh spacing
 
 
     // Mesh generation
@@ -21,16 +24,28 @@ int main(int argc, char *argv[]) {
 
 
     // Flow properties
-    double nu = 0.05;                                                   // Viscosity
+    double nu = 1./180;                                                  // Viscosity
 
 
     // Velocity field initialization (field and BCs)
     VectorField u;
     u.assign(theMesh.nInteriorElements, {0,0,0});
 
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<double> dis(-1.0, 1.0);
+
+    for (int i = 0; i < theMesh.nInteriorElements; ++i) {
+
+        u[i].x = 1*1/(2*1*nu)*theMesh.elements[i].centroid.y/1*(2 - theMesh.elements[i].centroid.y/1)*(1 - dis(gen)/10);
+        u[i].y = dis(gen);
+        u[i].z = dis(gen);
+    }
+
+
     VectorBoundaryConditions uBCs;
-    uBCs.addBC("fixedValue", {1,0,0});
-    uBCs.addBC("zeroGradient", {0,0,0});
+    uBCs.addBC("periodic", {0,0,0});
+    uBCs.addBC("periodic", {0,0,0});
     uBCs.addBC("fixedValue", {0,0,0});
     uBCs.addBC("fixedValue", {0,0,0});
     uBCs.addBC("periodic", {0,0,0});
@@ -42,8 +57,8 @@ int main(int argc, char *argv[]) {
     p.assign(theMesh.nInteriorElements, 0);
 
     ScalarBoundaryConditions pBCs;
-    pBCs.addBC("zeroGradient", 0);
-    pBCs.addBC("fixedValue", 0);
+    pBCs.addBC("periodic", 0);
+    pBCs.addBC("periodic", 0);
     pBCs.addBC("zeroGradient", 0);
     pBCs.addBC("zeroGradient", 0);
     pBCs.addBC("periodic", 0);
@@ -56,14 +71,15 @@ int main(int argc, char *argv[]) {
 
     // Transient parameters
     double t = 0;
-    double tFinal = 10;
+    double tFinal = 30;
     double DeltaT;
     double steadyStateCriterion = 1e-3;
+    int k = 0, writeInterval = 50;
 
 
     // Pre-definitions
     ScalarField mDot, divUPred, pNew, divUNew;
-    VectorField convU, diffU, R, RPrev, uPred, gradP, uNew;
+    VectorField convU, diffU, F, R, RPrev, uPred, gradP, uNew;
     SparseMatrix laplacianMatrixP;
     FvScalarEquation pEqn;
     double uConvergence, pConvergence;
@@ -86,10 +102,14 @@ int main(int argc, char *argv[]) {
         diffU = fvc::laplacianOrthogonal(u, theMesh, uBCs);
 
 
-        // Compute R field and RPrev field (if first time iteration)
-        R = nu*diffU - convU;
+        // Compute the forcing term   dp/dx = -1   in the x direction
+        F = fvc::forcingTerm({-1,0,0}, theMesh);
 
-        if (t == DeltaT) {
+
+        // Compute R field and RPrev field (if first time iteration)
+        R = nu*diffU - convU - F;
+
+        if (k == 0) {
 
             RPrev = R;
         }
@@ -106,7 +126,7 @@ int main(int argc, char *argv[]) {
 
         // Assemble and constrain (apply BCs) the Poisson Equation
         pEqn  =  laplacianMatrixP == (1/DeltaT)*divUPred;
-        pEqn.constrain(theMesh, pBCs);
+        pEqn.constrain(theMesh, 1/DeltaT, pBCs);
 
 
         // Solve the Poisson Equation with a linear solver to get the new pressure
@@ -143,14 +163,19 @@ int main(int argc, char *argv[]) {
             p = pNew;
             RPrev = R;
         }
+
+
+        // Write results to .VTK file
+        if (k % writeInterval == 0 && k != 0) {
+
+            printf("\nWriting data corresponding to Time = %f s \n\n", t);
+            writePressureVelocity2VTK(theMesh, pNew, uNew, pBCs, uBCs, t);
+        }
+
+        k++;
     }
 
-
-    // Write velocity and pressure fields to a .vtk file
-    u.writeVectorField2VTK("U", theMesh, uBCs);
-    p.writeScalarField2VTK("p", theMesh, pBCs);
-
-    printf("Simulation completed!");
+    printf("\nSimulation completed!");
 
 
     return 0;
