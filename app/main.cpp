@@ -4,8 +4,8 @@
 #include "../src/finiteVolumeMethod/fvm/fvm.h"
 #include "../src/finiteVolumeMethod/fvScalarEquation/FvScalarEquation.h"
 #include "../src/interpolation/interpolateMDotFromElements2Faces/RhieChowInterpolation.h"
+#include "../src/IO/writeTurbulentChannelFlowData2CSV.h"
 #include "../src/IO/writePressureVelocity2VTK.h"
-#include "../src/IO/writePressureVelocity2TXT.h"
 #include "../src/functionObjects/computeBulkVelocity/computeBulkVelocity.h"
 
 
@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
     TensorField gradU;
     SparseMatrix laplacianMatrixP;
     FvScalarEquation pEqn;
-    double uConvergence, pConvergence;
+    double uConvergence, pConvergence, uBulk, ReBulk, Cf;
     bool temporalIterate = true;
 
 
@@ -153,9 +153,9 @@ int main(int argc, char *argv[]) {
 
 
         // Compute the bulk velocity and the bulk Reynolds number
-        double uBulk = computeBulkVelocity(u, theMesh, uBCs, 0);
-        double ReBulk = uBulk*(4*Ly*Lz/(2*Ly + 2*Lz))/nu;
-        double Cf = 1/(0.5*1*pow(uBulk,2));
+        uBulk = computeBulkVelocity(u, theMesh, uBCs, 0);
+        ReBulk = uBulk*(4*Ly*Lz/(2*Ly + 2*Lz))/nu;
+        Cf = 1/(0.5*1*pow(uBulk,2));
 
         printf("\tThe bulk velocity is: %f\n", uBulk);
         printf("\tThe bulk Reynolds number is: %f\n", ReBulk);
@@ -174,10 +174,11 @@ int main(int argc, char *argv[]) {
         }
 
 
-        // Write results to .VTK file
+        // Write results to .csv and .VTK file
         if (k % writeInterval == 0 && k != 0) {
 
             printf("\nWriting data corresponding to Time = %f s \n", t);
+            writeTurbulentChannelFlowData2CSV(pNew, u, omega, uBulk, t);
             writePressureVelocity2VTK(theMesh, pNew, uNew, pBCs, uBCs, t);
         }
 
@@ -186,10 +187,10 @@ int main(int argc, char *argv[]) {
     printf("\nSimulation completed!");
 
 
-    // Write last time-step results
+    // Write last time-step results to .csv and .VTK file
     printf("\nWriting data corresponding to Time = %f s \n", t);
+    writeTurbulentChannelFlowData2CSV(pNew, u, omega, uBulk, t);
     writePressureVelocity2VTK(theMesh, pNew, uNew, pBCs, uBCs, t);
-    writePressureVelocity2TXT(theMesh, pNew, uNew, t);
 
 
     return 0;
