@@ -85,3 +85,67 @@ VectorField fvc::gradient(const ScalarField& Phi, const PolyMesh& theMesh, const
 
     return gradient;
 }
+
+
+
+TensorField fvc::gradient(const VectorField& Phi, const PolyMesh& theMesh, const VectorBoundaryConditions& PhiBCs) {
+
+    // Auxiliary variables declarations
+    ScalarField PhiX, PhiY, PhiZ;
+    VectorField gradX, gradY, gradZ;
+    ScalarBoundaryConditions PhiXBCs, PhiYBCs, PhiZBCs;
+
+
+    // Preallocate the gradient field
+    TensorField gradient;
+    gradient.resize(theMesh.nInteriorElements);
+
+
+    // Split the velocity vector field in the gradient field of its components
+    for (int i = 0; i < theMesh.nInteriorElements; ++i) {
+
+        PhiX.push_back(Phi[i].x);
+        PhiY.push_back(Phi[i].y);
+        PhiZ.push_back(Phi[i].z);
+    }
+
+
+    // Split the velocity boundary conditions in scalar boundary conditions for each component
+    for (int i = 0; i < PhiBCs.type.size(); ++i) {
+
+        PhiXBCs.type.push_back(PhiBCs.type[i]);
+        PhiXBCs.value.push_back(PhiBCs.value[i].x);
+
+        PhiYBCs.type.push_back(PhiBCs.type[i]);
+        PhiYBCs.value.push_back(PhiBCs.value[i].y);
+
+        PhiZBCs.type.push_back(PhiBCs.type[i]);
+        PhiZBCs.value.push_back(PhiBCs.value[i].z);
+    }
+
+
+    // Compute the gradient of each velocity component field
+    gradX = fvc::gradient(PhiX, theMesh, PhiXBCs);
+    gradY = fvc::gradient(PhiY, theMesh, PhiYBCs);
+    gradZ = fvc::gradient(PhiZ, theMesh, PhiZBCs);
+
+
+    // Assemble the gradient tensor field
+    for (int i = 0; i < theMesh.nInteriorElements; ++i) {
+
+        gradient[i][0][0] = gradX[i].x;
+        gradient[i][0][1] = gradX[i].y;
+        gradient[i][0][2] = gradX[i].z;
+
+        gradient[i][1][0] = gradY[i].x;
+        gradient[i][1][1] = gradY[i].y;
+        gradient[i][1][2] = gradY[i].z;
+
+        gradient[i][2][0] = gradZ[i].x;
+        gradient[i][2][1] = gradZ[i].y;
+        gradient[i][2][2] = gradZ[i].z;
+    }
+
+
+    return gradient;
+}

@@ -1,19 +1,20 @@
 #include <cmath>
-#include <random>
 #include "../src/interpolation/temporalAdvancement/computeTimeStepOrthogonal.h"
 #include "../src/finiteVolumeMethod/fvc/fvc.h"
 #include "../src/finiteVolumeMethod/fvm/fvm.h"
 #include "../src/finiteVolumeMethod/fvScalarEquation/FvScalarEquation.h"
 #include "../src/interpolation/interpolateMDotFromElements2Faces/RhieChowInterpolation.h"
 #include "../src/IO/writePressureVelocity2VTK.h"
+#include "../src/IO/writePressureVelocity2TXT.h"
+#include "../src/functionObjects/computeBulkVelocity/computeBulkVelocity.h"
 
 
 int main(int argc, char *argv[]) {
 
     // Mesh parameters
-    double delta = 1;
+    double delta = 1;                                                   // Reference length
     double Lx = 4*M_PI*delta, Ly = 2*delta, Lz = 4./3.*M_PI*delta;      // Domain size
-    int Nx = 48, Ny = 48, Nz = 48;                                      // Number of elements in each direction
+    int Nx = 32, Ny = 32, Nz = 32;                                      // Number of elements in each direction
     double sx = 0, sy = 2, sz = 0;                                      // Hyperbolic tangent mesh spacing
 
 
@@ -30,18 +31,7 @@ int main(int argc, char *argv[]) {
     // Velocity field initialization (field and BCs)
     VectorField u;
     u.assign(theMesh.nInteriorElements, {0,0,0});
-
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<double> dis(-1.0, 1.0);
-
-    for (int i = 0; i < theMesh.nInteriorElements; ++i) {
-
-        u[i].x = 1*1/(2*1*nu)*theMesh.elements[i].centroid.y/1*(2 - theMesh.elements[i].centroid.y/1)*(1 - dis(gen)/10);
-        u[i].y = dis(gen);
-        u[i].z = dis(gen);
-    }
-
+    #include "mainIncludes/initializeChannelFlowReTau180.h"
 
     VectorBoundaryConditions uBCs;
     uBCs.addBC("periodic", {0,0,0});
@@ -71,15 +61,16 @@ int main(int argc, char *argv[]) {
 
     // Transient parameters
     double t = 0;
-    double tFinal = 30;
+    double tFinal = 1e24;
     double DeltaT;
-    double steadyStateCriterion = 1e-3;
-    int k = 0, writeInterval = 50;
+    double steadyStateCriterion = 1e-4;
+    int k = 0, writeInterval = 5e3;
 
 
     // Pre-definitions
     ScalarField mDot, divUPred, pNew, divUNew;
-    VectorField convU, diffU, F, R, RPrev, uPred, gradP, uNew;
+    VectorField convU, diffU, F, R, RPrev, uPred, gradP, uNew, omega;
+    TensorField gradU;
     SparseMatrix laplacianMatrixP;
     FvScalarEquation pEqn;
     double uConvergence, pConvergence;
@@ -147,14 +138,32 @@ int main(int argc, char *argv[]) {
         printf("\tThe maximum value of divUNew is: %E \n", divUNew.max());
 
 
+        // Compute the gradient of the new velocity field
+        gradU = fvc::gradient(uNew, theMesh, uBCs);
+
+
+        // Compute the vorticity field
+        omega = fvc::curl(gradU, theMesh);
+
+
         // Compute the difference between the new and old maps and get its maximum-absolute value (to ensure temporal convergence)
         uConvergence = ((uNew - u)/DeltaT).maxAbs();
         pConvergence = ((pNew - p)/DeltaT).maxAbs();
         printf("\tThe steady-state convergence parameter is: %E \n", fmax(uConvergence, pConvergence));
 
 
+        // Compute the bulk velocity and the bulk Reynolds number
+        double uBulk = computeBulkVelocity(u, theMesh, uBCs, 0);
+        double ReBulk = uBulk*(4*Ly*Lz/(2*Ly + 2*Lz))/nu;
+        double Cf = 1/(0.5*1*pow(uBulk,2));
+
+        printf("\tThe bulk velocity is: %f\n", uBulk);
+        printf("\tThe bulk Reynolds number is: %f\n", ReBulk);
+        printf("\tThe numerical friction coefficient is: %E\n", Cf);
+
+
         // Check if new time iteration is needed
-        if (t > tFinal || fmax(uConvergence, pConvergence) < steadyStateCriterion) {
+        if ( t > tFinal || fmax(uConvergence, pConvergence) < steadyStateCriterion ) {
 
             temporalIterate = false;
         } else {
@@ -168,14 +177,19 @@ int main(int argc, char *argv[]) {
         // Write results to .VTK file
         if (k % writeInterval == 0 && k != 0) {
 
-            printf("\nWriting data corresponding to Time = %f s \n\n", t);
+            printf("\nWriting data corresponding to Time = %f s \n", t);
             writePressureVelocity2VTK(theMesh, pNew, uNew, pBCs, uBCs, t);
         }
 
         k++;
     }
-
     printf("\nSimulation completed!");
+
+
+    // Write last time-step results
+    printf("\nWriting data corresponding to Time = %f s \n", t);
+    writePressureVelocity2VTK(theMesh, pNew, uNew, pBCs, uBCs, t);
+    writePressureVelocity2TXT(theMesh, pNew, uNew, t);
 
 
     return 0;

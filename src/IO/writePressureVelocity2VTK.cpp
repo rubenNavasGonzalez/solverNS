@@ -4,7 +4,6 @@
 
 #include <fstream>
 #include <iostream>
-#include <string>
 #include "writePressureVelocity2VTK.h"
 #include "../interpolation/interpolateFromElements2Nodes/interpolateScalarFieldFromElements2Nodes.h"
 #include "../interpolation/interpolateFromElements2Nodes/interpolateVectorFieldFromElements2Nodes.h"

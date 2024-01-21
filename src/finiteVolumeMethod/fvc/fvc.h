@@ -7,6 +7,7 @@
 
 #include "../../fields/vectorField/VectorField.h"
 #include "../../fields/scalarField/ScalarField.h"
+#include "../../fields/tensorField/TensorField.h"
 #include "../../boundaryConditions/scalarBoundaryConditions/ScalarBoundaryConditions.h"
 
 
@@ -18,9 +19,13 @@ namespace fvc {
 
     VectorField gradient(const ScalarField& Phi, const PolyMesh& theMesh, const ScalarBoundaryConditions& PhiBCs);
 
+    TensorField gradient(const VectorField& Phi, const PolyMesh& theMesh, const VectorBoundaryConditions& PhiBCs);
+
     VectorField laplacianOrthogonal(const VectorField& Phi, const PolyMesh& theMesh, const VectorBoundaryConditions& PhiBCs);
 
     VectorField forcingTerm(const GeometricVector& Fe, const PolyMesh& theMesh);
+
+    VectorField curl(const TensorField& gradPhi, const PolyMesh& theMesh);
 }
 
 #endif //FLOWBETWEENFLATPLATES_FVC_H

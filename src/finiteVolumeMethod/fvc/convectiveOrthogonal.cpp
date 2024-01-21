@@ -32,17 +32,19 @@ VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField
 
         pOwner = theMesh.elements[iOwner].centroid;
         pNeighbour = theMesh.elements[iNeighbour].centroid;
-        pOwnerFar = theMesh.elements[iOwnerFar].centroid;
-        pNeighbourFar = theMesh.elements[iNeighbourFar].centroid;
+        //pOwnerFar = theMesh.elements[iOwnerFar].centroid;
+        //pNeighbourFar = theMesh.elements[iNeighbourFar].centroid;
         pF = theMesh.faces[i].centroid;
 
         PhiOwner = Phi[iOwner];
         PhiNeighbour = Phi[iNeighbour];
-        PhiOwnerFar = Phi[iOwnerFar];
-        PhiNeighbourFar = Phi[iNeighbourFar];
+        //PhiOwnerFar = Phi[iOwnerFar];
+        //PhiNeighbourFar = Phi[iNeighbourFar];
 
-        PhiF = convectiveSchemesOrthogonal(PhiOwner, pOwner, PhiOwnerFar, pOwnerFar, PhiNeighbour, pNeighbour, PhiNeighbourFar,
-                                            pNeighbourFar, pF, mDot[i], Sf, scheme);
+        //PhiF = convectiveSchemesOrthogonal(PhiOwner, pOwner, PhiOwnerFar, pOwnerFar, PhiNeighbour, pNeighbour, PhiNeighbourFar,
+                                            //pNeighbourFar, pF, mDot[i], Sf, scheme);
+
+        PhiF = 0.5*(PhiOwner + PhiNeighbour);
 
         convective[iOwner] += mDot[i]*PhiF;
         convective[iNeighbour] -= mDot[i]*PhiF;
