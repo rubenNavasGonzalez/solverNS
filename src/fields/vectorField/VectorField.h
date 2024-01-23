@@ -21,7 +21,7 @@ public:
 
     // VectorField methods
     double maxAbs();
-    void writeVectorField2VTK(const std::string& filename, const PolyMesh& theMesh, const VectorBoundaryConditions& PhiBCs);
+    void writeVectorField2VTK(const std::string& filename, const std::string& field, const PolyMesh& theMesh, const VectorBoundaryConditions& PhiBCs) const;
     friend VectorField operator+(const VectorField& field1, const VectorField& field2);
     friend VectorField operator-(const VectorField& field1, const VectorField& field2);
     friend VectorField operator*(const double& k, const VectorField& field);

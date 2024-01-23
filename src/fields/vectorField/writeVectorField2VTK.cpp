@@ -8,11 +8,7 @@
 #include "../../interpolation/interpolateFromElements2Nodes/interpolateVectorFieldFromElements2Nodes.h"
 
 
-void VectorField::writeVectorField2VTK(const std::string& filename, const PolyMesh& theMesh, const VectorBoundaryConditions& PhiBCs) {
-
-    // Write the Mesh into .VTK format
-    theMesh.writeMesh2VTK(filename);
-
+void VectorField::writeVectorField2VTK(const std::string& filename, const std::string& field, const PolyMesh& theMesh, const VectorBoundaryConditions& PhiBCs) const {
 
     // Open the mesh file in append mode
     std::ofstream outfile;
@@ -33,8 +29,8 @@ void VectorField::writeVectorField2VTK(const std::string& filename, const PolyMe
         }*/
 
         // Write the scalar field (point based)
-        outfile << "POINT_DATA " << theMesh.nNodes << "\n";
-        outfile << "VECTORS " + filename + " float" << "\n";
+        //outfile << "POINT_DATA " << theMesh.nNodes << "\n";
+        outfile << "VECTORS " + field + " float" << "\n";
         for (int i = 0; i < theMesh.nNodes; i++) {
             outfile << nodeField[i].x << "\t" << nodeField[i].y << "\t" << nodeField[i].z << "\n";
         }
@@ -43,6 +39,6 @@ void VectorField::writeVectorField2VTK(const std::string& filename, const PolyMe
         outfile.close();
 
     } else {
-        std::cout << "Unable to open file";
+        std::cout << "Unable to open file\n";
     }
 }

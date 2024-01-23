@@ -8,11 +8,7 @@
 #include "../../interpolation/interpolateFromElements2Nodes/interpolateScalarFieldFromElements2Nodes.h"
 
 
-void ScalarField::writeScalarField2VTK(const std::string &filename, const PolyMesh &theMesh, const ScalarBoundaryConditions &PhiBCs) {
-
-    // Write the Mesh into .VTK format
-    theMesh.writeMesh2VTK(filename);
-
+void ScalarField::writeScalarField2VTK(const std::string &filename, const std::string& field, const PolyMesh &theMesh, const ScalarBoundaryConditions &PhiBCs) const {
 
     // Open the mesh file in append mode
     std::ofstream outfile;
@@ -34,17 +30,19 @@ void ScalarField::writeScalarField2VTK(const std::string &filename, const PolyMe
         }*/
 
         // Write the scalar field (point based)
-        outfile << "POINT_DATA " << theMesh.nNodes << "\n";
-        outfile << "SCALARS " + filename + " float 1" << "\n";
+        //outfile << "POINT_DATA " << theMesh.nNodes << "\n\n";
+        outfile << "SCALARS " + field + " float 1" << "\n";
         outfile << "LOOKUP_TABLE default" << "\n";
         for (int i = 0; i < theMesh.nNodes; i++) {
             outfile << nodeField[i] << "\n";
         }
+        outfile << "\n";
 
         // Close the file
         outfile.close();
 
     } else {
-        std::cout << "Unable to open file";
+
+        std::cout << "Unable to open file\n";
     }
 }

@@ -23,7 +23,7 @@ public:
     double min();
     double maxAbs();
     double mag();
-    void writeScalarField2VTK(const std::string& filename, const PolyMesh& theMesh, const ScalarBoundaryConditions& PhiBCs);
+    void writeScalarField2VTK(const std::string& filename, const std::string& field, const PolyMesh& theMesh, const ScalarBoundaryConditions& PhiBCs) const;
     friend ScalarField operator-(const ScalarField& field1, const ScalarField& field2);
     friend ScalarField operator+(const ScalarField& field1, const ScalarField& field2);
     friend double operator*(const ScalarField& field1, const ScalarField& field2);

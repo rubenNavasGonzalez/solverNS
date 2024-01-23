@@ -7,22 +7,37 @@
 #include "writeTurbulentChannelFlowData2CSV.h"
 
 
-void writeTurbulentChannelFlowData2CSV(const ScalarField& p, const VectorField& u, const VectorField& omega, double uBulk, double t) {
+void writeTurbulentChannelFlowData2CSV(const PolyMesh& theMesh, const ScalarField& p, const VectorField& u, const VectorField& omega,
+                                       const ScalarField& nut, double uBulk, double t) {
 
-    std::ofstream outfile;
-    outfile.open("Time_" + std::to_string(t) + ".txt");
+    // Data file
+    std::ofstream outfileData;
+    outfileData.open("Time_" + std::to_string(t) + ".csv");
 
-    if (outfile.is_open()) {
+    if (outfileData.is_open()) {
 
         // Write the data file header
-        outfile << "p," << "uX," << "uY," << "uZ," << "wX," << "wY," << "wZ," << "uBulk \n";
+        outfileData << "x," << "y," << "z," << "p," << "uX," << "uY," << "uZ," << "wX," << "wY," << "wZ," << "nut," << "uBulk \n";
 
         // Assemble the .csv file
         for (int i = 0; i < p.size(); ++i) {
 
-            outfile << p[i] << "," << u[i].x << "," << u[i].y << "," << u[i].z << "," << omega[i].x << "," << omega[i].y << "," << omega[i].z << "," << uBulk << "\n";
+            outfileData << theMesh.elements[i].centroid.x << "," << theMesh.elements[i].centroid.y << "," << theMesh.elements[i].centroid.z << "," << p[i] << "," << u[i].x << "," << u[i].y << "," << u[i].z << "," << omega[i].x << "," << omega[i].y << "," << omega[i].z << "," << nut[i] << "," << uBulk << "\n";
         }
 
+    } else {
+
+        printf("Error. Unable to open file. \n");
+    }
+
+
+    // File with the write time
+    std::ofstream outfileTime;
+    outfileTime.open("writeTime.txt", std::ios_base::app);
+
+    if (outfileTime.is_open()) {
+
+        outfileTime << std::to_string(t) << "\n";
     } else {
 
         printf("Error. Unable to open file. \n");

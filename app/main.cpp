@@ -5,7 +5,7 @@
 #include "../src/finiteVolumeMethod/fvScalarEquation/FvScalarEquation.h"
 #include "../src/interpolation/interpolateMDotFromElements2Faces/RhieChowInterpolation.h"
 #include "../src/IO/writeTurbulentChannelFlowData2CSV.h"
-#include "../src/IO/writePressureVelocity2VTK.h"
+#include "../src/IO/writeTurbulentChannelFlowData2VTK.h"
 #include "../src/functionObjects/computeBulkVelocity/computeBulkVelocity.h"
 
 
@@ -14,8 +14,8 @@ int main(int argc, char *argv[]) {
     // Mesh parameters
     double delta = 1;                                                   // Reference length
     double Lx = 4*M_PI*delta, Ly = 2*delta, Lz = 4./3.*M_PI*delta;      // Domain size
-    int Nx = 32, Ny = 32, Nz = 32;                                      // Number of elements in each direction
-    double sx = 0, sy = 2, sz = 0;                                      // Hyperbolic tangent mesh spacing
+    int Nx = 8, Ny = 8, Nz = 8;                                       // Number of elements in each direction
+    double sx = 0, sy = 4, sz = 0;                                    // Hyperbolic tangent mesh spacing
 
 
     // Mesh generation
@@ -32,6 +32,7 @@ int main(int argc, char *argv[]) {
     VectorField u;
     u.assign(theMesh.nInteriorElements, {0,0,0});
     #include "mainIncludes/initializeChannelFlowReTau180.h"
+    //#include "mainIncludes/initializeChannelFlowReTau180_new.h"
 
     VectorBoundaryConditions uBCs;
     uBCs.addBC("periodic", {0,0,0});
@@ -55,16 +56,29 @@ int main(int argc, char *argv[]) {
     pBCs.addBC("periodic", 0);
 
 
+    // Turbulent viscosity field initialization (field and BCs)
+    ScalarField nut;
+    nut.assign(theMesh.nInteriorElements, 0);
+
+    ScalarBoundaryConditions nutBCs;
+    nutBCs.addBC("periodic", 0);
+    nutBCs.addBC("periodic", 0);
+    nutBCs.addBC("fixedValue", 0);
+    nutBCs.addBC("fixedValue", 0);
+    nutBCs.addBC("periodic", 0);
+    nutBCs.addBC("periodic", 0);
+
+
     // Linear solver parameters initialization
     LinearSolverConfig pSolver("BiCGSTAB", 1e-6, 1e6);
 
 
     // Transient parameters
     double t = 0;
-    double tFinal = 1e24;
+    double tFinal = 200;
     double DeltaT;
     double steadyStateCriterion = 1e-4;
-    int k = 0, writeInterval = 5e3;
+    int k = 0, writeInterval = 500;
 
 
     // Pre-definitions
@@ -178,8 +192,8 @@ int main(int argc, char *argv[]) {
         if (k % writeInterval == 0 && k != 0) {
 
             printf("\nWriting data corresponding to Time = %f s \n", t);
-            writeTurbulentChannelFlowData2CSV(pNew, u, omega, uBulk, t);
-            writePressureVelocity2VTK(theMesh, pNew, uNew, pBCs, uBCs, t);
+            writeTurbulentChannelFlowData2CSV(theMesh, pNew, u, omega, nut, uBulk, t);
+            writeTurbulentChannelFlowData2VTK(theMesh, pNew, uNew, omega, nut, pBCs, uBCs, uBCs, nutBCs, t);
         }
 
         k++;
@@ -189,8 +203,8 @@ int main(int argc, char *argv[]) {
 
     // Write last time-step results to .csv and .VTK file
     printf("\nWriting data corresponding to Time = %f s \n", t);
-    writeTurbulentChannelFlowData2CSV(pNew, u, omega, uBulk, t);
-    writePressureVelocity2VTK(theMesh, pNew, uNew, pBCs, uBCs, t);
+    writeTurbulentChannelFlowData2CSV(theMesh, pNew, u, omega, nut, uBulk, t);
+    writeTurbulentChannelFlowData2VTK(theMesh, pNew, uNew, omega, nut, pBCs, uBCs, uBCs, nutBCs, t);
 
 
     return 0;

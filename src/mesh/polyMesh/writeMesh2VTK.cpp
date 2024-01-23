@@ -44,10 +44,11 @@ void PolyMesh::writeMesh2VTK(const std::string& filename) const {
         for (int i = 0; i < nCells; i++) {
             outfile << elements[i].elementType << "\n";
         }
+        outfile << "\n";
 
         // Close the file
         outfile.close();
     } else {
-        std::cout << "Unable to open file";
+        std::cout << "Unable to open file\n";
     }
 }

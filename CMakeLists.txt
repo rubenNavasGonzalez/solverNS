@@ -99,8 +99,6 @@ add_executable(solverNS app/main.cpp
         src/finiteVolumeMethod/fvc/forcingTerm.cpp
         src/functionObjects/computeBulkVelocity/computeBulkVelocity.cpp
         src/functionObjects/computeBulkVelocity/computeBulkVelocity.h
-        src/IO/writePressureVelocity2VTK.cpp
-        src/IO/writePressureVelocity2VTK.h
         src/math/tensor/Tensor.cpp
         src/math/tensor/Tensor.h
         src/fields/tensorField/TensorField.cpp
@@ -108,4 +106,6 @@ add_executable(solverNS app/main.cpp
         src/finiteVolumeMethod/fvc/curl.cpp
         src/IO/writeTurbulentChannelFlowData2CSV.cpp
         src/IO/writeTurbulentChannelFlowData2CSV.h
+        src/IO/writeTurbulentChannelFlowData2VTK.cpp
+        src/IO/writeTurbulentChannelFlowData2VTK.h
 )
