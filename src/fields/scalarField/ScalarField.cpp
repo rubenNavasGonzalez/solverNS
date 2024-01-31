@@ -14,10 +14,11 @@ ScalarField::~ScalarField() = default;
 ScalarField operator-(const ScalarField &field1, const ScalarField &field2) {
 
     ScalarField result;
+    result.assign(field1.size(), 0);
 
     for (int i = 0; i < field1.size(); ++i) {
 
-        result.push_back( field1[i] - field2[i] );
+        result[i] = field1[i] - field2[i] ;
     }
 
 
@@ -28,10 +29,11 @@ ScalarField operator-(const ScalarField &field1, const ScalarField &field2) {
 ScalarField operator+(const ScalarField &field1, const ScalarField &field2) {
 
     ScalarField result;
+    result.assign(field1.size(), 0);
 
     for (int i = 0; i < field1.size(); ++i) {
 
-        result.push_back( field1[i] + field2[i] );
+        result[i] = field1[i] + field2[i] ;
     }
 
 
@@ -57,9 +59,12 @@ double operator*(const ScalarField &field1, const ScalarField &field2) {
 ScalarField operator*(const double &k, const ScalarField &field) {
 
     ScalarField result;
+    result.assign(field.size(), 0);
+
 
     for (int i = 0; i < field.size(); ++i) {
-        result.push_back( k*field[i] );
+
+        result[i] = k*field[i];
     }
 
 

@@ -1,21 +1,25 @@
 #include <cmath>
+#include "../src/IO/turbulentChannelFlow/writeTurbulentChannelFlowData.h"
 #include "../src/interpolation/temporalAdvancement/computeTimeStepOrthogonal.h"
 #include "../src/finiteVolumeMethod/fvc/fvc.h"
 #include "../src/finiteVolumeMethod/fvm/fvm.h"
 #include "../src/finiteVolumeMethod/fvScalarEquation/FvScalarEquation.h"
 #include "../src/interpolation/interpolateMDotFromElements2Faces/RhieChowInterpolation.h"
-#include "../src/IO/writeTurbulentChannelFlowData2CSV.h"
-#include "../src/IO/writeTurbulentChannelFlowData2VTK.h"
 #include "../src/functionObjects/computeBulkVelocity/computeBulkVelocity.h"
+#include "../src/functionObjects/computeQCrit/computeQCrit.h"
+#include "../src/IO/turbulentChannelFlow/writeTurbulentChannelFlowData2CSV.h"
+#include "../src/IO/turbulentChannelFlow/writeTurbulentChannelFlowData2VTK.h"
+
 
 
 int main(int argc, char *argv[]) {
 
+
     // Mesh parameters
     double delta = 1;                                                   // Reference length
     double Lx = 2*M_PI*delta, Ly = 2*delta, Lz = M_PI*delta;            // Domain size
-    int Nx = 24, Ny = 25, Nz = 24;                                      // Number of elements in each direction
-    double sx = 0, sy = 0, sz = 0;                                      // Hyperbolic tangent mesh stretching
+    int Nx = 32, Ny = 33, Nz = 32;                                      // Number of elements in each direction
+    double sx = 0, sy = 3.5, sz = 0;                                    // Hyperbolic tangent mesh stretching
 
 
     // Mesh generation
@@ -25,7 +29,10 @@ int main(int argc, char *argv[]) {
 
 
     // Flow properties
-    double nu = 1./30;                                                  // Viscosity
+    double nu = 1./180;                                                 // Viscosity
+
+
+    // y-plus of the first node in the wall direction
     double yPlusMin = theMesh.elements[0].centroid.y/nu;
 
 
@@ -69,6 +76,19 @@ int main(int argc, char *argv[]) {
     nutBCs.addBC("periodic", 0);
 
 
+    // QCriterion field initialization (field and BCs)
+    ScalarField QCrit;
+    QCrit.assign(theMesh.nInteriorElements, 0);
+
+    ScalarBoundaryConditions QCritBCs;
+    QCritBCs.addBC("zeroGradient", 0);
+    QCritBCs.addBC("zeroGradient", 0);
+    QCritBCs.addBC("zeroGradient", 0);
+    QCritBCs.addBC("zeroGradient", 0);
+    QCritBCs.addBC("zeroGradient", 0);
+    QCritBCs.addBC("zeroGradient", 0);
+
+
     // Linear solver parameters initialization
     LinearSolverConfig pSolver("CGS", 1e-6, 1e6);
 
@@ -79,7 +99,10 @@ int main(int argc, char *argv[]) {
     double DeltaT;
     double f = 1;
     double steadyStateCriterion = 1e-4;
-    int k = 0, writeInterval = 1e24;
+    int k = 0, writeInterval = 10000;
+
+
+    // HPC parameters
 
 
     // Pre-definitions
@@ -88,8 +111,13 @@ int main(int argc, char *argv[]) {
     TensorField gradU;
     SparseMatrix laplacianMatrixP;
     FvScalarEquation pEqn;
-    double uConvergence, pConvergence, uBulk, ReBulk, Cf;
+    double uConvergence, pConvergence, uBulk;
     bool temporalIterate = true;
+
+
+    // Write the simulation set-up data
+    writeTurbulentChannelFlowData(delta, Lx, Ly, Lz, Nx, Ny, Nz, sx, sy, sz, nu, yPlusMin, pSolver.tolerance,
+                                  pSolver.solver, pSolver.maxIter, t, tFinal, f, steadyStateCriterion, writeInterval);
 
 
 
@@ -153,28 +181,21 @@ int main(int argc, char *argv[]) {
         printf("\tThe maximum value of divUNew is: %E \n", divUNew.rms());
 
 
-        // Compute the gradient of the new velocity field
-        gradU = fvc::gradient(uNew, theMesh, uBCs);
-
-
-        // Compute the vorticity field
-        omega = fvc::curl(gradU, theMesh);
-
-
         // Compute the difference between the new and old maps and get its maximum-absolute value (to ensure temporal convergence)
         uConvergence = ((uNew - u)/DeltaT).maxAbs();
         pConvergence = ((pNew - p)/DeltaT).maxAbs();
         printf("\tThe steady-state convergence parameter is: %E \n", fmax(uConvergence, pConvergence));
 
 
-        // Compute the bulk velocity and the bulk Reynolds number
-        uBulk = computeBulkVelocity(u, theMesh, uBCs, 0);
-        ReBulk = uBulk*(4*Ly*Lz/(2*Ly + 2*Lz))/nu;
-        Cf = 1/(0.5*1*pow(uBulk,2));
+        // Compute the bulk velocity
+        uBulk = computeBulkVelocity(uNew, theMesh, uBCs, 0);
+        printf("\tThe bulk velocity is: %f \n", uBulk);
 
-        printf("\tThe bulk velocity is: %f\n", uBulk);
-        printf("\tThe bulk Reynolds number is: %f\n", ReBulk);
-        printf("\tThe numerical friction coefficient is: %E\n", Cf);
+
+        // Compute the vorticity and QCriterion
+        gradU = fvc::gradient(u, theMesh, uBCs);
+        omega = fvc::curl(gradU, theMesh);
+        QCrit = computeQCrit(theMesh, gradU);
 
 
         // Check if new time iteration is needed
@@ -193,8 +214,8 @@ int main(int argc, char *argv[]) {
         if (k % writeInterval == 0 && k != 0) {
 
             printf("\nWriting data corresponding to Time = %f s \n", t);
-            writeTurbulentChannelFlowData2CSV(theMesh, pNew, u, uPred, omega, nut, uBulk, t);
-            writeTurbulentChannelFlowData2VTK(theMesh, pNew, uNew, omega, nut, pBCs, uBCs, uBCs, nutBCs, t);
+            writeTurbulentChannelFlowData2CSV(theMesh, pNew, uNew, omega, nut, uBulk, t);
+            writeTurbulentChannelFlowData2VTK(theMesh, pNew, uNew, omega, nut, QCrit, pBCs, uBCs, uBCs, nutBCs, QCritBCs, t);
         }
 
         k++;
@@ -204,8 +225,8 @@ int main(int argc, char *argv[]) {
 
     // Write last time-step results to .csv and .VTK file
     printf("\nWriting data corresponding to Time = %f s \n", t);
-    writeTurbulentChannelFlowData2CSV(theMesh, pNew, u, uPred, omega, nut, uBulk, t);
-    writeTurbulentChannelFlowData2VTK(theMesh, pNew, uNew, omega, nut, pBCs, uBCs, uBCs, nutBCs, t);
+    writeTurbulentChannelFlowData2CSV(theMesh, pNew, uNew, omega, nut, uBulk, t);
+    writeTurbulentChannelFlowData2VTK(theMesh, pNew, uNew, omega, nut, QCrit, pBCs, uBCs, uBCs, nutBCs, QCritBCs, t);
 
 
     return 0;

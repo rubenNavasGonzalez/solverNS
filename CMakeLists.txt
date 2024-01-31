@@ -11,7 +11,11 @@ if (NOT CMAKE_BUILD_TYPE)
 endif ()
 
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/app)
-#SET(CMAKE_CXX_FLAGS "-O3")
+SET(CMAKE_CXX_FLAGS "-O3")
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
+
+#find_package(OpenMP REQUIRED)
 
 add_executable(solverNS app/main.cpp
         src/mesh/node/Node.cpp
@@ -94,14 +98,25 @@ add_executable(solverNS app/main.cpp
         src/fields/tensorField/TensorField.cpp
         src/fields/tensorField/TensorField.h
         src/finiteVolumeMethod/fvc/curl.cpp
-        src/IO/writeTurbulentChannelFlowData2CSV.cpp
-        src/IO/writeTurbulentChannelFlowData2CSV.h
-        src/IO/writeTurbulentChannelFlowData2VTK.cpp
-        src/IO/writeTurbulentChannelFlowData2VTK.h
+        src/IO/turbulentChannelFlow/writeTurbulentChannelFlowData2CSV.cpp
+        src/IO/turbulentChannelFlow/writeTurbulentChannelFlowData2CSV.h
+        src/IO/turbulentChannelFlow/writeTurbulentChannelFlowData2VTK.cpp
+        src/IO/turbulentChannelFlow/writeTurbulentChannelFlowData2VTK.h
         src/math/linearSolver/CGS/solveCGS.cpp
         src/math/linearSolver/CGS/solveCGS.h
         src/finiteVolumeMethod/fvc/divergenceNVS.cpp
         src/fields/scalarField/rms.cpp
         src/math/linearSolver/preconditioner/jacobiPreconditioner.cpp
         src/math/linearSolver/preconditioner/jacobiPreconditioner.h
+        src/math/tensor/transpose.cpp
+        src/math/tensor/symmetric.cpp
+        src/math/tensor/skewSymmetric.cpp
+        src/math/tensor/frobeniusNorm.cpp
+        src/functionObjects/computeQCrit/computeQCrit.cpp
+        src/functionObjects/computeQCrit/computeQCrit.h
+        src/IO/turbulentChannelFlow/writeTurbulentChannelFlowData.cpp
+        src/IO/turbulentChannelFlow/writeTurbulentChannelFlowData.h
 )
+
+#target_compile_options(solverNS PRIVATE ${OpenMP_CXX_FLAGS})
+#target_link_libraries(solverNS PRIVATE OpenMP::OpenMP_CXX)

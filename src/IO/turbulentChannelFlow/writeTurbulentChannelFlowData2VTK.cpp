@@ -8,8 +8,9 @@
 
 
 void writeTurbulentChannelFlowData2VTK(const PolyMesh& theMesh, const ScalarField& p, const VectorField& u, const VectorField& omega,
-                                       const ScalarField& nut, const ScalarBoundaryConditions& pBCs, const VectorBoundaryConditions& uBCs,
-                                       const VectorBoundaryConditions& omegaBCs, const ScalarBoundaryConditions& nutBCs, double t) {
+                                       const ScalarField& nut, const ScalarField& QCrit, const ScalarBoundaryConditions& pBCs,
+                                       const VectorBoundaryConditions& uBCs, const VectorBoundaryConditions& omegaBCs,
+                                       const ScalarBoundaryConditions& nutBCs, const ScalarBoundaryConditions& QCritBCs, double t) {
 
     // Auxiliary variables declaration
     std::string filename = "Time_" + std::to_string(t);
@@ -35,6 +36,10 @@ void writeTurbulentChannelFlowData2VTK(const PolyMesh& theMesh, const ScalarFiel
 
     // Write the pressure data
     p.writeScalarField2VTK(filename, "p", theMesh, pBCs);
+
+
+    // Write the QCriterion data
+    QCrit.writeScalarField2VTK(filename, "QCrit", theMesh, QCritBCs);
 
 
     // Write the turbulent viscosity data

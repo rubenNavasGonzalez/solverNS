@@ -3,7 +3,6 @@
 //
 
 #include "solveCGS.h"
-#include "../preconditioner/jacobiPreconditioner.h"
 
 
 ScalarField solveCGS(const SparseMatrix& A, const ScalarField& b, const LinearSolverConfig& theLinearSolverConfig, const ScalarField& PhiOld) {
