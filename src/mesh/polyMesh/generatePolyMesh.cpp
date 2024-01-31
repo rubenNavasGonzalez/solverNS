@@ -106,11 +106,6 @@ void PolyMesh::generatePolyMesh(double Lx, double Ly, double Lz, int Nx, int Ny,
                 auxFace.iOwner = j + Nx*i + Nx*Ny*k;
                 auxFace.iNeighbour = (j + 1) + Nx*i + Nx*Ny*k;
 
-                if (Nx > 1) {
-                    auxFace.iOwnerFar = auxFace.iOwner - 1;
-                    auxFace.iNeighbourFar = auxFace.iNeighbour + 1;
-                }
-
                 // Element to face connectivity
                 elements[auxFace.iOwner].iFaces.push_back(nFaces);
                 elements[auxFace.iNeighbour].iFaces.push_back(nFaces);
@@ -147,11 +142,6 @@ void PolyMesh::generatePolyMesh(double Lx, double Ly, double Lz, int Nx, int Ny,
                 auxFace.iOwner = j + Nx*i + Nx*Ny*k;
                 auxFace.iNeighbour = j + Nx*(i + 1) + Nx*Ny*k;
 
-                if (Ny > 1) {
-                    auxFace.iOwnerFar = auxFace.iOwner - Nx;
-                    auxFace.iNeighbourFar = auxFace.iNeighbour + Nx;
-                }
-
                 // Element to face connectivity
                 elements[auxFace.iOwner].iFaces.push_back(nFaces);
                 elements[auxFace.iNeighbour].iFaces.push_back(nFaces);
@@ -187,12 +177,6 @@ void PolyMesh::generatePolyMesh(double Lx, double Ly, double Lz, int Nx, int Ny,
                 // It is assumed that the owner is the element with the lowest index
                 auxFace.iOwner = j + Nx*i + Nx*Ny*k;
                 auxFace.iNeighbour = j + Nx*i + Nx*Ny*(k + 1);
-
-                if (Nz > 1) {
-                    auxFace.iOwnerFar = auxFace.iOwner - Nx*Ny;
-                    auxFace.iNeighbourFar = auxFace.iNeighbour + Nx*Ny;
-                }
-
 
                 // Element to face connectivity
                 elements[auxFace.iOwner].iFaces.push_back(nFaces);

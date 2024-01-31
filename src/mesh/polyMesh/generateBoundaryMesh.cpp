@@ -51,10 +51,6 @@ void PolyMesh::generateBoundaryMesh(int Nx, int Ny, int Nz) {
             auxFace.iNeighbour = nElements;
             auxFace.iPeriodicFace = nFaces + auxBoundary.nBoundaryFaces;
 
-            if (Nx > 1) {
-                faces[(Nx - 1)*i + (Nx - 1)*Ny*k].iOwnerFar = nElements;
-            }
-
             // Computation of the surface and the surface vector. The surface vector points to the neighbour element
             auxFace.SfMag = computeRectangleArea(nodes[vertices[0]].y, nodes[vertices[4]].y,
                                                  nodes[vertices[0]].z, nodes[vertices[3]].z);
@@ -95,10 +91,6 @@ void PolyMesh::generateBoundaryMesh(int Nx, int Ny, int Nz) {
             auxFace.iOwner = (Nx - 1) + Nx*i + Nx*Ny*k;
             auxFace.iNeighbour = nElements;
             auxFace.iPeriodicFace = nFaces - auxBoundary.nBoundaryFaces;
-
-            if (Nx > 1) {
-                faces[Nx - 2 + (Nx - 1)*i + (Nx - 1)*Ny*k].iNeighbourFar = nElements;
-            }
 
             // Computation of the surface and the surface vector. The surface vector points to the neighbour element
             auxFace.SfMag = computeRectangleArea(nodes[vertices[1]].y, nodes[vertices[5]].y,
@@ -141,10 +133,6 @@ void PolyMesh::generateBoundaryMesh(int Nx, int Ny, int Nz) {
             auxFace.iNeighbour = nElements;
             auxFace.iPeriodicFace = nFaces + auxBoundary.nBoundaryFaces;
 
-            if (Ny > 1) {
-                faces[(Nx - 1)*Ny*Nz + j + Nx*(Ny - 1)*k].iOwnerFar = nElements;
-            }
-
             // Computation of the surface and the surface vector. The surface vector points to the neighbour element
             auxFace.SfMag = computeRectangleArea(nodes[vertices[0]].x, nodes[vertices[1]].x,
                                                  nodes[vertices[0]].z, nodes[vertices[3]].z);
@@ -185,10 +173,6 @@ void PolyMesh::generateBoundaryMesh(int Nx, int Ny, int Nz) {
             auxFace.iOwner = Nx*(Ny - 1) + j + Nx*Ny*k;
             auxFace.iNeighbour = nElements;
             auxFace.iPeriodicFace = nFaces - auxBoundary.nBoundaryFaces;
-
-            if (Ny > 1) {
-                faces[(Nx - 1)*Ny*Nz + Nx*(Ny - 2) + j + Nx*(Ny - 1)*k].iNeighbourFar = nElements;
-            }
 
             // Computation of the surface and the surface vector. The surface vector points to the neighbour element
             auxFace.SfMag = computeRectangleArea(nodes[vertices[4]].x, nodes[vertices[5]].x,
@@ -231,10 +215,6 @@ void PolyMesh::generateBoundaryMesh(int Nx, int Ny, int Nz) {
             auxFace.iNeighbour = nElements;
             auxFace.iPeriodicFace = nFaces + auxBoundary.nBoundaryFaces;
 
-            if (Nz > 1) {
-                faces[(Nx - 1)*Ny*Nz + Nx*(Ny - 1)*Nz + j + Nx*i].iOwnerFar = nElements;
-            }
-
             // Computation of the surface and the surface vector. The surface vector points to the neighbour element
             auxFace.SfMag = computeRectangleArea(nodes[vertices[0]].x, nodes[vertices[1]].x,
                                                  nodes[vertices[0]].y, nodes[vertices[4]].y);
@@ -276,10 +256,6 @@ void PolyMesh::generateBoundaryMesh(int Nx, int Ny, int Nz) {
             auxFace.iOwner = Nx*Ny*(Nz - 1) + j + Nx*i;
             auxFace.iNeighbour = nElements;
             auxFace.iPeriodicFace = nFaces - auxBoundary.nBoundaryFaces;
-
-            if (Nz > 1) {
-                faces[(Nx - 1)*Ny*Nz + Nx*(Ny - 1)*Nz + Nx*Ny*(Nz - 2) + j + Nx*i].iNeighbourFar = nElements;
-            }
 
             // Computation of the surface and the surface vector. The surface vector points to the neighbour element
             auxFace.SfMag = computeRectangleArea(nodes[vertices[3]].x, nodes[vertices[2]].x,
@@ -329,41 +305,6 @@ void PolyMesh::generateBoundaryMesh(int Nx, int Ny, int Nz) {
         // Computation of the linear interpolation factor to face
         faces[i].gf = (faces[i].dONMag - faces[i].dOfMag)/faces[i].dONMag;
 
-    }
-
-
-    // Loop over all the boundary faces
-    for (int k = 0; k < nBoundaries; ++k) {
-
-        // Loop over all the boundary faces of the k_th boundary
-        for (int i = boundaries[k].startFace; i < boundaries[k].startFace + boundaries[k].nBoundaryFaces; ++i) {
-
-            if (k == 0) {
-
-                faces[i].iOwnerFar = faces[i].iOwner + 1;
-                faces[i].iNeighbourFar = faces[faces[i].iPeriodicFace].iOwner - 1;
-            } else if (k == 1) {
-
-                faces[i].iOwnerFar = faces[i].iOwner - 1;
-                faces[i].iNeighbourFar = faces[faces[i].iPeriodicFace].iOwner + 1;
-            } else if (k == 2) {
-
-                faces[i].iOwnerFar = faces[i].iOwner + Nx;
-                faces[i].iNeighbourFar = faces[faces[i].iPeriodicFace].iOwner - Nx;
-            } else if (k == 3) {
-
-                faces[i].iOwnerFar = faces[i].iOwner - Nx;
-                faces[i].iNeighbourFar = faces[faces[i].iPeriodicFace].iOwner + Nx;
-            } else if (k == 4) {
-
-                faces[i].iOwnerFar = faces[i].iOwner + Nx*Ny;
-                faces[i].iNeighbourFar = faces[faces[i].iPeriodicFace].iOwner - Nx*Ny;
-            } else {
-
-                faces[i].iOwnerFar = faces[i].iOwner - Nx*Ny;
-                faces[i].iNeighbourFar = faces[faces[i].iPeriodicFace].iOwner + Nx*Ny;
-            }
-        }
     }
 
 

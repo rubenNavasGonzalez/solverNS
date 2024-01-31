@@ -41,20 +41,5 @@ SparseMatrix fvm::laplacianOrthogonal(const PolyMesh& theMesh) {
     }
 
 
-    // Average the matrix by the element volume
-    for (int i = 0; i < laplacian.upperIndex.size(); ++i) {
-
-        laplacian.upperValue[i] /= theMesh.elements[ laplacian.upperIndex[i][0] ].Vf;
-    }
-    for (int i = 0; i < laplacian.diagIndex.size(); ++i) {
-
-        laplacian.diagValue[i] /= theMesh.elements[ laplacian.diagIndex[i][0] ].Vf;
-    }
-    for (int i = 0; i < laplacian.lowerIndex.size(); ++i) {
-
-        laplacian.lowerValue[i] /= theMesh.elements[ laplacian.lowerIndex[i][0] ].Vf;
-    }
-
-
     return laplacian;
 }

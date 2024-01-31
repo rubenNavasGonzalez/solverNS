@@ -36,6 +36,7 @@ ScalarField solveBiCGSTAB(const SparseMatrix& A, const ScalarField& b, const Lin
     r0 = r;
 
     if (r.maxAbs() <= theLinearSolverConfig.tolerance) {
+
         iterate = false;
         printf("\tSolution converged after %i iterations. \n", numberOfIterations);
     }
@@ -48,6 +49,7 @@ ScalarField solveBiCGSTAB(const SparseMatrix& A, const ScalarField& b, const Lin
             beta = (rho/rhoPrev)*(alpha/omegaPrev);
             p = rPrev + beta*( pPrev - omegaPrev*vPrev );
         } else {
+
             p = rPrev;
         }
 
@@ -62,12 +64,15 @@ ScalarField solveBiCGSTAB(const SparseMatrix& A, const ScalarField& b, const Lin
         numberOfIterations++;
 
         if(r.maxAbs() <= theLinearSolverConfig.tolerance) {
+
             iterate = false;
             printf("\tSolution converged after %i iterations. \n", numberOfIterations);
         } else if(numberOfIterations > theLinearSolverConfig.maxIter) {
+
             iterate = false;
             printf("\tMaximum number of iterations reached. \n");
         } else {
+
             r = s - omega*t;
             rhoPrev = rho;
             omegaPrev = omega;

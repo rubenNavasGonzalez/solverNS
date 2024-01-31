@@ -26,6 +26,7 @@ public:
     std::vector<double> getValue(std::vector<int> ij);
     void addValue(double value, std::vector<int> ij);
     friend ScalarField operator*(const SparseMatrix& A, const ScalarField& field);
+    friend SparseMatrix operator*(const SparseMatrix& A, const SparseMatrix& B);
 };
 
 

@@ -17,7 +17,6 @@ public:
     GeometricVector Sf;                     // Surface vector (oriented to owner element)
     double SfMag{};                         // Face area
     int iOwner{}, iNeighbour{};             // Tag of the owner and neighbour elements of the face
-    int iOwnerFar{}, iNeighbourFar{};       // Tag of the far owner and far neighbour elements of the face
     GeometricVector dON, dOf;               // Owner to neighbour element and Owner to face distance vectors
     double dONMag{}, dOfMag{};              // Magnitude of the vectors above
     double gf{};                            // Face linear iterpolation factor Phi_f = gf*Phi_C + (1 - gf)*Phi_E

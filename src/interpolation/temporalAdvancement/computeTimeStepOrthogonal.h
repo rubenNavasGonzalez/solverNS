@@ -9,6 +9,6 @@
 #include "../../fields/vectorField/VectorField.h"
 
 
-double computeTimeStepOrthogonal(const PolyMesh& theMesh, const VectorField& u, double nu);
+double computeTimeStepOrthogonal(const PolyMesh& theMesh, const VectorField& u, double nu, double f);
 
 #endif //FLOWBETWEENFLATPLATES_COMPUTETIMESTEPORTHOGONAL_H

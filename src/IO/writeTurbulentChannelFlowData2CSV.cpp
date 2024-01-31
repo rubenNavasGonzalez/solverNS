@@ -7,8 +7,8 @@
 #include "writeTurbulentChannelFlowData2CSV.h"
 
 
-void writeTurbulentChannelFlowData2CSV(const PolyMesh& theMesh, const ScalarField& p, const VectorField& u, const VectorField& omega,
-                                       const ScalarField& nut, double uBulk, double t) {
+void writeTurbulentChannelFlowData2CSV(const PolyMesh& theMesh, const ScalarField& p, const VectorField& u, const VectorField& uPred,
+                                       const VectorField& omega, const ScalarField& nut, double uBulk, double t) {
 
     // Data file
     std::ofstream outfileData;
@@ -17,12 +17,12 @@ void writeTurbulentChannelFlowData2CSV(const PolyMesh& theMesh, const ScalarFiel
     if (outfileData.is_open()) {
 
         // Write the data file header
-        outfileData << "x," << "y," << "z," << "p," << "uX," << "uY," << "uZ," << "wX," << "wY," << "wZ," << "nut," << "uBulk \n";
+        outfileData << "x," << "y," << "z," << "p," << "uX," << "uY," << "uZ," << "uPredX," << "uPredY," << "uPredZ," << "wX," << "wY," << "wZ," << "nut," << "uBulk \n";
 
         // Assemble the .csv file
         for (int i = 0; i < p.size(); ++i) {
 
-            outfileData << theMesh.elements[i].centroid.x << "," << theMesh.elements[i].centroid.y << "," << theMesh.elements[i].centroid.z << "," << p[i] << "," << u[i].x << "," << u[i].y << "," << u[i].z << "," << omega[i].x << "," << omega[i].y << "," << omega[i].z << "," << nut[i] << "," << uBulk << "\n";
+            outfileData << theMesh.elements[i].centroid.x << "," << theMesh.elements[i].centroid.y << "," << theMesh.elements[i].centroid.z << "," << p[i] << "," << u[i].x << "," << u[i].y << "," << u[i].z << "," << uPred[i].x << "," << uPred[i].y << "," << uPred[i].z << "," << omega[i].x << "," << omega[i].y << "," << omega[i].z << "," << nut[i] << "," << uBulk << "\n";
         }
 
     } else {

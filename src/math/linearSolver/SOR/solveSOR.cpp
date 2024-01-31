@@ -8,11 +8,10 @@
 
 ScalarField solveSOR(const SparseMatrix& A, const ScalarField& b, const LinearSolverConfig& theLinearSolverConfig, const ScalarField& PhiOld) {
 
-    double maxResidual;
     int numberOfIterations = 0;
 
     ScalarField x0 = PhiOld;
-    ScalarField x = PhiOld;
+    ScalarField x = x0;
 
     double xi, aii;
 

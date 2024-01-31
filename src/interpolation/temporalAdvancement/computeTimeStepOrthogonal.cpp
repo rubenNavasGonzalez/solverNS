@@ -7,7 +7,7 @@
 #include "../../fields/scalarField/ScalarField.h"
 
 
-double computeTimeStepOrthogonal(const PolyMesh& theMesh, const VectorField& u, double nu) {
+double computeTimeStepOrthogonal(const PolyMesh& theMesh, const VectorField& u, double nu, double f) {
 
     // Auxiliary variables
     int iOwner, iNeighbour;
@@ -39,10 +39,10 @@ double computeTimeStepOrthogonal(const PolyMesh& theMesh, const VectorField& u, 
         uElement = u[iNeighbour];
         uMod = uElement.mag();
 
-        DeltaT_c.push_back( DeltaX/uMod );
-        DeltaT_d.push_back( 0.5*pow(DeltaX,2)/nu );
+        DeltaT_c.push_back( 0.35*DeltaX/uMod );
+        DeltaT_d.push_back( 0.2*pow(DeltaX,2)/nu );
     }
 
 
-    return 0.5*std::min(DeltaT_c.min(), DeltaT_d.min());
+    return std::min(DeltaT_c.min(), DeltaT_d.min());
 }

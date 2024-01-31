@@ -134,15 +134,15 @@ TensorField fvc::gradient(const VectorField& Phi, const PolyMesh& theMesh, const
     for (int i = 0; i < theMesh.nInteriorElements; ++i) {
 
         gradient[i][0][0] = gradX[i].x;
-        gradient[i][0][1] = gradX[i].y;
-        gradient[i][0][2] = gradX[i].z;
+        gradient[i][0][1] = gradY[i].x;
+        gradient[i][0][2] = gradZ[i].x;
 
-        gradient[i][1][0] = gradY[i].x;
+        gradient[i][1][0] = gradX[i].y;
         gradient[i][1][1] = gradY[i].y;
-        gradient[i][1][2] = gradY[i].z;
+        gradient[i][1][2] = gradZ[i].y;
 
-        gradient[i][2][0] = gradZ[i].x;
-        gradient[i][2][1] = gradZ[i].y;
+        gradient[i][2][0] = gradX[i].z;
+        gradient[i][2][1] = gradY[i].z;
         gradient[i][2][2] = gradZ[i].z;
     }
 

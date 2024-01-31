@@ -3,15 +3,13 @@
 //
 
 #include "fvc.h"
-#include "../../interpolation/convectiveSchemes/convectiveSchemesOrthogonal.h"
 
 
-VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField& Phi, const PolyMesh& theMesh, const VectorBoundaryConditions& PhiBCs, const std:: string& scheme) {
+VectorField fvc::convective(const ScalarField& mDot, const VectorField& Phi, const PolyMesh& theMesh, const VectorBoundaryConditions& PhiBCs) {
 
     // Auxiliary variables
-    int iOwner, iNeighbour, iOwnerFar, iNeighbourFar, iPeriodicFace, iHalo;
-    Node pOwner, pNeighbour, pOwnerFar, pNeighbourFar, pF;
-    GeometricVector PhiF, PhiOwner, PhiNeighbour, PhiOwnerFar, PhiNeighbourFar, PhiHalo, Sf, BCValue;
+    int iOwner, iNeighbour, iPeriodicFace, iHalo;
+    GeometricVector PhiF, PhiOwner, PhiNeighbour, PhiHalo, Sf, BCValue;
     std::string BCType;
 
 
@@ -23,29 +21,18 @@ VectorField fvc::convectiveOrthogonal(const ScalarField& mDot, const VectorField
     // Loop over all the interior faces
     for (int i = 0; i < theMesh.nInteriorFaces; ++i) {
 
-        Sf = theMesh.faces[i].Sf;
-
+        // Get the owner and neighbour element indices
         iOwner = theMesh.faces[i].iOwner;
         iNeighbour = theMesh.faces[i].iNeighbour;
-        iOwnerFar = theMesh.faces[i].iOwnerFar;
-        iNeighbourFar = theMesh.faces[i].iNeighbourFar;
 
-        pOwner = theMesh.elements[iOwner].centroid;
-        pNeighbour = theMesh.elements[iNeighbour].centroid;
-        //pOwnerFar = theMesh.elements[iOwnerFar].centroid;
-        //pNeighbourFar = theMesh.elements[iNeighbourFar].centroid;
-        pF = theMesh.faces[i].centroid;
-
+        // Get the owner and neighbour Phi value
         PhiOwner = Phi[iOwner];
         PhiNeighbour = Phi[iNeighbour];
-        //PhiOwnerFar = Phi[iOwnerFar];
-        //PhiNeighbourFar = Phi[iNeighbourFar];
 
-        //PhiF = convectiveSchemesOrthogonal(PhiOwner, pOwner, PhiOwnerFar, pOwnerFar, PhiNeighbour, pNeighbour, PhiNeighbourFar,
-                                            //pNeighbourFar, pF, mDot[i], Sf, scheme);
-
+        // Interpolate the Phi value at the element face (a symmetry-preserving scheme is used)
         PhiF = 0.5*(PhiOwner + PhiNeighbour);
 
+        // Compute the convective term
         convective[iOwner] += mDot[i]*PhiF;
         convective[iNeighbour] -= mDot[i]*PhiF;
     }

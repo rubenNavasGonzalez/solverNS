@@ -13,9 +13,9 @@ int main(int argc, char *argv[]) {
 
     // Mesh parameters
     double delta = 1;                                                   // Reference length
-    double Lx = 4*M_PI*delta, Ly = 2*delta, Lz = 4./3.*M_PI*delta;      // Domain size
-    int Nx = 8, Ny = 8, Nz = 8;                                       // Number of elements in each direction
-    double sx = 0, sy = 4, sz = 0;                                    // Hyperbolic tangent mesh spacing
+    double Lx = 2*M_PI*delta, Ly = 2*delta, Lz = M_PI*delta;            // Domain size
+    int Nx = 24, Ny = 25, Nz = 24;                                      // Number of elements in each direction
+    double sx = 0, sy = 0, sz = 0;                                      // Hyperbolic tangent mesh stretching
 
 
     // Mesh generation
@@ -25,14 +25,14 @@ int main(int argc, char *argv[]) {
 
 
     // Flow properties
-    double nu = 1./180;                                                  // Viscosity
+    double nu = 1./30;                                                  // Viscosity
+    double yPlusMin = theMesh.elements[0].centroid.y/nu;
 
 
     // Velocity field initialization (field and BCs)
     VectorField u;
     u.assign(theMesh.nInteriorElements, {0,0,0});
     #include "mainIncludes/initializeChannelFlowReTau180.h"
-    //#include "mainIncludes/initializeChannelFlowReTau180_new.h"
 
     VectorBoundaryConditions uBCs;
     uBCs.addBC("periodic", {0,0,0});
@@ -70,15 +70,16 @@ int main(int argc, char *argv[]) {
 
 
     // Linear solver parameters initialization
-    LinearSolverConfig pSolver("BiCGSTAB", 1e-6, 1e6);
+    LinearSolverConfig pSolver("CGS", 1e-6, 1e6);
 
 
     // Transient parameters
     double t = 0;
-    double tFinal = 200;
+    double tFinal = 1e24;
     double DeltaT;
+    double f = 1;
     double steadyStateCriterion = 1e-4;
-    int k = 0, writeInterval = 500;
+    int k = 0, writeInterval = 1e24;
 
 
     // Pre-definitions
@@ -96,14 +97,14 @@ int main(int argc, char *argv[]) {
     while (temporalIterate) {
 
         // Compute time-step and update time
-        DeltaT = computeTimeStepOrthogonal(theMesh, u, nu);
+        DeltaT = computeTimeStepOrthogonal(theMesh, u, nu, f);
         t += DeltaT;
         printf("\nTime = %f s \n", t);
 
 
         // Compute convective and diffusive term explicitly
         mDot = RhieChowInterpolation(u, p, theMesh, DeltaT, uBCs, pBCs);
-        convU = fvc::convectiveOrthogonal(mDot, u, theMesh, uBCs, "CDS");
+        convU = fvc::convective(mDot, u, theMesh, uBCs);
         diffU = fvc::laplacianOrthogonal(u, theMesh, uBCs);
 
 
@@ -125,7 +126,7 @@ int main(int argc, char *argv[]) {
 
 
         // Compute the divergence of UPred explicitly and the laplacian of the pressure field implicitly
-        divUPred = fvc::divergence(uPred, theMesh, uBCs);
+        divUPred = fvc::divergenceNVS(uPred, theMesh, uBCs);
         laplacianMatrixP = fvm::laplacianOrthogonal(theMesh);
 
 
@@ -149,7 +150,7 @@ int main(int argc, char *argv[]) {
 
         // Compute the divergence of the new velocity explicitly and get its maximum-absolute value (to ensure continuity)
         divUNew = fvc::divergence(uNew, theMesh, uBCs);
-        printf("\tThe maximum value of divUNew is: %E \n", divUNew.max());
+        printf("\tThe maximum value of divUNew is: %E \n", divUNew.rms());
 
 
         // Compute the gradient of the new velocity field
@@ -192,7 +193,7 @@ int main(int argc, char *argv[]) {
         if (k % writeInterval == 0 && k != 0) {
 
             printf("\nWriting data corresponding to Time = %f s \n", t);
-            writeTurbulentChannelFlowData2CSV(theMesh, pNew, u, omega, nut, uBulk, t);
+            writeTurbulentChannelFlowData2CSV(theMesh, pNew, u, uPred, omega, nut, uBulk, t);
             writeTurbulentChannelFlowData2VTK(theMesh, pNew, uNew, omega, nut, pBCs, uBCs, uBCs, nutBCs, t);
         }
 
@@ -203,7 +204,7 @@ int main(int argc, char *argv[]) {
 
     // Write last time-step results to .csv and .VTK file
     printf("\nWriting data corresponding to Time = %f s \n", t);
-    writeTurbulentChannelFlowData2CSV(theMesh, pNew, u, omega, nut, uBulk, t);
+    writeTurbulentChannelFlowData2CSV(theMesh, pNew, u, uPred, omega, nut, uBulk, t);
     writeTurbulentChannelFlowData2VTK(theMesh, pNew, uNew, omega, nut, pBCs, uBCs, uBCs, nutBCs, t);
 
 

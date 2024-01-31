@@ -9,7 +9,7 @@
 #include "../fields/vectorField/VectorField.h"
 
 
-void writeTurbulentChannelFlowData2CSV(const PolyMesh& theMesh, const ScalarField& p, const VectorField& u, const VectorField& omega,
-                                       const ScalarField& nut, double uBulk, double t);
+void writeTurbulentChannelFlowData2CSV(const PolyMesh& theMesh, const ScalarField& p, const VectorField& u, const VectorField& uPred,
+                                       const VectorField& omega, const ScalarField& nut, double uBulk, double t);
 
 #endif //SOLVERNS_WRITETURBULENTCHANNELFLOWDATA2CSV_H

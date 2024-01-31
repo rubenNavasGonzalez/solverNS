@@ -43,3 +43,38 @@ ScalarField operator*(const SparseMatrix &A, const ScalarField &field) {
 
     return result;
 }
+
+
+// Sparse matrix multiplication (it is assumed A is a diagonal matrix)
+SparseMatrix operator*(const SparseMatrix& A, const SparseMatrix& B) {
+
+    // Initialize the product matrix
+    SparseMatrix C;
+
+
+    // Loop for all the B matrix diagonal elements
+    for (int i = 0; i < B.diagIndex.size(); ++i) {
+
+        C.diagValue.push_back( A.diagValue[i]*B.diagValue[i] );
+        C.diagIndex.push_back({i,i});
+    }
+
+
+    // Loop for all the B matrix upper elements
+    for (int i = 0; i < B.upperIndex.size(); ++i) {
+
+        C.upperValue.push_back( A.diagValue[ B.upperIndex[i][0] ]*B.upperValue[i] );
+        C.upperIndex.push_back( B.upperIndex[i] );
+    }
+
+
+    // Loop for all the B matrix lower elements
+    for (int i = 0; i < B.lowerIndex.size(); ++i) {
+
+        C.lowerValue.push_back( A.diagValue[ B.lowerIndex[i][0] ]*B.lowerValue[i] );
+        C.lowerIndex.push_back( B.lowerIndex[i] );
+    }
+
+
+    return C;
+}

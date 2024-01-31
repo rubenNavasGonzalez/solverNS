@@ -15,8 +15,8 @@ VectorField fvc::curl(const TensorField& gradPhi, const PolyMesh& theMesh) {
     // Loop over all the interior elements and assemble curl vector field
     for (int i = 0; i < theMesh.nInteriorElements; ++i) {
 
-        curl[i].x = gradPhi[i][2][1] - gradPhi[i][1][2];
-        curl[i].y = gradPhi[i][0][2] - gradPhi[i][2][0];
+        curl[i].x = gradPhi[i][1][2] - gradPhi[i][2][1];
+        curl[i].y = gradPhi[i][2][0] - gradPhi[i][0][2];
         curl[i].z = gradPhi[i][1][0] - gradPhi[i][0][1];
     }
 

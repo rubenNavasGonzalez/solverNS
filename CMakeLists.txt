@@ -50,18 +50,9 @@ add_executable(solverNS app/main.cpp
         src/boundaryConditions/scalarBoundaryConditions/ScalarBoundaryConditions.cpp
         src/boundaryConditions/scalarBoundaryConditions/ScalarBoundaryConditions.h
         src/boundaryConditions/scalarBoundaryConditions/addBC.cpp
-        src/finiteVolumeMethod/fvc/convectiveOrthogonal.cpp
+        src/finiteVolumeMethod/fvc/convective.cpp
         src/finiteVolumeMethod/fvc/laplacianOrthogonal.cpp
-        src/interpolation/convectiveSchemes/convectiveSchemesOrthogonal.cpp
-        src/interpolation/convectiveSchemes/convectiveSchemesOrthogonal.h
-        src/interpolation/convectiveSchemes/interpolateUDS.cpp
-        src/interpolation/convectiveSchemes/interpolateDDS.cpp
         src/fields/vectorField/applyBCs.cpp
-        src/interpolation/convectiveSchemes/interpolateCDS_Orthogonal.cpp
-        src/interpolation/convectiveSchemes/interpolateSUDS_Orthogonal.cpp
-        src/interpolation/convectiveSchemes/interpolateQUICK_Orthogonal.cpp
-        src/interpolation/convectiveSchemes/interpolateSMART_Orthogonal.cpp
-        src/interpolation/convectiveSchemes/interpolateSP.cpp
         src/finiteVolumeMethod/fvc/divergence.cpp
         src/fields/scalarField/max.cpp
         src/math/sparseMatrix/SparseMatrix.cpp
@@ -85,7 +76,6 @@ add_executable(solverNS app/main.cpp
         src/interpolation/interpolateMDotFromElements2Faces/RhieChowInterpolation.h
         src/math/linearSolver/SOR/solveSOR.cpp
         src/math/linearSolver/SOR/solveSOR.h
-        src/fields/scalarField/mag.cpp
         src/interpolation/temporalAdvancement/computeTimeStepOrthogonal.cpp
         src/interpolation/temporalAdvancement/computeTimeStepOrthogonal.h
         src/fields/scalarField/min.cpp
@@ -108,4 +98,10 @@ add_executable(solverNS app/main.cpp
         src/IO/writeTurbulentChannelFlowData2CSV.h
         src/IO/writeTurbulentChannelFlowData2VTK.cpp
         src/IO/writeTurbulentChannelFlowData2VTK.h
+        src/math/linearSolver/CGS/solveCGS.cpp
+        src/math/linearSolver/CGS/solveCGS.h
+        src/finiteVolumeMethod/fvc/divergenceNVS.cpp
+        src/fields/scalarField/rms.cpp
+        src/math/linearSolver/preconditioner/jacobiPreconditioner.cpp
+        src/math/linearSolver/preconditioner/jacobiPreconditioner.h
 )
