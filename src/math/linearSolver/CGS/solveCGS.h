@@ -5,7 +5,6 @@
 #ifndef SOLVERNS_SOLVECGS_H
 #define SOLVERNS_SOLVECGS_H
 
-#include <string>
 #include "../../../finiteVolumeMethod/fvScalarEquation/FvScalarEquation.h"
 
 

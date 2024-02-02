@@ -17,7 +17,7 @@ VectorField fvc::curl(const TensorField& gradPhi, const PolyMesh& theMesh) {
 
         curl[i].x = gradPhi[i][1][2] - gradPhi[i][2][1];
         curl[i].y = gradPhi[i][2][0] - gradPhi[i][0][2];
-        curl[i].z = gradPhi[i][1][0] - gradPhi[i][0][1];
+        curl[i].z = gradPhi[i][0][1] - gradPhi[i][1][0];
     }
 
 

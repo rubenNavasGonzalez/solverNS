@@ -1,25 +1,24 @@
 //
-// Created by ruben on 6/12/23.
+// Created by ruben on 1/02/24.
 //
 
-#include "solveBiCGSTAB.h"
+#include "solveCG.h"
+#include "../preconditioner/jacobiPreconditioner.h"
 
 
-ScalarField solveBiCGSTAB(const SparseMatrix& A, const ScalarField& b, const LinearSolverConfig& theLinearSolverConfig, const ScalarField& PhiOld) {
+ScalarField solveCG(const SparseMatrix& A, const ScalarField& b, const LinearSolverConfig& theLinearSolverConfig, const ScalarField& PhiOld) {
 
-
-     // Auxiliary variables initialization
-     int numberOfIterations = 0;
-     ScalarField r, rOld, rHat, p, s, t, q, Phi;
-     double alpha, omega, beta;
-     bool iterate = true;
+    // Auxiliary variables initialization
+    int numberOfIterations = 0;
+    ScalarField r, rOld, p, t, Phi;
+    double beta, alpha;
+    bool iterate = true;
 
 
     // Check if the Phi field is already converged
     Phi = PhiOld;
     r = b - A*Phi;
     rOld = r;
-    rHat = r;
 
     if (r.maxAbs() <= theLinearSolverConfig.tolerance) {
 
@@ -39,12 +38,12 @@ ScalarField solveBiCGSTAB(const SparseMatrix& A, const ScalarField& b, const Lin
 
         // Update the solution
         t = A * p;
-        alpha = (r * rHat) / (t * rHat);
-        s = r - alpha * t;
-        q = A * s;
-        omega = (q * s) / (q * q);
-        Phi = Phi + (alpha * p) + (omega * s);
-        r = s - omega * q;
+        alpha = (r * r) / (p * t);
+        Phi = Phi + alpha * p;
+
+
+        // Update the residual
+        r = r - alpha * t;
 
 
         // Update the number of iterations
@@ -63,8 +62,8 @@ ScalarField solveBiCGSTAB(const SparseMatrix& A, const ScalarField& b, const Lin
         } else {
 
             // Compute the search direction and update parameters
-            beta = (alpha / omega) * (r * rHat) / (rOld * rHat);
-            p = r + beta * (p - omega * t);
+            beta = (r * r) / (rOld * rOld);
+            p = r + beta * p;
 
             rOld = r;
         }

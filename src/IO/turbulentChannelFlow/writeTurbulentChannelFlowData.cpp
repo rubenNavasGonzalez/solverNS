@@ -21,7 +21,7 @@ void writeTurbulentChannelFlowData(double delta, double Lx, double Ly, double Lz
         // Write the header
         outFile << "=== Turbulent Channel Flow Data === \n";
         outFile << "Description: Case set-up data. \n";
-        outFile << "================================== \n\n";
+        outFile << "=================================== \n\n";
 
 
         // Write the geometrical data

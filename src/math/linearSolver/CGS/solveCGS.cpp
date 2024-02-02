@@ -9,43 +9,42 @@ ScalarField solveCGS(const SparseMatrix& A, const ScalarField& b, const LinearSo
 
     // Auxiliary variables initialization
     int numberOfIterations = 0;
-    ScalarField r, rOld, p, pOld, Phi, PhiAux;
+    ScalarField r, rOld, rHat, p, t, q, u, Phi;
     double beta, alpha;
     bool iterate = true;
 
 
     // Check if the Phi field is already converged
-    PhiAux = PhiOld;
-    r = b - A*PhiAux;
+    Phi = PhiOld;
+    r = b - A*Phi;
     rOld = r;
+    rHat = r;
 
     if (r.maxAbs() <= theLinearSolverConfig.tolerance) {
 
         printf("\tSolution converged after %i iterations. \n", numberOfIterations);
-        return PhiAux;
+
+        return Phi;
     }
 
 
     // Compute the initial search direction
     p = r;
-    pOld = p;
+    u = r;
 
     // Iterative process until reach convergence or exceed the maximum number of iterations
     while (iterate) {
 
 
         // Update the solution
-        alpha = (rOld*rOld) / (pOld*(A*pOld));
-        Phi = PhiAux + alpha*pOld;
+        t = A * p;
+        alpha = (r * rHat) / (rHat * t);
+        q = u - alpha * t;
+        Phi = Phi + alpha * (u + q);
 
 
         // Update the residual
-        r = rOld - alpha*(A*pOld);
-
-
-        // Compute the search direction
-        beta = (r*r) / (rOld*rOld);
-        p = r + beta*pOld;
+        r = rOld - alpha * (A * (u + q));
 
 
         // Update the number of iterations
@@ -63,9 +62,12 @@ ScalarField solveCGS(const SparseMatrix& A, const ScalarField& b, const LinearSo
             printf("\tMaximum number of iterations reached. \n");
         } else {
 
+            // Compute the search direction and update parameters
+            beta = (r * rHat) / (rOld * rHat);
+            u = r + beta * q;
+            p = u + beta * (q + beta * p);
+
             rOld = r;
-            pOld = p;
-            PhiAux = Phi;
         }
     }
 

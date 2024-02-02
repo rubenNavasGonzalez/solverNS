@@ -116,6 +116,8 @@ add_executable(solverNS app/main.cpp
         src/functionObjects/computeQCrit/computeQCrit.h
         src/IO/turbulentChannelFlow/writeTurbulentChannelFlowData.cpp
         src/IO/turbulentChannelFlow/writeTurbulentChannelFlowData.h
+        src/math/linearSolver/CG/solveCG.cpp
+        src/math/linearSolver/CG/solveCG.h
 )
 
 #target_compile_options(solverNS PRIVATE ${OpenMP_CXX_FLAGS})

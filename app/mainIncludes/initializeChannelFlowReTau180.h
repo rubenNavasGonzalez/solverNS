@@ -22,10 +22,10 @@ for (int i = 0; i < theMesh.nInteriorElements; ++i) {
     }
 
     sinX = sin(4*M_PI*theMesh.elements[i].centroid.x/Lx);
-    sinY = sin(M_PI*theMesh.elements[i].centroid.y);
+    sinY = sin(M_PI*y);
     sinZ = sin(2*M_PI*theMesh.elements[i].centroid.z/Lz);
     cosX = cos(4*M_PI*theMesh.elements[i].centroid.x/Lx);
-    cosY = 1 + cos(M_PI*theMesh.elements[i].centroid.y);
+    cosY = 1 + cos(M_PI*y);
     cosZ = cos(2*M_PI*theMesh.elements[i].centroid.z/Lz);
 
     u[i].x = uAvg + A*cosX*sinY*sinZ*Lx/2;

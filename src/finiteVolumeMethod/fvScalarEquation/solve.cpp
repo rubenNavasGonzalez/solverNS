@@ -3,6 +3,7 @@
 //
 
 #include "FvScalarEquation.h"
+#include "../../math/linearSolver/CG/solveCG.h"
 #include "../../math/linearSolver/CGS/solveCGS.h"
 #include "../../math/linearSolver/BiCGSTAB/solveBiCGSTAB.h"
 #include "../../math/linearSolver/SOR/solveSOR.h"
@@ -11,7 +12,10 @@
 
 ScalarField FvScalarEquation::solve(const LinearSolverConfig& theLinearSolverConfig, const ScalarField& PhiOld) {
 
-    if (theLinearSolverConfig.solver == "CGS") {
+    if (theLinearSolverConfig.solver == "CG") {
+
+        return solveCG(A, b, theLinearSolverConfig, PhiOld);
+    } else if (theLinearSolverConfig.solver == "CGS") {
 
         return solveCGS(A, b, theLinearSolverConfig, PhiOld);
     } else if (theLinearSolverConfig.solver == "BiCGSTAB") {

@@ -15,11 +15,136 @@
 int main(int argc, char *argv[]) {
 
 
+    /*// Mesh parameters
+    double delta = 1;                                                       // Reference length
+    double Lx = 4*M_PI*delta, Ly = 2*delta, Lz = 4./3*M_PI*delta;           // Domain size
+    int m = 8;                                                              // Mesh power factor
+    int Nx = pow(2,m), Ny = pow(2,m) + 1, Nz = pow(2,m); // Number of elements in each direction
+    double sx = 0, sy = 4.5, sz = 0;                                        // Hyperbolic tangent mesh stretching
+
+
+    // Mesh generation
+    PolyMesh theMesh;
+    theMesh.generatePolyMesh(Lx, Ly, Lz, Nx, Ny, Nz, sx, sy, sz);       // Generate internal mesh
+    theMesh.generateBoundaryMesh(Nx, Ny, Nz);                           // Generate boundary mesh
+
+
+    // Velocity field initialization (field and BCs)
+    VectorField u;
+    u.assign(theMesh.nInteriorElements, {0,0,0});
+
+    for (int i = 0; i < theMesh.nInteriorElements; ++i) {
+
+        double x = theMesh.elements[i].centroid.x;
+        double y = theMesh.elements[i].centroid.y;
+        double z = theMesh.elements[i].centroid.z;
+        double pi = M_PI;
+
+        u[i].x = sin(2*pi/Lx*x)*sin(pi/Ly*y)*cos(2*pi/Lz*z);
+        u[i].y = -cos(2*pi/Lx*x)*sin(pi/Ly*y)*sin(2*pi/Lz*z);
+        u[i].z = sin(2*pi/Lx*x)*sin(pi/Ly*y)*cos(2*pi/Lz*z);
+    }
+
+    VectorBoundaryConditions uBCs;
+    uBCs.addBC("periodic", {0,0,0});
+    uBCs.addBC("periodic", {0,0,0});
+    uBCs.addBC("fixedValue", {0,0,0});
+    uBCs.addBC("fixedValue", {0,0,0});
+    uBCs.addBC("periodic", {0,0,0});
+    uBCs.addBC("periodic", {0,0,0});
+
+
+    // Compute the vorticity
+    TensorField gradU = fvc::gradient(u, theMesh, uBCs);
+    VectorField omega = fvc::curl(gradU, theMesh);
+
+
+    // Verify the gradient field
+    ScalarField r11, r12, r13, r21, r22, r23, r31, r32, r33;
+    double val11, val12, val13, val21, val22, val23, val31, val32, val33;
+
+    r11.assign(theMesh.nInteriorElements, 0);
+    r12.assign(theMesh.nInteriorElements, 0);
+    r13.assign(theMesh.nInteriorElements, 0);
+    r21.assign(theMesh.nInteriorElements, 0);
+    r22.assign(theMesh.nInteriorElements, 0);
+    r23.assign(theMesh.nInteriorElements, 0);
+    r31.assign(theMesh.nInteriorElements, 0);
+    r32.assign(theMesh.nInteriorElements, 0);
+    r33.assign(theMesh.nInteriorElements, 0);
+
+    for (int i = 0; i < theMesh.nInteriorElements; ++i) {
+
+        double x = theMesh.elements[i].centroid.x;
+        double y = theMesh.elements[i].centroid.y;
+        double z = theMesh.elements[i].centroid.z;
+        double pi = M_PI;
+
+        val11 = (2*pi*cos((2*pi*x)/Lx)*cos((2*pi*z)/Lz)*sin((pi*y)/Ly))/Lx;
+        val12 = (2*pi*sin((2*pi*x)/Lx)*sin((pi*y)/Ly)*sin((2*pi*z)/Lz))/Lx;
+        val13 = (2*pi*cos((2*pi*x)/Lx)*cos((2*pi*z)/Lz)*sin((pi*y)/Ly))/Lx;
+        val21 = (pi*cos((pi*y)/Ly)*cos((2*pi*z)/Lz)*sin((2*pi*x)/Lx))/Ly;
+        val22 = -(pi*cos((2*pi*x)/Lx)*cos((pi*y)/Ly)*sin((2*pi*z)/Lz))/Ly;
+        val23 = (pi*cos((pi*y)/Ly)*cos((2*pi*z)/Lz)*sin((2*pi*x)/Lx))/Ly;
+        val31 = -(2*pi*sin((2*pi*x)/Lx)*sin((pi*y)/Ly)*sin((2*pi*z)/Lz))/Lz;
+        val32 = -(2*pi*cos((2*pi*x)/Lx)*cos((2*pi*z)/Lz)*sin((pi*y)/Ly))/Lz;
+        val33 = -(2*pi*sin((2*pi*x)/Lx)*sin((pi*y)/Ly)*sin((2*pi*z)/Lz))/Lz;
+
+        r11[i] = fabs(val11 - gradU[i][0][0]);
+        r12[i] = fabs(val12 - gradU[i][0][1]);
+        r13[i] = fabs(val13 - gradU[i][0][2]);
+        r21[i] = fabs(val21 - gradU[i][1][0]);
+        r22[i] = fabs(val22 - gradU[i][1][1]);
+        r23[i] = fabs(val23 - gradU[i][1][2]);
+        r31[i] = fabs(val31 - gradU[i][2][0]);
+        r32[i] = fabs(val32 - gradU[i][2][1]);
+        r33[i] = fabs(val33 - gradU[i][2][2]);
+    }
+
+    printf("\nThe RMS of the (1,1) gradU tensor error is: %f \n", r11.rms());
+    printf("The RMS of the (1,2) gradU tensor error is: %f \n", r12.rms());
+    printf("The RMS of the (1,3) gradU tensor error is: %f \n", r13.rms());
+    printf("The RMS of the (2,1) gradU tensor error is: %f \n", r21.rms());
+    printf("The RMS of the (2,2) gradU tensor error is: %f \n", r22.rms());
+    printf("The RMS of the (2,3) gradU tensor error is: %f \n", r23.rms());
+    printf("The RMS of the (3,1) gradU tensor error is: %f \n", r31.rms());
+    printf("The RMS of the (3,2) gradU tensor error is: %f \n", r32.rms());
+    printf("The RMS of the (3,3) gradU tensor error is: %f \n", r33.rms());
+
+
+    // Verify the vorticity field
+    ScalarField rX, rY, rZ;
+    double valX, valY, valZ;
+    rX.assign(theMesh.nInteriorElements, 0);
+    rY.assign(theMesh.nInteriorElements, 0);
+    rZ.assign(theMesh.nInteriorElements, 0);
+
+    for (int i = 0; i < theMesh.nInteriorElements; ++i) {
+
+        double x = theMesh.elements[i].centroid.x;
+        double y = theMesh.elements[i].centroid.y;
+        double z = theMesh.elements[i].centroid.z;
+        double pi = M_PI;
+
+        valX = (pi*cos((2*pi*z)/Lz)*(2*Ly*cos((2*pi*x)/Lx)*sin((pi*y)/Ly) + Lz*cos((pi*y)/Ly)*sin((2*pi*x)/Lx)))/(Ly*Lz);
+        valY = -(2*pi*sin((pi*y)/Ly)*(Lz*cos((2*pi*x)/Lx)*cos((2*pi*z)/Lz) + Lx*sin((2*pi*x)/Lx)*sin((2*pi*z)/Lz)))/(Lx*Lz);
+        valZ = -(pi*sin((2*pi*x)/Lx)*(Lx*cos((pi*y)/Ly)*cos((2*pi*z)/Lz) - 2*Ly*sin((pi*y)/Ly)*sin((2*pi*z)/Lz)))/(Lx*Ly);
+
+        rX[i] = fabs(valX - omega[i].x);
+        rY[i] = fabs(valY - omega[i].y);
+        rZ[i] = fabs(valZ - omega[i].z);
+    }
+
+    printf("\nThe RMS of the x-vorticity error is: %f \n", rX.rms());
+    printf("The RMS of the y-vorticity error is: %f \n", rY.rms());
+    printf("The RMS of the z-vorticity error is: %f \n", rZ.rms());*/
+
+
     // Mesh parameters
     double delta = 1;                                                   // Reference length
-    double Lx = 2*M_PI*delta, Ly = 2*delta, Lz = M_PI*delta;            // Domain size
-    int Nx = 32, Ny = 33, Nz = 32;                                      // Number of elements in each direction
-    double sx = 0, sy = 3.5, sz = 0;                                    // Hyperbolic tangent mesh stretching
+    double Lx = 4*M_PI*delta, Ly = 2*delta, Lz = 4./3*M_PI*delta;       // Domain size
+    int Nx = 24, Ny = 25, Nz = 24;                                      // Number of elements in each direction
+    double sx = 0, sy = 4, sz = 0;                                      // Hyperbolic tangent mesh stretching
 
 
     // Mesh generation
@@ -90,19 +215,16 @@ int main(int argc, char *argv[]) {
 
 
     // Linear solver parameters initialization
-    LinearSolverConfig pSolver("CGS", 1e-6, 1e6);
+    LinearSolverConfig pSolver("CG", 1e-6, 1e6);
 
 
     // Transient parameters
     double t = 0;
-    double tFinal = 1e24;
+    double tFinal = 500;
     double DeltaT;
     double f = 1;
     double steadyStateCriterion = 1e-4;
-    int k = 0, writeInterval = 10000;
-
-
-    // HPC parameters
+    int k = 0, writeInterval = 2500;
 
 
     // Pre-definitions
@@ -118,7 +240,6 @@ int main(int argc, char *argv[]) {
     // Write the simulation set-up data
     writeTurbulentChannelFlowData(delta, Lx, Ly, Lz, Nx, Ny, Nz, sx, sy, sz, nu, yPlusMin, pSolver.tolerance,
                                   pSolver.solver, pSolver.maxIter, t, tFinal, f, steadyStateCriterion, writeInterval);
-
 
 
     // Time loop FSM algorithm
@@ -178,7 +299,7 @@ int main(int argc, char *argv[]) {
 
         // Compute the divergence of the new velocity explicitly and get its maximum-absolute value (to ensure continuity)
         divUNew = fvc::divergence(uNew, theMesh, uBCs);
-        printf("\tThe maximum value of divUNew is: %E \n", divUNew.rms());
+        printf("\tThe RMS of divUNew is: %E \n", divUNew.rms());
 
 
         // Compute the difference between the new and old maps and get its maximum-absolute value (to ensure temporal convergence)
@@ -193,7 +314,7 @@ int main(int argc, char *argv[]) {
 
 
         // Compute the vorticity and QCriterion
-        gradU = fvc::gradient(u, theMesh, uBCs);
+        gradU = fvc::gradient(uNew, theMesh, uBCs);
         omega = fvc::curl(gradU, theMesh);
         QCrit = computeQCrit(theMesh, gradU);
 
@@ -214,7 +335,7 @@ int main(int argc, char *argv[]) {
         if (k % writeInterval == 0 && k != 0) {
 
             printf("\nWriting data corresponding to Time = %f s \n", t);
-            writeTurbulentChannelFlowData2CSV(theMesh, pNew, uNew, omega, nut, uBulk, t);
+            writeTurbulentChannelFlowData2CSV(theMesh, pNew, uNew, omega, nut, gradU, uBulk, t);
             writeTurbulentChannelFlowData2VTK(theMesh, pNew, uNew, omega, nut, QCrit, pBCs, uBCs, uBCs, nutBCs, QCritBCs, t);
         }
 
@@ -225,7 +346,7 @@ int main(int argc, char *argv[]) {
 
     // Write last time-step results to .csv and .VTK file
     printf("\nWriting data corresponding to Time = %f s \n", t);
-    writeTurbulentChannelFlowData2CSV(theMesh, pNew, uNew, omega, nut, uBulk, t);
+    writeTurbulentChannelFlowData2CSV(theMesh, pNew, uNew, omega, nut, gradU, uBulk, t);
     writeTurbulentChannelFlowData2VTK(theMesh, pNew, uNew, omega, nut, QCrit, pBCs, uBCs, uBCs, nutBCs, QCritBCs, t);
 
 
