@@ -1,5 +1,5 @@
 #include <cmath>
-#include "../src/IO/turbulentChannelFlow/writeTurbulentChannelFlowData.h"
+#include "../src/IO/turbulentChannelFlow/writeTurbulentChannelFlowSetUp.h"
 #include "../src/interpolation/temporalAdvancement/computeTimeStepOrthogonal.h"
 #include "../src/finiteVolumeMethod/fvc/fvc.h"
 #include "../src/finiteVolumeMethod/fvm/fvm.h"
@@ -143,8 +143,8 @@ int main(int argc, char *argv[]) {
     // Mesh parameters
     double delta = 1;                                                   // Reference length
     double Lx = 4*M_PI*delta, Ly = 2*delta, Lz = 4./3*M_PI*delta;       // Domain size
-    int Nx = 24, Ny = 25, Nz = 24;                                      // Number of elements in each direction
-    double sx = 0, sy = 4, sz = 0;                                      // Hyperbolic tangent mesh stretching
+    int Nx = 48, Ny = 33, Nz = 48;                                      // Number of elements in each direction
+    double sx = 0, sy = 3.5, sz = 0;                                    // Hyperbolic tangent mesh stretching
 
 
     // Mesh generation
@@ -224,7 +224,12 @@ int main(int argc, char *argv[]) {
     double DeltaT;
     double f = 1;
     double steadyStateCriterion = 1e-4;
-    int k = 0, writeInterval = 2500;
+
+
+    // File recording parameters
+    int k = 0;
+    int writeIntervalCSV = 3000;
+    int writeIntervalVTK = 5*writeIntervalCSV;
 
 
     // Pre-definitions
@@ -238,12 +243,14 @@ int main(int argc, char *argv[]) {
 
 
     // Write the simulation set-up data
-    writeTurbulentChannelFlowData(delta, Lx, Ly, Lz, Nx, Ny, Nz, sx, sy, sz, nu, yPlusMin, pSolver.tolerance,
-                                  pSolver.solver, pSolver.maxIter, t, tFinal, f, steadyStateCriterion, writeInterval);
+    writeTurbulentChannelFlowSetUp(delta, Lx, Ly, Lz, Nx, Ny, Nz, sx, sy, sz, nu, yPlusMin, pSolver.tolerance,
+                                   pSolver.solver, pSolver.maxIter, t, tFinal, f, steadyStateCriterion, writeIntervalCSV,
+                                   writeIntervalVTK);
 
 
     // Time loop FSM algorithm
     while (temporalIterate) {
+
 
         // Compute time-step and update time
         DeltaT = computeTimeStepOrthogonal(theMesh, u, nu, f);
@@ -313,12 +320,6 @@ int main(int argc, char *argv[]) {
         printf("\tThe bulk velocity is: %f \n", uBulk);
 
 
-        // Compute the vorticity and QCriterion
-        gradU = fvc::gradient(uNew, theMesh, uBCs);
-        omega = fvc::curl(gradU, theMesh);
-        QCrit = computeQCrit(theMesh, gradU);
-
-
         // Check if new time iteration is needed
         if ( t > tFinal || fmax(uConvergence, pConvergence) < steadyStateCriterion ) {
 
@@ -331,23 +332,35 @@ int main(int argc, char *argv[]) {
         }
 
 
-        // Write results to .csv and .VTK file
-        if (k % writeInterval == 0 && k != 0) {
+        // Write results to .csv file
+        if (k % writeIntervalCSV == 0 || !temporalIterate) {
 
-            printf("\nWriting data corresponding to Time = %f s \n", t);
+
+            // Compute the gradient of velocity tensor and vorticity
+            gradU = fvc::gradient(uNew, theMesh, uBCs);
+            omega = fvc::curl(gradU, theMesh);
+
+            printf("\nWriting .csv data corresponding to Time = %f s \n", t);
             writeTurbulentChannelFlowData2CSV(theMesh, pNew, uNew, omega, nut, gradU, uBulk, t);
+        }
+
+
+        // Write results to .VTK file
+        if (k % writeIntervalVTK == 0 || !temporalIterate) {
+
+
+            // Compute the gradient of velocity tensor, vorticity and QCriterion
+            gradU = fvc::gradient(uNew, theMesh, uBCs);
+            omega = fvc::curl(gradU, theMesh);
+            QCrit = computeQCrit(theMesh, gradU);
+
+            printf("\nWriting .VTK data corresponding to Time = %f s \n", t);
             writeTurbulentChannelFlowData2VTK(theMesh, pNew, uNew, omega, nut, QCrit, pBCs, uBCs, uBCs, nutBCs, QCritBCs, t);
         }
 
         k++;
     }
     printf("\nSimulation completed!");
-
-
-    // Write last time-step results to .csv and .VTK file
-    printf("\nWriting data corresponding to Time = %f s \n", t);
-    writeTurbulentChannelFlowData2CSV(theMesh, pNew, uNew, omega, nut, gradU, uBulk, t);
-    writeTurbulentChannelFlowData2VTK(theMesh, pNew, uNew, omega, nut, QCrit, pBCs, uBCs, uBCs, nutBCs, QCritBCs, t);
 
 
     return 0;

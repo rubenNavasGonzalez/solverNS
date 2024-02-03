@@ -4,13 +4,13 @@
 
 #include <fstream>
 #include <iostream>
-#include "writeTurbulentChannelFlowData.h"
+#include "writeTurbulentChannelFlowSetUp.h"
 
 
-void writeTurbulentChannelFlowData(double delta, double Lx, double Ly, double Lz, double Nx, double Ny, double Nz,
+void writeTurbulentChannelFlowSetUp(double delta, double Lx, double Ly, double Lz, double Nx, double Ny, double Nz,
                                    double sx, double sy, double sz, double nu, double yPlusMin, double solverTolerance,
                                    std::string solver, int maxIter, double tInit, double tFinal, double f,
-                                   double steadyStateCriterion, int writeInterval) {
+                                   double steadyStateCriterion, int writeIntervalCSV,  int writeIntervalVTK) {
 
     // Data file
     std::ofstream outFile;
@@ -65,7 +65,8 @@ void writeTurbulentChannelFlowData(double delta, double Lx, double Ly, double Lz
 
         // Write the file recording data
         outFile << "File recording data: \n";
-        outFile << "\twriteInterval = " << writeInterval << "\n\n";
+        outFile << "\twriteInterval2CSV = " << writeIntervalCSV << "\n";
+        outFile << "\twriteInterval2VTK = " << writeIntervalVTK << "\n\n";
 
     } else {
 

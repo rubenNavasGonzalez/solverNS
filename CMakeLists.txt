@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 
 project(solverNS
         VERSION 0.0.1
-        DESCRIPTION "Incompressible 3D laminar flow passed two parallel flat plates."
+        DESCRIPTION "Incompressible Navier Stokes solver using the FSM algorithm."
         LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 
@@ -114,8 +114,8 @@ add_executable(solverNS app/main.cpp
         src/math/tensor/frobeniusNorm.cpp
         src/functionObjects/computeQCrit/computeQCrit.cpp
         src/functionObjects/computeQCrit/computeQCrit.h
-        src/IO/turbulentChannelFlow/writeTurbulentChannelFlowData.cpp
-        src/IO/turbulentChannelFlow/writeTurbulentChannelFlowData.h
+        src/IO/turbulentChannelFlow/writeTurbulentChannelFlowSetUp.cpp
+        src/IO/turbulentChannelFlow/writeTurbulentChannelFlowSetUp.h
         src/math/linearSolver/CG/solveCG.cpp
         src/math/linearSolver/CG/solveCG.h
 )
