@@ -25,6 +25,8 @@ namespace fvc {
 
     VectorField laplacianOrthogonal(const VectorField& Phi, const PolyMesh& theMesh, const VectorBoundaryConditions& PhiBCs);
 
+    VectorField laplacianOrthogonal(const ScalarField& Gamma, const VectorField& Phi, const PolyMesh& theMesh, const VectorBoundaryConditions& PhiBCs);
+
     VectorField forcingTerm(const GeometricVector& Fe, const PolyMesh& theMesh);
 
     VectorField curl(const TensorField& gradPhi, const PolyMesh& theMesh);

@@ -10,7 +10,7 @@
 void writeTurbulentChannelFlowSetUp(double delta, double Lx, double Ly, double Lz, double Nx, double Ny, double Nz,
                                    double sx, double sy, double sz, double nu, double yPlusMin, double solverTolerance,
                                    std::string solver, int maxIter, double tInit, double tFinal, double f,
-                                   double steadyStateCriterion, int writeIntervalCSV,  int writeIntervalVTK) {
+                                   double steadyStateCriterion, double writeIntervalCSV,  double writeIntervalVTK) {
 
     // Data file
     std::ofstream outFile;
@@ -26,10 +26,10 @@ void writeTurbulentChannelFlowSetUp(double delta, double Lx, double Ly, double L
 
         // Write the geometrical data
         outFile << "Geometrical data: \n";
-        outFile << "\tdelta = " << delta << "\n";
-        outFile << "\tLx = " << Lx << "\n";
-        outFile << "\tLy = " << Ly << "\n";
-        outFile << "\tLz = " << Lz << "\n\n";
+        outFile << "\tdelta = " << delta << " m\n";
+        outFile << "\tLx = " << Lx << " m\n";
+        outFile << "\tLy = " << Ly << " m\n";
+        outFile << "\tLz = " << Lz << " m\n\n";
 
 
         // Write the spatial discretization data
@@ -45,7 +45,7 @@ void writeTurbulentChannelFlowSetUp(double delta, double Lx, double Ly, double L
 
         // Write the flow data
         outFile << "Flow data: \n";
-        outFile << "\tnu = " << nu << "\n\n";
+        outFile << "\tnu = " << nu << " m^2/s" << "\n\n";
 
 
         // Write the linear solver data
@@ -57,16 +57,16 @@ void writeTurbulentChannelFlowSetUp(double delta, double Lx, double Ly, double L
 
         // Write the temporal advancement data
         outFile << "Temporal advancement data: \n";
-        outFile << "\ttInit = " << tInit << "\n";
-        outFile << "\ttFinal = " << tFinal << "\n";
+        outFile << "\ttInit = " << tInit << " s" << "\n";
+        outFile << "\ttFinal = " << tFinal << " s" << "\n";
         outFile << "\tf = " << f << "\n";
         outFile << "\tsteadyStateCriterion = " << steadyStateCriterion << "\n\n";
 
 
         // Write the file recording data
         outFile << "File recording data: \n";
-        outFile << "\twriteInterval2CSV = " << writeIntervalCSV << "\n";
-        outFile << "\twriteInterval2VTK = " << writeIntervalVTK << "\n\n";
+        outFile << "\twriteInterval2CSV = " << writeIntervalCSV << " s" << "\n";
+        outFile << "\twriteInterval2VTK = " << writeIntervalVTK << " s" << "\n\n";
 
     } else {
 

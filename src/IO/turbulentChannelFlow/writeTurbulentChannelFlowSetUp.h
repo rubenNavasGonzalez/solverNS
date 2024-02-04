@@ -11,6 +11,6 @@
 void writeTurbulentChannelFlowSetUp(double delta, double Lx, double Ly, double Lz, double Nx, double Ny, double Nz,
                                    double sx, double sy, double sz, double nu, double yPlusMin, double solverTolerance,
                                    std::string solver, int maxIter, double tInit, double tFinal, double f,
-                                   double steadyStateCriterion, int writeIntervalCSV,  int writeIntervalVTK);
+                                   double steadyStateCriterion, double writeIntervalCSV,  double writeIntervalVTK);
 
 #endif //SOLVERNS_WRITETURBULENTCHANNELFLOWSETUP_H

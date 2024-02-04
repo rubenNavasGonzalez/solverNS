@@ -58,18 +58,22 @@ void FvScalarEquation::constrain(const PolyMesh& theMesh, double kValue, const S
     A.diagValue[0] = A.diagValue[0]*1.1;
 
     for (int i = 0; i < A.diagValue.size(); ++i) {
+
         A.diagValue[i] = A.diagValue[i]*(-1);
     }
 
     for (int i = 0; i < A.lowerValue.size(); ++i) {
+
         A.lowerValue[i] = A.lowerValue[i]*(-1);
     }
 
     for (int i = 0; i < A.lowerValue.size(); ++i) {
+
         A.upperValue[i] = A.upperValue[i]*(-1);
     }
 
     for (int i = 0; i < b.size(); ++i) {
+
         b[i] = b[i]*(-1);
     }
  }
