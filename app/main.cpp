@@ -16,21 +16,21 @@ int main(int argc, char *argv[]) {
 
 
     // Mesh parameters
-    double delta = 1;                                                   // Reference length
-    double Lx = 4*M_PI*delta, Ly = 2*delta, Lz = 4./3*M_PI*delta;       // Domain size
-    int Nx = 48, Ny = 33, Nz = 48;                                      // Number of elements in each direction
-    double sx = 0, sy = 3.5, sz = 0;                                    // Hyperbolic tangent mesh stretching
+    double delta = 1;                                                           // Reference length
+    double Lx = 4*M_PI*delta, Ly = 2*delta, Lz = 4./3*M_PI*delta;               // Domain size
+    int Nx = 48, Ny = 33, Nz = 48;                                              // Number of elements in each direction
+    double sx = 0, sy = 3.5, sz = 0;                                            // Hyperbolic tangent mesh stretching
 
 
     // Mesh generation
     PolyMesh theMesh;
-    theMesh.generatePolyMesh(Lx, Ly, Lz, Nx, Ny, Nz, sx, sy, sz);       // Generate internal mesh
-    theMesh.generateBoundaryMesh(Nx, Ny, Nz);                           // Generate boundary mesh
+    theMesh.generatePolyMesh(Lx, Ly, Lz, Nx, Ny, Nz, sx, sy, sz);               // Generate internal mesh
+    theMesh.generateBoundaryMesh(Nx, Ny, Nz);                                   // Generate boundary mesh
 
 
     // Flow properties
-    double nu = 1./180;                                                 // Viscosity
-    ScalarField nuVector;                                               // Viscosity (vector form)
+    double nu = 1./180;                                                         // Viscosity
+    ScalarField nuVector;                                                       // Viscosity (vector form)
     nuVector.assign(theMesh.nInteriorElements, nu);
 
 
@@ -43,17 +43,18 @@ int main(int argc, char *argv[]) {
 
 
     // File recording parameters
-    int k = 0;
-    double writeIntervalCSV = 3000;
-    double writeIntervalVTK = 5*writeIntervalCSV;
+    int k = 0;                                                                  // Temporal iteration
+    double writeIntervalCSV = 1;                                                // Frequency to generate .csv data
+    double writeIntervalVTK = 10;                                               // Frequency to generate .VTK data
 
 
     // Transient parameters
-    double t = 0;
-    double tFinal = 500;
-    double DeltaT;
-    double f = 1;
-    double steadyStateCriterion = 1e-4;
+    double t = 0;                                                               // Present time
+    double t0 = t;                                                              // Initial time
+    double tFinal = 500;                                                        // Final time
+    double DeltaT;                                                              // Time-step
+    double f = 1;                                                               // Time-step calculation correction factor
+    double steadyStateCriterion = 1e-4;                                         // Steady-state criterion
 
 
     // Velocity field initialization (field and BCs)
@@ -210,7 +211,7 @@ int main(int argc, char *argv[]) {
 
 
         // Write results to .csv file
-        if ( t >= writeIntervalCSV || k == 0 || !temporalIterate ) {
+        if ( t - t0 >= writeIntervalCSV || k == 0 || !temporalIterate ) {
 
 
             // Compute the gradient of velocity tensor and vorticity
@@ -228,7 +229,7 @@ int main(int argc, char *argv[]) {
 
 
         // Write results to .VTK file
-        if ( t >= writeIntervalVTK || k == 0 || !temporalIterate ) {
+        if ( t - t0 >= writeIntervalVTK || k == 0 || !temporalIterate ) {
 
 
             // Compute the gradient of velocity tensor, vorticity and QCriterion
