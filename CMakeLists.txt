@@ -11,11 +11,12 @@ if (NOT CMAKE_BUILD_TYPE)
 endif ()
 
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/app)
-#SET(CMAKE_CXX_FLAGS "-O3")
+SET(CMAKE_CXX_FLAGS "-O3")
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
 
 #find_package(OpenMP REQUIRED)
+#SET(CMAKE_CXX_FLAGS "-fopenmp")
 
 add_executable(solverNS app/main.cpp
         src/mesh/node/Node.cpp
@@ -45,7 +46,6 @@ add_executable(solverNS app/main.cpp
         src/mesh/polyMesh/writeMesh2VTK.cpp
         src/fields/vectorField/VectorField.cpp
         src/fields/vectorField/VectorField.h
-        src/fields/vectorField/initialize.cpp
         src/fields/scalarField/ScalarField.cpp
         src/fields/scalarField/ScalarField.h
         src/boundaryConditions/vectorBoundaryConditions/VectorBoundaryConditions.cpp
@@ -56,7 +56,6 @@ add_executable(solverNS app/main.cpp
         src/boundaryConditions/scalarBoundaryConditions/addBC.cpp
         src/finiteVolumeMethod/fvc/convective.cpp
         src/finiteVolumeMethod/fvc/laplacianOrthogonal.cpp
-        src/fields/vectorField/applyBCs.cpp
         src/finiteVolumeMethod/fvc/divergence.cpp
         src/fields/scalarField/max.cpp
         src/math/sparseMatrix/SparseMatrix.cpp
@@ -98,26 +97,38 @@ add_executable(solverNS app/main.cpp
         src/fields/tensorField/TensorField.cpp
         src/fields/tensorField/TensorField.h
         src/finiteVolumeMethod/fvc/curl.cpp
-        src/IO/turbulentChannelFlow/writeTurbulentChannelFlowData2CSV.cpp
-        src/IO/turbulentChannelFlow/writeTurbulentChannelFlowData2CSV.h
-        src/IO/turbulentChannelFlow/writeTurbulentChannelFlowData2VTK.cpp
-        src/IO/turbulentChannelFlow/writeTurbulentChannelFlowData2VTK.h
+        src/IO/out/turbulentChannelFlow/writeTurbulentChannelFlowData2CSV.cpp
+        src/IO/out/turbulentChannelFlow/writeTurbulentChannelFlowData2CSV.h
+        src/IO/out/turbulentChannelFlow/writeTurbulentChannelFlowData2VTK.cpp
+        src/IO/out/turbulentChannelFlow/writeTurbulentChannelFlowData2VTK.h
         src/math/linearSolver/CGS/solveCGS.cpp
         src/math/linearSolver/CGS/solveCGS.h
         src/finiteVolumeMethod/fvc/divergenceNVS.cpp
         src/fields/scalarField/rms.cpp
-        src/math/linearSolver/preconditioner/jacobiPreconditioner.cpp
-        src/math/linearSolver/preconditioner/jacobiPreconditioner.h
         src/math/tensor/transpose.cpp
         src/math/tensor/symmetric.cpp
         src/math/tensor/skewSymmetric.cpp
         src/math/tensor/frobeniusNorm.cpp
         src/functionObjects/computeQCrit/computeQCrit.cpp
         src/functionObjects/computeQCrit/computeQCrit.h
-        src/IO/turbulentChannelFlow/writeTurbulentChannelFlowSetUp.cpp
-        src/IO/turbulentChannelFlow/writeTurbulentChannelFlowSetUp.h
+        src/IO/out/turbulentChannelFlow/writeTurbulentChannelFlowSetUp.cpp
+        src/IO/out/turbulentChannelFlow/writeTurbulentChannelFlowSetUp.h
         src/math/linearSolver/CG/solveCG.cpp
         src/math/linearSolver/CG/solveCG.h
+        src/fields/vectorField/initialize.cpp
+        src/fields/vectorField/initializeTurbulentChannelFlowReTau180.cpp
+        src/fields/vectorField/initializeTurbulentChannelFlowReTau180.h
+        src/IO/in/readCSV.cpp
+        src/IO/in/readCSV.h
+        src/fields/vectorField/initializeFromSelectedTime.cpp
+        src/fields/vectorField/initializeFromSelectedTime.h
+        src/finiteVolumeMethod/fvScalarEquation/perturb.cpp
+        src/functionObjects/probe/Probe.h
+        src/functionObjects/probe/Probe.cpp
+        src/functionObjects/probe/assign.cpp
+        src/functionObjects/probe/writeField.cpp
+        src/fields/vectorField/interpolateFromDifferentMesh.cpp
+        src/fields/vectorField/interpolateFromDifferentMesh.h
 )
 
 #target_compile_options(solverNS PRIVATE ${OpenMP_CXX_FLAGS})

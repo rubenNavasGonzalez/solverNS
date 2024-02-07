@@ -8,13 +8,16 @@
 
 double ScalarField::maxAbs() {
 
+    // Initialize the result
     double max = 0;
 
-    for (int i = 0; i < size(); ++i) {
 
-        if ( max < fabs(at(i)) ) {
+    // Perform the operation
+    for (int i = 0; i < this->size(); ++i) {
 
-            max = fabs(at(i));
+        if ( max < fabs(this->at(i)) ) {
+
+            max = fabs(this->at(i));
         }
     }
 

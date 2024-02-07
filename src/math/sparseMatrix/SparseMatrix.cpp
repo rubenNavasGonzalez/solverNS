@@ -10,34 +10,30 @@ SparseMatrix::SparseMatrix() = default;
 SparseMatrix::~SparseMatrix() = default;
 
 
-// Matrix times vector operator
+
+// Matrix times vector operator (it is assumed A is a symmetric matrix)
 ScalarField operator*(const SparseMatrix &A, const ScalarField &field) {
 
+    // Initialize the result
     ScalarField result;
-    result.resize( field.size() );
+    result.assign(field.size(), 0);
 
-    if( !A.upperIndex.empty() ) {
 
-        for(int i = 0; i < A.upperIndex.size(); i++)
-        {
+    // Computations regarding the upper and lower triangular part of A
+    for (int i = 0; i < A.upperIndex.size(); i++) {
 
-            result[A.upperIndex[i][0]] += A.upperValue[i]*field[A.upperIndex[i][1]];
-        }
+        // Upper triangular part of A
+        result[A.upperIndex[i][0]] += A.upperValue[i] * field[A.upperIndex[i][1]];
+
+        // Lower triangular part of A
+        result[A.upperIndex[i][1]] += A.upperValue[i] * field[A.upperIndex[i][0]];
     }
-    if( !A.diagIndex.empty() ) {
 
-        for(int i = 0; i < A.diagIndex.size(); i++)
-        {
 
-            result[A.diagIndex[i][0]] += A.diagValue[i]*field[A.diagIndex[i][1]];
-        }
-    }
-    if( !A.lowerIndex.empty() ) {
+    // Computations regarding the diagonal part of A
+    for (int i = 0; i < A.diagIndex.size(); i++) {
 
-        for (int i = 0; i < A.lowerIndex.size(); i++) {
-
-            result[A.lowerIndex[i][0]] += A.lowerValue[i]*field[A.lowerIndex[i][1]];
-        }
+        result[A.diagIndex[i][0]] += A.diagValue[i] * field[A.diagIndex[i][1]];
     }
 
 
@@ -45,36 +41,33 @@ ScalarField operator*(const SparseMatrix &A, const ScalarField &field) {
 }
 
 
-// Sparse matrix multiplication (it is assumed A is a diagonal matrix)
+
+// Sparse matrix multiplication (it is assumed A is a diagonal matrix and B a symmetric matrix)
 SparseMatrix operator*(const SparseMatrix& A, const SparseMatrix& B) {
 
-    // Initialize the product matrix
+    // Initialize result
     SparseMatrix C;
 
 
-    // Loop for all the B matrix diagonal elements
+    // Computations regarding the diagonal part of A
     for (int i = 0; i < B.diagIndex.size(); ++i) {
 
-        C.diagValue.push_back( A.diagValue[i]*B.diagValue[i] );
-        C.diagIndex.push_back({i,i});
+        C.diagValue.push_back( A.diagValue[0] * B.diagValue[i] );
+        C.diagIndex.push_back( {i, i} );
     }
 
 
-    // Loop for all the B matrix upper elements
+    // Computations regarding the upper and lower triangular part of A
     for (int i = 0; i < B.upperIndex.size(); ++i) {
 
-        C.upperValue.push_back( A.diagValue[ B.upperIndex[i][0] ]*B.upperValue[i] );
+        // Upper triangular part of A
+        C.upperValue.push_back( A.diagValue[0] * B.upperValue[i] );
         C.upperIndex.push_back( B.upperIndex[i] );
+
+        // Lower triangular part of A
+        C.lowerValue.push_back( A.diagValue[0] * B.upperValue[i] );
+        C.lowerIndex.push_back( {B.upperIndex[i][1], B.upperIndex[i][0]} );
     }
-
-
-    // Loop for all the B matrix lower elements
-    for (int i = 0; i < B.lowerIndex.size(); ++i) {
-
-        C.lowerValue.push_back( A.diagValue[ B.lowerIndex[i][0] ]*B.lowerValue[i] );
-        C.lowerIndex.push_back( B.lowerIndex[i] );
-    }
-
 
     return C;
 }

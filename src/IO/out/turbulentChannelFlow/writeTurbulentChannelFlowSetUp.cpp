@@ -8,13 +8,14 @@
 
 
 void writeTurbulentChannelFlowSetUp(double delta, double Lx, double Ly, double Lz, double Nx, double Ny, double Nz,
-                                   double sx, double sy, double sz, double nu, double yPlusMin, double solverTolerance,
-                                   std::string solver, int maxIter, double tInit, double tFinal, double f,
-                                   double steadyStateCriterion, double writeIntervalCSV,  double writeIntervalVTK) {
+                                    double sx, double sy, double sz, double nu, double yPlusMin, double solverTolerance,
+                                    std::string solver, int maxIter, double tInit, double tFinal, double f, double steadyStateCriterion,
+                                    double writeIntervalCSV,  double writeIntervalVTK, std::string filename) {
+
 
     // Data file
     std::ofstream outFile;
-    outFile.open("caseSetUp.txt");
+    outFile.open(filename + ".txt");
 
     if (outFile.is_open()) {
 
@@ -50,7 +51,7 @@ void writeTurbulentChannelFlowSetUp(double delta, double Lx, double Ly, double L
 
         // Write the linear solver data
         outFile << "Linear solver data: \n";
-        outFile << "\tSolver " + solver + ".\n";
+        outFile << "\tSolver " + solver + "\n";
         outFile << "\tsolverTolerance = " << solverTolerance << "\n";
         outFile << "\tmaxIter = " << maxIter << "\n\n";
 

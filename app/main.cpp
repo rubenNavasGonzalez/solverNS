@@ -1,25 +1,25 @@
 #include <cmath>
-#include "../src/IO/turbulentChannelFlow/writeTurbulentChannelFlowSetUp.h"
+#include "../src/IO/out/turbulentChannelFlow/writeTurbulentChannelFlowSetUp.h"
 #include "../src/interpolation/temporalAdvancement/computeTimeStepOrthogonal.h"
 #include "../src/finiteVolumeMethod/fvc/fvc.h"
 #include "../src/finiteVolumeMethod/fvm/fvm.h"
 #include "../src/finiteVolumeMethod/fvScalarEquation/FvScalarEquation.h"
 #include "../src/interpolation/interpolateMDotFromElements2Faces/RhieChowInterpolation.h"
+#include "../src/functionObjects/probe/Probe.h"
 #include "../src/functionObjects/computeBulkVelocity/computeBulkVelocity.h"
 #include "../src/functionObjects/computeQCrit/computeQCrit.h"
-#include "../src/IO/turbulentChannelFlow/writeTurbulentChannelFlowData2CSV.h"
-#include "../src/IO/turbulentChannelFlow/writeTurbulentChannelFlowData2VTK.h"
+#include "../src/IO/out/turbulentChannelFlow/writeTurbulentChannelFlowData2CSV.h"
+#include "../src/IO/out/turbulentChannelFlow/writeTurbulentChannelFlowData2VTK.h"
 
 
-
-int main(int argc, char *argv[]) {
+int main() {
 
 
     // Mesh parameters
     double delta = 1;                                                           // Reference length
     double Lx = 4*M_PI*delta, Ly = 2*delta, Lz = 4./3*M_PI*delta;               // Domain size
-    int Nx = 48, Ny = 33, Nz = 48;                                              // Number of elements in each direction
-    double sx = 0, sy = 3.5, sz = 0;                                            // Hyperbolic tangent mesh stretching
+    int Nx = 16, Ny = 17, Nz = 16;                                              // Number of elements in each direction
+    double sx = 0, sy = 4.5, sz = 0;                                            // Hyperbolic tangent mesh stretching
 
 
     // Mesh generation
@@ -30,8 +30,6 @@ int main(int argc, char *argv[]) {
 
     // Flow properties
     double nu = 1./180;                                                         // Viscosity
-    ScalarField nuVector;                                                       // Viscosity (vector form)
-    nuVector.assign(theMesh.nInteriorElements, nu);
 
 
     // y-plus of the first node in the wall direction
@@ -44,13 +42,15 @@ int main(int argc, char *argv[]) {
 
     // File recording parameters
     int k = 0;                                                                  // Temporal iteration
-    double writeIntervalCSV = 1;                                                // Frequency to generate .csv data
-    double writeIntervalVTK = 10;                                               // Frequency to generate .VTK data
+    double writeIntervalCSV = 2;                                                // Frequency to generate .csv data
+    double writeIntervalCSVStatic = writeIntervalCSV;
+    double writeIntervalVTK = 1e24;                                             // Frequency to generate .VTK data
+    double writeIntervalVTKStatic = writeIntervalVTK;
 
 
     // Transient parameters
-    double t = 0;                                                               // Present time
-    double t0 = t;                                                              // Initial time
+    double t = 0;                                                               // Time (dynamic)
+    double t0 = t;                                                              // Initial time (static)
     double tFinal = 500;                                                        // Final time
     double DeltaT;                                                              // Time-step
     double f = 1;                                                               // Time-step calculation correction factor
@@ -59,8 +59,7 @@ int main(int argc, char *argv[]) {
 
     // Velocity field initialization (field and BCs)
     VectorField u;
-    u.assign(theMesh.nInteriorElements, {0,0,0});
-    #include "mainIncludes/initializeChannelFlowReTau180.h"
+    u.initialize(theMesh, t, Lx, Ly, Lz, nu, 0);
 
     VectorBoundaryConditions uBCs;
     uBCs.addBC("periodic", {0,0,0});
@@ -110,6 +109,14 @@ int main(int argc, char *argv[]) {
     QCritBCs.addBC("zeroGradient", 0);
 
 
+    // Probes initialization
+    Probe pMid(Lx/2, Ly/2, Lz/2);
+    Probe pLow(Lx/2, 0.125*Ly, Lz/2);
+    Probe pWall(Lx/2, 0.1*Ly, Lz/2);
+
+    pMid.assign(theMesh); pLow.assign(theMesh); pWall.assign(theMesh);
+
+
     // Pre-definitions
     ScalarField mDot, divUPred, pNew, divUNew;
     VectorField convU, diffU, F, R, RPrev, uPred, gradP, uNew, omega;
@@ -123,7 +130,7 @@ int main(int argc, char *argv[]) {
     // Write the simulation set-up data
     writeTurbulentChannelFlowSetUp(delta, Lx, Ly, Lz, Nx, Ny, Nz, sx, sy, sz, nu, yPlusMin, pSolver.tolerance,
                                    pSolver.solver, pSolver.maxIter, t, tFinal, f, steadyStateCriterion, writeIntervalCSV,
-                                   writeIntervalVTK);
+                                   writeIntervalVTK, "caseSetUp");
 
 
     // Time loop FSM algorithm
@@ -167,6 +174,7 @@ int main(int argc, char *argv[]) {
         // Assemble and constrain (apply BCs) the Poisson Equation
         pEqn  =  laplacianMatrixP == (1/DeltaT)*divUPred;
         pEqn.constrain(theMesh, 1/DeltaT, pBCs);
+        pEqn.perturb();
 
 
         // Solve the Poisson Equation with a linear solver to get the new pressure
@@ -194,8 +202,14 @@ int main(int argc, char *argv[]) {
 
 
         // Compute the bulk velocity
-        uBulk = computeBulkVelocity(uNew, theMesh, uBCs, 0);
+        uBulk = computeBulkVelocity(uNew, theMesh, uBCs, 0, t);
         printf("\tThe bulk velocity is: %f \n", uBulk);
+
+
+        // Write probe data
+        pMid.writeField(uNew, t, "probeMid");
+        pLow.writeField(uNew, t, "probeLow");
+        pWall.writeField(uNew, t, "probeWall");
 
 
         // Check if new time iteration is needed
@@ -219,11 +233,11 @@ int main(int argc, char *argv[]) {
             omega = fvc::curl(gradU, theMesh);
 
             printf("\nWriting .csv data corresponding to Time = %f s \n", t);
-            writeTurbulentChannelFlowData2CSV(theMesh, pNew, uNew, omega, nut, gradU, uBulk, t);
+            writeTurbulentChannelFlowData2CSV(theMesh, pNew, uNew, omega, nut, gradU, t);
 
             if (k != 0) {
 
-                writeIntervalCSV += writeIntervalCSV;
+                writeIntervalCSV += writeIntervalCSVStatic;
             }
         }
 
@@ -242,13 +256,13 @@ int main(int argc, char *argv[]) {
 
             if (k != 0) {
 
-                writeIntervalVTK += writeIntervalVTK;
+                writeIntervalVTK += writeIntervalVTKStatic;
             }
         }
 
         k++;
     }
-    printf("\nSimulation completed!");
+    printf("\nSimulation completed! \n");
 
 
     return 0;

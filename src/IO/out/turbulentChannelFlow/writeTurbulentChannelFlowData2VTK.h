@@ -5,8 +5,8 @@
 #ifndef SOLVERNS_WRITETURBULENTCHANNELFLOWDATA2VTK_H
 #define SOLVERNS_WRITETURBULENTCHANNELFLOWDATA2VTK_H
 
-#include "../../fields/scalarField/ScalarField.h"
-#include "../../fields/vectorField/VectorField.h"
+#include "../../../fields/scalarField/ScalarField.h"
+#include "../../../fields/vectorField/VectorField.h"
 
 
 void writeTurbulentChannelFlowData2VTK(const PolyMesh& theMesh, const ScalarField& p, const VectorField& u, const VectorField& omega,

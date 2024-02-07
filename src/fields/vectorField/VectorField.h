@@ -20,6 +20,7 @@ public:
 
 
     // VectorField methods
+    void initialize(const PolyMesh& theMesh, double t, double Lx, double Ly, double Lz,  double nu, int mode);
     double maxAbs();
     void writeVectorField2VTK(const std::string& filename, const std::string& field, const PolyMesh& theMesh, const VectorBoundaryConditions& PhiBCs) const;
     friend VectorField operator+(const VectorField& field1, const VectorField& field2);

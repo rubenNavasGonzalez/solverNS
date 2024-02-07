@@ -2,10 +2,13 @@
 // Created by ruben on 26/12/23.
 //
 
+#include <iostream>
+#include <fstream>
 #include "computeBulkVelocity.h"
 
 
-double computeBulkVelocity(const VectorField& u, const PolyMesh& theMesh, const VectorBoundaryConditions& uBCs, int k) {
+double computeBulkVelocity(const VectorField& u, const PolyMesh& theMesh, const VectorBoundaryConditions& uBCs, int k, double t) {
+
 
     // Auxiliary variables initialization
     int iOwner, iPeriodicFace, iHalo;
@@ -48,6 +51,28 @@ double computeBulkVelocity(const VectorField& u, const PolyMesh& theMesh, const 
             SfBoundary += Sf.mag();
         }
     }
+
+
+    // Write the bulk velocity to .csv file along with time
+    std::ofstream outfileData;
+    outfileData.open("uBulk.csv", std::ios_base::app);
+
+    if (outfileData.is_open()) {
+
+        // Write the header if file is created
+        if (outfileData.tellp() == 0) {
+
+            outfileData << "\"t\"," << "\"uBulk\"\n";
+        }
+
+        // Append data (time, bulk velocity)
+        outfileData << t << "," << mDot/SfBoundary << "\n";
+        outfileData.close();
+    } else {
+
+        printf("Error. Unable to open file. \n");
+    }
+
 
 
     return mDot/SfBoundary;

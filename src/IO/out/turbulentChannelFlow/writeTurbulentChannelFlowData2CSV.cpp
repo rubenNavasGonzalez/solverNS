@@ -8,7 +8,7 @@
 
 
 void writeTurbulentChannelFlowData2CSV(const PolyMesh& theMesh, const ScalarField& p, const VectorField& u, const VectorField& omega,
-                                       const ScalarField& nut, const TensorField& gradU, double uBulk, double t) {
+                                       const ScalarField& nut, const TensorField& gradU, double t) {
 
     // Data file
     std::ofstream outfileData;
@@ -18,9 +18,9 @@ void writeTurbulentChannelFlowData2CSV(const PolyMesh& theMesh, const ScalarFiel
 
 
         // Write the data file header
-        outfileData << "x," << "y," << "z," << "p," << "uX," << "uY," << "uZ," << "wX," << "wY," << "wZ," << "nut," <<
-        "partU_partX," << "partV_partX," << "partW_partX," << "partU_partY," << "partV_partY," << "partW_partY," <<
-        "partU_partZ," << "partV_partZ," << "partW_partZ," << "uBulk \n";
+        outfileData << "\"x\"," << "\"y\"," << "\"z\"," << "\"p\"," << "\"uX\"," << "\"uY\"," << "\"uZ\"," << "\"wX\"," <<
+        "\"wY\"," << "\"wZ\"," << "\"nut\"," << "\"partU_partX\"," << "\"partV_partX\"," << "\"partW_partX\"," << "\"partU_partY\"," <<
+        "\"partV_partY\"," << "\"partW_partY\"," << "\"partU_partZ\"," << "\"partV_partZ\"," << "\"partW_partZ\"\n";
 
 
         // Assemble the .csv file
@@ -28,8 +28,8 @@ void writeTurbulentChannelFlowData2CSV(const PolyMesh& theMesh, const ScalarFiel
 
             outfileData << theMesh.elements[i].centroid.x << "," << theMesh.elements[i].centroid.y << "," << theMesh.elements[i].centroid.z << "," <<
             p[i] << "," << u[i].x << "," << u[i].y << "," << u[i].z << "," << omega[i].x << "," << omega[i].y << "," << omega[i].z << "," <<
-            nut[i] << "," << gradU[i][0][0]<< "," << gradU[i][0][1]<< "," << gradU[i][0][2]<< "," << gradU[i][1][0]<< "," << gradU[i][1][1] << "," <<
-            "," << gradU[i][1][2] <<"," << gradU[i][2][0] << "," << gradU[i][2][1] << "," << gradU[i][2][2] << "," << uBulk << "\n";
+            nut[i] << "," << gradU[i][0][0]<< "," << gradU[i][0][1]<< "," << gradU[i][0][2]<< "," << gradU[i][1][0]<< "," << gradU[i][1][1] <<
+            "," << gradU[i][1][2] <<"," << gradU[i][2][0] << "," << gradU[i][2][1] << "," << gradU[i][2][2] << "\n";
         }
 
 
