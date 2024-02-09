@@ -27,6 +27,6 @@ ScalarField FvScalarEquation::solve(const LinearSolverConfig& theLinearSolverCon
     } else {
 
         printf("ERROR. Incorrect solver selected!! \n");
-        return PhiOld;
+        std::exit(EXIT_FAILURE);
     }
 }

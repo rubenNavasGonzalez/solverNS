@@ -50,6 +50,7 @@ std::vector< std::vector<double> > readCSV(std::string filename) {
     } else {
 
         printf("Error. Unable to open the .csv file \n");
+        std::exit(EXIT_FAILURE);
     }
 
 

@@ -20,9 +20,16 @@ public:
     Tensor symmetric();
     Tensor skewSymmetric();
     double frobeniusNorm();
+    double trace();
+    double determiant();
+    double invariantP();
+    double invariantQ();
+    double invariantR();
+    double invariantV2();
     friend Tensor operator+(const Tensor& T1, const Tensor& T2);
     friend Tensor operator-(const Tensor& T1, const Tensor& T2);
     friend Tensor operator*(const double& k, const Tensor& T);
+    friend Tensor operator*(const Tensor& T1, const Tensor& T2);
 };
 
 #endif //SOLVERNS_TENSOR_H

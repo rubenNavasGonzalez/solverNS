@@ -31,6 +31,7 @@ void writeTurbulentChannelFlowData2VTK(const PolyMesh& theMesh, const ScalarFiel
     } else {
 
         printf("Unable to open file\n");
+        std::exit(EXIT_FAILURE);
     }
 
 

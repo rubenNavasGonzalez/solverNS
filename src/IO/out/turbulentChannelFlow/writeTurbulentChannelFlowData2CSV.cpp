@@ -39,6 +39,7 @@ void writeTurbulentChannelFlowData2CSV(const PolyMesh& theMesh, const ScalarFiel
     } else {
 
         printf("Error. Unable to open file. \n");
+        std::exit(EXIT_FAILURE);
     }
 
 
@@ -53,5 +54,6 @@ void writeTurbulentChannelFlowData2CSV(const PolyMesh& theMesh, const ScalarFiel
     } else {
 
         printf("Error. Unable to open file. \n");
+        std::exit(EXIT_FAILURE);
     }
 }

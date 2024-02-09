@@ -11,7 +11,6 @@ void Probe::assign(const PolyMesh& theMesh) {
     double dMin1 = 1e24;
     double dMin2 = 1e25;
     double dMag;
-    GeometricVector _d;
 
 
     // Loop for all the interior elements
@@ -19,8 +18,7 @@ void Probe::assign(const PolyMesh& theMesh) {
 
 
         // Distance vector between the element i and the probe
-        _d = theMesh.elements[i].centroid - this->p;
-        dMag = _d.mag();
+        dMag = (theMesh.elements[i].centroid - this->p).mag();
 
 
         // Check if the distance is minimum

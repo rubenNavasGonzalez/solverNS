@@ -72,6 +72,7 @@ VectorField fvc::laplacianOrthogonal(const VectorField& Phi, const PolyMesh& the
                 } else {
 
                 printf("ERROR. No correct boundary condition type selected !!\n");
+                std::exit(EXIT_FAILURE);
             }
 
             laplacian[iOwner] += DivPhiF*SfMag;

@@ -42,7 +42,27 @@ ScalarField operator+(const ScalarField &field1, const ScalarField &field2) {
     // Perform the operation
     for (int i = 0; i < field1.size(); ++i) {
 
-        result[i] = field1[i] + field2[i] ;
+        result[i] = field1[i] + field2[i];
+    }
+
+
+    return result;
+}
+
+
+
+// ScalarField plus constant
+ScalarField operator+(const double &k, const ScalarField &field) {
+
+    // Initialize the result
+    ScalarField result;
+    result.assign(field.size(), 0);
+
+
+    // Perform the operation
+    for (int i = 0; i < field.size(); ++i) {
+
+        result[i] = field[i] + k;
     }
 
 

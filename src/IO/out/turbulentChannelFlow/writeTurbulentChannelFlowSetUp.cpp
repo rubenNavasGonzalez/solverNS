@@ -10,7 +10,7 @@
 void writeTurbulentChannelFlowSetUp(double delta, double Lx, double Ly, double Lz, double Nx, double Ny, double Nz,
                                     double sx, double sy, double sz, double nu, double yPlusMin, double solverTolerance,
                                     std::string solver, int maxIter, double tInit, double tFinal, double f, double steadyStateCriterion,
-                                    double writeIntervalCSV,  double writeIntervalVTK, std::string filename) {
+                                    double writeIntervalCSV,  double writeIntervalVTK, modelLES turbulenceModel, std::string filename) {
 
 
     // Data file
@@ -49,6 +49,11 @@ void writeTurbulentChannelFlowSetUp(double delta, double Lx, double Ly, double L
         outFile << "\tnu = " << nu << " m^2/s" << "\n\n";
 
 
+        // Write the turbulence modeling data
+        outFile << "Turbulence modeling data: \n";
+        outFile << "\tturbulenceModel = " << turbulenceModel << "\n\n";
+
+
         // Write the linear solver data
         outFile << "Linear solver data: \n";
         outFile << "\tSolver " + solver + "\n";
@@ -72,5 +77,6 @@ void writeTurbulentChannelFlowSetUp(double delta, double Lx, double Ly, double L
     } else {
 
         printf("Error. Unable to open file. \n");
+        std::exit(EXIT_FAILURE);
     }
 }

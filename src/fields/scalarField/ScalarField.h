@@ -26,6 +26,7 @@ public:
     void writeScalarField2VTK(const std::string& filename, const std::string& field, const PolyMesh& theMesh, const ScalarBoundaryConditions& PhiBCs) const;
     friend ScalarField operator-(const ScalarField& field1, const ScalarField& field2);
     friend ScalarField operator+(const ScalarField& field1, const ScalarField& field2);
+    friend ScalarField operator+( const double& k, const ScalarField& field);
     friend double operator*(const ScalarField& field1, const ScalarField& field2);
     friend ScalarField operator*(const double& k, const ScalarField& field);
     friend ScalarField operator/(const ScalarField& field, const double& k);

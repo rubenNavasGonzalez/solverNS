@@ -16,6 +16,7 @@ void SparseMatrix::addValue(double value, std::vector<int> ij) {
         lowerValue.push_back(value);
         lowerIndex.push_back(ij);
     } else {
+
         diagValue.push_back(value);
         diagIndex.push_back(ij);
     }

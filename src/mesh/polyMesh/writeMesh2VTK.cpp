@@ -49,6 +49,8 @@ void PolyMesh::writeMesh2VTK(const std::string& filename) const {
         // Close the file
         outfile.close();
     } else {
+
         std::cout << "Unable to open file\n";
+        std::exit(EXIT_FAILURE);
     }
 }

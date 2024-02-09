@@ -31,6 +31,7 @@ void VectorField::initialize(const PolyMesh& theMesh, double t, double Lx, doubl
 
             printf("Error. No correct initialization mode selected. Valid ones are 0 (start from time t) and 1 "
                    "(interpolate from different mesh at time t). \n");
+            std::exit(EXIT_FAILURE);
         }
     }
 }

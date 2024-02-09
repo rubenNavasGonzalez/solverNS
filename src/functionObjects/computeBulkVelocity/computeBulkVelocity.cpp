@@ -66,11 +66,12 @@ double computeBulkVelocity(const VectorField& u, const PolyMesh& theMesh, const 
         }
 
         // Append data (time, bulk velocity)
-        outfileData << t << "," << mDot/SfBoundary << "\n";
+        outfileData << std::to_string(t) << "," << mDot/SfBoundary << "\n";
         outfileData.close();
     } else {
 
         printf("Error. Unable to open file. \n");
+        std::exit(EXIT_FAILURE);
     }
 
 

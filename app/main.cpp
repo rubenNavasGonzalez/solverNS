@@ -1,4 +1,5 @@
 #include <cmath>
+#include "../src/turbulenceModeling/LES/modelLES.h"
 #include "../src/IO/out/turbulentChannelFlow/writeTurbulentChannelFlowSetUp.h"
 #include "../src/interpolation/temporalAdvancement/computeTimeStepOrthogonal.h"
 #include "../src/finiteVolumeMethod/fvc/fvc.h"
@@ -18,8 +19,8 @@ int main() {
     // Mesh parameters
     double delta = 1;                                                           // Reference length
     double Lx = 4*M_PI*delta, Ly = 2*delta, Lz = 4./3*M_PI*delta;               // Domain size
-    int Nx = 16, Ny = 17, Nz = 16;                                              // Number of elements in each direction
-    double sx = 0, sy = 4.5, sz = 0;                                            // Hyperbolic tangent mesh stretching
+    int Nx = 32, Ny = 33, Nz = 32;                                              // Number of elements in each direction
+    double sx = 0, sy = 3.5, sz = 0;                                            // Hyperbolic tangent mesh stretching
 
 
     // Mesh generation
@@ -42,19 +43,24 @@ int main() {
 
     // File recording parameters
     int k = 0;                                                                  // Temporal iteration
-    double writeIntervalCSV = 2;                                                // Frequency to generate .csv data
+    double writeIntervalCSV = 0.5;                                              // Frequency to generate .csv data
     double writeIntervalCSVStatic = writeIntervalCSV;
-    double writeIntervalVTK = 1e24;                                             // Frequency to generate .VTK data
+    double writeIntervalVTK = 10;                                               // Frequency to generate .VTK data
     double writeIntervalVTKStatic = writeIntervalVTK;
 
 
     // Transient parameters
     double t = 0;                                                               // Time (dynamic)
     double t0 = t;                                                              // Initial time (static)
-    double tFinal = 500;                                                        // Final time
+    double tFinal = 0;                                                          // Final time
     double DeltaT;                                                              // Time-step
     double f = 1;                                                               // Time-step calculation correction factor
     double steadyStateCriterion = 1e-4;                                         // Steady-state criterion
+
+
+    // Turbulence modeling
+    modelLES turbulenceModel;
+    turbulenceModel = None;
 
 
     // Velocity field initialization (field and BCs)
@@ -130,7 +136,7 @@ int main() {
     // Write the simulation set-up data
     writeTurbulentChannelFlowSetUp(delta, Lx, Ly, Lz, Nx, Ny, Nz, sx, sy, sz, nu, yPlusMin, pSolver.tolerance,
                                    pSolver.solver, pSolver.maxIter, t, tFinal, f, steadyStateCriterion, writeIntervalCSV,
-                                   writeIntervalVTK, "caseSetUp");
+                                   writeIntervalVTK, turbulenceModel, "caseSetUp");
 
 
     // Time loop FSM algorithm
@@ -141,6 +147,10 @@ int main() {
         DeltaT = computeTimeStepOrthogonal(theMesh, u, nu, f);
         t += DeltaT;
         printf("\nTime = %f s \n", t);
+
+
+        // Compute the turbulent viscosity
+        nut = computeTurbulentViscosity(theMesh, u, uBCs, turbulenceModel);
 
 
         // Compute convective and diffusive term explicitly

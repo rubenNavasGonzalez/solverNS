@@ -51,6 +51,7 @@ void FvScalarEquation::constrain(const PolyMesh& theMesh, double _k, const Scala
             } else {
 
                 printf("ERROR. No correct boundary condition type selected !!\n");
+                std::exit(EXIT_FAILURE);
             }
         }
     }

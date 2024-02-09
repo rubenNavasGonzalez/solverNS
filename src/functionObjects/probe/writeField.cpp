@@ -15,7 +15,7 @@ void Probe::writeField(const VectorField& Phi, double t, std::string filename) {
 
     // Compute the Phi variable at probe position
     dTotal = this->d[0] + this->d[1];
-    PhiProbe = Phi[this->iElements[0]]*(1 - this->d[0]/dTotal) + Phi[this->iElements[0]]*(1 - this->d[1]/dTotal);
+    PhiProbe = Phi[this->iElements[0]]*(1 - this->d[0]/dTotal) + Phi[this->iElements[1]]*(1 - this->d[1]/dTotal);
 
 
     // Write the probe data to .csv file along with time
@@ -31,10 +31,11 @@ void Probe::writeField(const VectorField& Phi, double t, std::string filename) {
         }
 
         // Append data (time, bulk velocity)
-        outfileData << t << "," << PhiProbe.x << "," << PhiProbe.y << "," << PhiProbe.z << "\n";
+        outfileData << std::to_string(t) << "," << PhiProbe.x << "," << PhiProbe.y << "," << PhiProbe.z << "\n";
         outfileData.close();
     } else {
 
         printf("Error. Unable to open file. \n");
+        std::exit(EXIT_FAILURE);
     }
 }

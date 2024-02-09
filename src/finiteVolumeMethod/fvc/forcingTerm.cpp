@@ -12,14 +12,5 @@ VectorField fvc::forcingTerm(const GeometricVector& Fe, const PolyMesh& theMesh)
     F.assign(theMesh.nInteriorElements, Fe);
 
 
-/*
-    // Average by the volume
-    for (int i = 0; i < theMesh.nInteriorElements; ++i) {
-
-        F[i] /= theMesh.elements[i].Vf;
-    }
-*/
-
-
     return F;
 }

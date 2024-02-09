@@ -129,6 +129,25 @@ add_executable(solverNS app/main.cpp
         src/functionObjects/probe/writeField.cpp
         src/fields/vectorField/interpolateFromDifferentMesh.cpp
         src/fields/vectorField/interpolateFromDifferentMesh.h
+        src/turbulenceModeling/computeTurbulentViscosity/computeTurbulentViscosity.cpp
+        src/turbulenceModeling/computeTurbulentViscosity/computeTurbulentViscosity.h
+        src/math/tensor/trace.cpp
+        src/math/tensor/determinant.cpp
+        src/turbulenceModeling/LES/modelSmagorinsky/modelSmagorinsky.cpp
+        src/turbulenceModeling/LES/modelSmagorinsky/modelSmagorinsky.h
+        src/math/tensor/invariantQ.cpp
+        src/math/tensor/invariantR.cpp
+        src/math/tensor/invariantV2.cpp
+        src/turbulenceModeling/LES/modelWALE/modelWALE.cpp
+        src/turbulenceModeling/LES/modelWALE/modelWALE.h
+        src/turbulenceModeling/LES/modelVreman/modelVreman.cpp
+        src/turbulenceModeling/LES/modelVreman/modelVreman.h
+        src/turbulenceModeling/LES/modelVerstappen/modelVerstappen.cpp
+        src/turbulenceModeling/LES/modelVerstappen/modelVerstappen.h
+        src/turbulenceModeling/LES/modelLES.h
+        src/turbulenceModeling/LES/modelS3PQR/modelS3PQR.cpp
+        src/turbulenceModeling/LES/modelS3PQR/modelS3PQR.h
+        src/math/tensor/invariantP.cpp
 )
 
 #target_compile_options(solverNS PRIVATE ${OpenMP_CXX_FLAGS})

@@ -39,6 +39,8 @@ void VectorField::writeVectorField2VTK(const std::string& filename, const std::s
         outfile.close();
 
     } else {
+
         std::cout << "Unable to open file\n";
+        std::exit(EXIT_FAILURE);
     }
 }

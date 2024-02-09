@@ -11,9 +11,9 @@ Probe::~Probe() = default;
 
 
 // Probe overloaded constructor
-Probe::Probe(double _x, double _y, double _z) {
+Probe::Probe(double x, double y, double z) {
 
-    this->p = {_x, _y, _z};
+    this->p = {x, y, z};
 
     this->iElements.assign(2,0);
     this->d.assign(2,0);
