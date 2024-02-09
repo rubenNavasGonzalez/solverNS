@@ -183,8 +183,10 @@ int main() {
 
         // Assemble and constrain (apply BCs) the Poisson Equation
         pEqn  =  laplacianMatrixP == (1/DeltaT)*divUPred;
+
         pEqn.constrain(theMesh, 1/DeltaT, pBCs);
         pEqn.perturb();
+        pEqn.changeSign();
 
 
         // Solve the Poisson Equation with a linear solver to get the new pressure

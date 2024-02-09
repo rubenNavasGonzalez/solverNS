@@ -148,6 +148,7 @@ add_executable(solverNS app/main.cpp
         src/turbulenceModeling/LES/modelS3PQR/modelS3PQR.cpp
         src/turbulenceModeling/LES/modelS3PQR/modelS3PQR.h
         src/math/tensor/invariantP.cpp
+        src/finiteVolumeMethod/fvScalarEquation/changeSign.cpp
 )
 
 #target_compile_options(solverNS PRIVATE ${OpenMP_CXX_FLAGS})

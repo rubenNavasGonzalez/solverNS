@@ -28,6 +28,7 @@ public:
     void constrain(const PolyMesh& theMesh, double _k, const ScalarBoundaryConditions& PhiBCs);
     ScalarField solve(const LinearSolverConfig& theLinearSolverConfig, const ScalarField& PhiOld);
     void perturb();
+    void changeSign();
 };
 
 
