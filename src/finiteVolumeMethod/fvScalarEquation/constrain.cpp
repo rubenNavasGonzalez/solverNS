@@ -5,7 +5,7 @@
 #include "FvScalarEquation.h"
 
 
-void FvScalarEquation::constrain(const PolyMesh& theMesh, double _k, const ScalarBoundaryConditions& PhiBCs) {
+void FvScalarEquation::constrain(const PolyMesh& theMesh, const ScalarBoundaryConditions& PhiBCs) {
 
     // Auxiliary variables declaration
     double BCValue, dONMag, SfMag, coeffValue;
@@ -27,7 +27,6 @@ void FvScalarEquation::constrain(const PolyMesh& theMesh, double _k, const Scala
             SfMag = theMesh.faces[i].SfMag;
 
             iOwner = theMesh.faces[i].iOwner;
-            iNeighbour = theMesh.faces[i].iNeighbour;
             iPeriodicFace = theMesh.faces[i].iPeriodicFace;
             iHalo = theMesh.faces[iPeriodicFace].iOwner;
 
@@ -37,7 +36,7 @@ void FvScalarEquation::constrain(const PolyMesh& theMesh, double _k, const Scala
                 coeffValue = SfMag/dONMag;
 
                 A.diagValue[iOwner] -= coeffValue;
-                b[iNeighbour] -= BCValue * _k;
+                b[iOwner] -= BCValue * coeffValue;
 
             } else if (BCType == "zeroGradient" || BCType == "empty") {
 

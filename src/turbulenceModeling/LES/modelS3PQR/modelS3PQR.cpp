@@ -11,28 +11,31 @@ ScalarField modelS3PQR(const PolyMesh& theMesh, const VectorField& u, const Vect
 
     // Auxiliary variables declaration
     TensorField gradU;
-    double Delta, C_s3pqr, p;
+    double Delta, p, P_GGT, Q_GGT, R_GGT;
+    double C_s3pqr = sqrt(3) * sqrt(0.07);
     Tensor GGT;
-    double P_GGT, Q_GGT, R_GGT;
 
 
-    // Assign constant model and exponent degree as a function of the turbulence model
+    // Assign the and exponent degree depending on the turbulence model
     switch (turbulenceModel) {
 
         case S3PQ: {
 
-            C_s3pqr = 0.458;
             p = -2.5;
+            //C_s3pqr = 0.572;
+            break;
         }
         case S3PR: {
 
-            C_s3pqr = 0.458;
             p = -1;
+            //C_s3pqr = 0.709;
+            break;
         }
         case S3QR: {
 
-            C_s3pqr = 0.458;
             p = 0;
+            //C_s3pqr = 0.762;
+            break;
         }
     }
 

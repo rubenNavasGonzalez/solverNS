@@ -11,8 +11,9 @@ ScalarField modelVreman(const PolyMesh& theMesh, const VectorField& u, const Vec
 
     // Auxiliary variables declaration
     TensorField gradU;
-    double Delta, V2, QG, QOmega, QS;
-    double Cvr = 0.266;
+    Tensor GGT;
+    double Delta;
+    double Cvr = sqrt(0.07);
 
 
     // Initialize the turbulent viscosity field
@@ -33,12 +34,8 @@ ScalarField modelVreman(const PolyMesh& theMesh, const VectorField& u, const Vec
 
 
         // Compute the turbulent viscosity
-        V2 = gradU[i].invariantV2();
-        QG = gradU[i].invariantQ();
-        QOmega = gradU[i].skewSymmetric().invariantQ();
-        QS = gradU[i].symmetric().invariantQ();
-
-        nut[i] = 2 * pow(Cvr*Delta,2) * pow((V2 + pow(QG,2)) / (2*(QOmega - QS)), 0.5);
+        GGT = gradU[i] * (gradU[i].transpose());
+        nut[i] = 2 * pow(Cvr*Delta,2) * pow( GGT.invariantQ() / GGT.invariantP() , 0.5);
     }
 
 

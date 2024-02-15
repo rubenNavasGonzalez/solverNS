@@ -12,7 +12,7 @@ ScalarField modelVerstappen(const PolyMesh& theMesh, const VectorField& u, const
     // Auxiliary variables declaration
     TensorField gradU;
     double Delta, RS, QS;
-    double Cve = 0.527;
+    double Cve = 1/M_PI * sqrt(1.5);
 
 
     // Initialize the turbulent viscosity field

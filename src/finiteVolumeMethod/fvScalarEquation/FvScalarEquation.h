@@ -25,7 +25,7 @@ public:
 
 
     // FvScalarEquation methods
-    void constrain(const PolyMesh& theMesh, double _k, const ScalarBoundaryConditions& PhiBCs);
+    void constrain(const PolyMesh& theMesh, const ScalarBoundaryConditions& PhiBCs);
     ScalarField solve(const LinearSolverConfig& theLinearSolverConfig, const ScalarField& PhiOld);
     void perturb();
     void changeSign();

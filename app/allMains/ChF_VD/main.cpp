@@ -1,19 +1,19 @@
 #include <cmath>
-#include "../src/interpolation/temporalAdvancement/computeTimeStepOrthogonal.h"
-#include "../src/finiteVolumeMethod/fvc/fvc.h"
-#include "../src/finiteVolumeMethod/fvm/fvm.h"
-#include "../src/finiteVolumeMethod/fvScalarEquation/FvScalarEquation.h"
-#include "../src/interpolation/interpolateMDotFromElements2Faces/RhieChowInterpolation.h"
-#include "../src/functionObjects/computeQCrit/computeQCrit.h"
-#include "../src/IO/turbulentChannelFlow/writeTurbulentChannelFlowData2VTK.h"
+#include "../../../src/interpolation/temporalAdvancement/computeTimeStepOrthogonal.h"
+#include "../../../src/finiteVolumeMethod/fvc/fvc.h"
+#include "../../../src/finiteVolumeMethod/fvm/fvm.h"
+#include "../../../src/finiteVolumeMethod/fvScalarEquation/FvScalarEquation.h"
+#include "../../../src/interpolation/interpolateMDotFromElements2Faces/RhieChowInterpolation.h"
+#include "../../../src/functionObjects/computeQCrit/computeQCrit.h"
+#include "../../../src/IO/out/turbulentChannelFlow/writeTurbulentChannelFlowData2VTK.h"
 
 
 int main(int argc, char *argv[]) {
 
     // Mesh parameters
     double delta = 1;                                                       // Channel semi-height
-    double Lx = 10*delta, Ly = delta, Lz = delta;                           // Domain size
-    int Nx = 128, Ny = 32, Nz = 8;                                          // Number of elements in each direction
+    double Lx = 5*delta, Ly = delta, Lz = delta;                            // Domain size
+    int Nx = 64, Ny = 32, Nz = 8;                                           // Number of elements in each direction
     double sx = 0, sy = 0, sz = 0;                                          // Hyperbolic tangent mesh spacing
 
 
@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
 
 
     // Flow properties
-    double nu = 1./20;                                                      // Viscosity
+    double nu = 1./30;                                                      // Viscosity
 
 
     // Linear solver parameters initialization
@@ -32,8 +32,9 @@ int main(int argc, char *argv[]) {
 
 
     // File recording parameters
-    int k = 0;
-    double writeIntervalVTK = 1e24;
+    int k = 0;                                                                  // Temporal iteration
+    double writeIntervalVTK = 1e24;                                             // Frequency to generate .VTK data
+    double writeIntervalVTKStatic = writeIntervalVTK;
 
 
     // Transient parameters
@@ -41,7 +42,7 @@ int main(int argc, char *argv[]) {
     double tFinal = 1e24;
     double DeltaT;
     double f = 1;
-    double steadyStateCriterion = 1e-4;
+    double steadyStateCriterion = 1e-6;
 
 
     // Velocity field initialization (field and BCs)
@@ -143,7 +144,10 @@ int main(int argc, char *argv[]) {
 
         // Assemble and constrain (apply BCs) the Poisson Equation
         pEqn  =  laplacianMatrixP == (1/DeltaT)*divUPred;
-        pEqn.constrain(theMesh, 1/DeltaT, pBCs);
+
+        pEqn.constrain(theMesh, pBCs);
+        pEqn.perturb();
+        pEqn.changeSign();
 
 
         // Solve the Poisson Equation with a linear solver to get the new pressure
@@ -183,7 +187,7 @@ int main(int argc, char *argv[]) {
 
 
         // Write results to .VTK file
-        if ( t >= writeIntervalVTK || !temporalIterate ) {
+        if ( t >= writeIntervalVTK || k == 0 || !temporalIterate ) {
 
 
             // Compute the gradient of velocity tensor, vorticity and QCriterion
@@ -196,7 +200,7 @@ int main(int argc, char *argv[]) {
 
             if (k != 0) {
 
-                writeIntervalVTK += writeIntervalVTK;
+                writeIntervalVTK += writeIntervalVTKStatic;
             }
         }
 

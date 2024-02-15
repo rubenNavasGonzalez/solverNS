@@ -116,11 +116,11 @@ int main() {
 
 
     // Probes initialization
-    Probe pMid(Lx/2, Ly/2, Lz/2);
+    /*Probe pMid(Lx/2, Ly/2, Lz/2);
     Probe pLow(Lx/2, 0.125*Ly, Lz/2);
     Probe pWall(Lx/2, 0.1*Ly, Lz/2);
 
-    pMid.assign(theMesh); pLow.assign(theMesh); pWall.assign(theMesh);
+    pMid.assign(theMesh); pLow.assign(theMesh); pWall.assign(theMesh);*/
 
 
     // Pre-definitions
@@ -156,7 +156,7 @@ int main() {
         // Compute convective and diffusive term explicitly
         mDot = RhieChowInterpolation(u, p, theMesh, DeltaT, uBCs, pBCs);
         convU = fvc::convective(mDot, u, theMesh, uBCs);
-        diffU = fvc::laplacianOrthogonal(u, theMesh, uBCs);
+        diffU = fvc::laplacianOrthogonal(nu + nut, u, theMesh, uBCs);
 
 
         // Compute the forcing term   dp/dx = -1   in the x direction
@@ -184,7 +184,7 @@ int main() {
         // Assemble and constrain (apply BCs) the Poisson Equation
         pEqn  =  laplacianMatrixP == (1/DeltaT)*divUPred;
 
-        pEqn.constrain(theMesh, 1/DeltaT, pBCs);
+        pEqn.constrain(theMesh, pBCs);
         pEqn.perturb();
         pEqn.changeSign();
 
@@ -219,9 +219,9 @@ int main() {
 
 
         // Write probe data
-        pMid.writeField(uNew, t, "probeMid");
+        /*pMid.writeField(uNew, t, "probeMid");
         pLow.writeField(uNew, t, "probeLow");
-        pWall.writeField(uNew, t, "probeWall");
+        pWall.writeField(uNew, t, "probeWall");*/
 
 
         // Check if new time iteration is needed

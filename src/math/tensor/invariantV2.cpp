@@ -9,8 +9,8 @@ double Tensor::invariantV2() {
 
     // Auxiliary variables definition
     Tensor S = this->symmetric();
-    Tensor Omega = this->skewSymmetric();
+    Tensor W = this->skewSymmetric();
 
 
-    return 4*(( (S*S) * (Omega*Omega) ).trace() - 2*S.invariantQ()*Omega.invariantQ());
+    return 4*(( (S*S) * (W*W) ).trace() - 2*S.invariantQ()*W.invariantQ());
 }

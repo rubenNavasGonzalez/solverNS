@@ -92,11 +92,11 @@ VectorField fvc::laplacianOrthogonal(const VectorField& Phi, const PolyMesh& the
 
 
 
-VectorField laplacianOrthogonal(const ScalarField& Gamma, const VectorField& Phi, const PolyMesh& theMesh, const VectorBoundaryConditions& PhiBCs) {
+VectorField fvc::laplacianOrthogonal(const ScalarField& Gamma, const VectorField& Phi, const PolyMesh& theMesh, const VectorBoundaryConditions& PhiBCs) {
 
 
     // Auxiliary variables
-    double dONMag, SfMag;
+    double dONMag, SfMag, gf, GammaF;
     int iOwner, iNeighbour, iHalo, iPeriodicFace;
     GeometricVector PhiOwner, PhiNeighbour, PhiHalo, DivPhiF, BCValue;
     std::string BCType;
@@ -112,6 +112,7 @@ VectorField laplacianOrthogonal(const ScalarField& Gamma, const VectorField& Phi
 
         dONMag = theMesh.faces[i].dONMag;
         SfMag = theMesh.faces[i].SfMag;
+        gf = theMesh.faces[i].gf;
 
         iOwner = theMesh.faces[i].iOwner;
         iNeighbour = theMesh.faces[i].iNeighbour;
@@ -119,7 +120,8 @@ VectorField laplacianOrthogonal(const ScalarField& Gamma, const VectorField& Phi
         PhiOwner = Phi[iOwner];
         PhiNeighbour = Phi[iNeighbour];
 
-        DivPhiF = (PhiNeighbour - PhiOwner)/dONMag;
+        GammaF = gf*Gamma[iOwner] + (1 - gf)*Gamma[iNeighbour];
+        DivPhiF = GammaF * (PhiNeighbour - PhiOwner) / dONMag;
 
         laplacian[iOwner] += DivPhiF*SfMag;
         laplacian[iNeighbour] -= DivPhiF*SfMag;
@@ -144,7 +146,9 @@ VectorField laplacianOrthogonal(const ScalarField& Gamma, const VectorField& Phi
 
             if (BCType == "fixedValue") {
 
-                DivPhiF = (BCValue - PhiOwner)/dONMag;
+                GammaF = Gamma[iOwner];
+                DivPhiF = GammaF*(BCValue - PhiOwner)/dONMag;
+
             } else if (BCType == "zeroGradient" || BCType == "empty") {
 
                 DivPhiF = {0,0,0};
@@ -152,13 +156,16 @@ VectorField laplacianOrthogonal(const ScalarField& Gamma, const VectorField& Phi
 
                 iPeriodicFace = theMesh.faces[i].iPeriodicFace;
                 iHalo = theMesh.faces[iPeriodicFace].iOwner;
+
+                GammaF = 0.5*(Gamma[iOwner] + Gamma[iHalo]);
                 PhiHalo = Phi[iHalo];
 
-                DivPhiF = (PhiHalo - PhiOwner)/(2*dONMag);
+                DivPhiF = GammaF*(PhiHalo - PhiOwner)/(2*dONMag);
 
             } else {
 
                 printf("ERROR. No correct boundary condition type selected !!\n");
+                std::exit(EXIT_FAILURE);
             }
 
             laplacian[iOwner] += DivPhiF*SfMag;
