@@ -147,7 +147,7 @@ VectorField fvc::laplacianOrthogonal(const ScalarField& Gamma, const VectorField
             if (BCType == "fixedValue") {
 
                 GammaF = Gamma[iOwner];
-                DivPhiF = GammaF*(BCValue - PhiOwner)/dONMag;
+                DivPhiF = GammaF * (BCValue - PhiOwner) / dONMag;
 
             } else if (BCType == "zeroGradient" || BCType == "empty") {
 
@@ -160,7 +160,7 @@ VectorField fvc::laplacianOrthogonal(const ScalarField& Gamma, const VectorField
                 GammaF = 0.5*(Gamma[iOwner] + Gamma[iHalo]);
                 PhiHalo = Phi[iHalo];
 
-                DivPhiF = GammaF*(PhiHalo - PhiOwner)/(2*dONMag);
+                DivPhiF = GammaF * (PhiHalo - PhiOwner) / (2*dONMag);
 
             } else {
 

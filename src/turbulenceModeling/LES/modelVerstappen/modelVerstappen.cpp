@@ -11,6 +11,7 @@ ScalarField modelVerstappen(const PolyMesh& theMesh, const VectorField& u, const
 
     // Auxiliary variables declaration
     TensorField gradU;
+    Tensor S;
     double Delta, RS, QS;
     double Cve = 1/M_PI * sqrt(1.5);
 
@@ -33,10 +34,11 @@ ScalarField modelVerstappen(const PolyMesh& theMesh, const VectorField& u, const
 
 
         // Compute the turbulent viscosity
-        RS = gradU[i].symmetric().invariantR();
-        QS = gradU[i].symmetric().invariantQ();
+        S = gradU[i].symmetric();
+        RS = S.invariantR();
+        QS = S.invariantQ();
 
-        nut[i] = 2 * pow(Cve*Delta,2) * fabs(RS) / (-QS);
+        nut[i] = pow(Cve*Delta, 2) * fabs(RS) / (-QS);
     }
 
 

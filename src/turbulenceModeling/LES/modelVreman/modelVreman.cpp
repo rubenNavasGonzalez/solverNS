@@ -35,7 +35,7 @@ ScalarField modelVreman(const PolyMesh& theMesh, const VectorField& u, const Vec
 
         // Compute the turbulent viscosity
         GGT = gradU[i] * (gradU[i].transpose());
-        nut[i] = 2 * pow(Cvr*Delta,2) * pow( GGT.invariantQ() / GGT.invariantP() , 0.5);
+        nut[i] = pow(Cvr*Delta, 2) * sqrt( GGT.invariantQ() / GGT.invariantP() );
     }
 
 

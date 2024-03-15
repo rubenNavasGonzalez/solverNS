@@ -22,19 +22,19 @@ ScalarField modelS3PQR(const PolyMesh& theMesh, const VectorField& u, const Vect
         case S3PQ: {
 
             p = -2.5;
-            //C_s3pqr = 0.572;
+            C_s3pqr = 0.572;
             break;
         }
         case S3PR: {
 
             p = -1;
-            //C_s3pqr = 0.709;
+            C_s3pqr = 0.709;
             break;
         }
         case S3QR: {
 
             p = 0;
-            //C_s3pqr = 0.762;
+            C_s3pqr = 0.762;
             break;
         }
     }
@@ -58,12 +58,12 @@ ScalarField modelS3PQR(const PolyMesh& theMesh, const VectorField& u, const Vect
 
 
         // Compute the turbulent viscosity
-        GGT = gradU[i] * gradU[i].transpose();
+        GGT = gradU[i] * (gradU[i].transpose());
         P_GGT = GGT.invariantP();
         Q_GGT = GGT.invariantQ();
-        R_GGT = GGT.invariantR();
+        R_GGT = fabs(GGT.invariantR());
 
-        nut[i] = 2 * pow(C_s3pqr*Delta,2) * pow(P_GGT,p) * pow(Q_GGT,-(p + 1)) * pow(R_GGT,(p + 2.5)/3);
+        nut[i] = pow(C_s3pqr*Delta, 2) * pow(P_GGT, p) * pow(Q_GGT, -(p + 1)) * pow(R_GGT, (p + 2.5)/3);
     }
 
 

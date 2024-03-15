@@ -29,6 +29,8 @@ namespace fvc {
 
     VectorField forcingTerm(const GeometricVector& Fe, const PolyMesh& theMesh);
 
+    VectorField cosYForce(double A, double k, const PolyMesh& theMesh);
+
     VectorField curl(const TensorField& gradPhi, const PolyMesh& theMesh);
 }
 

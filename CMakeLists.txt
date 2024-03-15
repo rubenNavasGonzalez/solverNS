@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 
 project(solverNS
         VERSION 0.0.1
-        DESCRIPTION "Incompressible Navier Stokes solver using the FSM algorithm."
+        DESCRIPTION "Incompressible Navier Stokes equations solver using the FSM algorithm."
         LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 
@@ -14,9 +14,6 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/app)
 #SET(CMAKE_CXX_FLAGS "-O3")
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
-
-#find_package(OpenMP REQUIRED)
-#SET(CMAKE_CXX_FLAGS "-fopenmp")
 
 add_executable(solverNS app/main.cpp
         src/mesh/node/Node.cpp
@@ -149,7 +146,12 @@ add_executable(solverNS app/main.cpp
         src/turbulenceModeling/LES/modelS3PQR/modelS3PQR.h
         src/math/tensor/invariantP.cpp
         src/finiteVolumeMethod/fvScalarEquation/changeSign.cpp
+        src/IO/out/TaylorGreenVortex/writeTaylorGreenVortexSetUp.cpp
+        src/IO/out/TaylorGreenVortex/writeTaylorGreenVortexSetUp.h
+        src/fields/vectorField/initializeTaylorGreenVortex.cpp
+        src/fields/vectorField/initializeTaylorGreenVortex.h
+        src/functionObjects/computeEk/computeEk.cpp
+        src/functionObjects/computeEk/computeEk.h
+        src/functionObjects/computeEnsotrophy/computeEnsotrophy.cpp
+        src/functionObjects/computeEnsotrophy/computeEnsotrophy.h
 )
-
-#target_compile_options(solverNS PRIVATE ${OpenMP_CXX_FLAGS})
-#target_link_libraries(solverNS PRIVATE OpenMP::OpenMP_CXX)

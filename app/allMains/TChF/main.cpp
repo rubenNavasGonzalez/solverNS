@@ -18,9 +18,9 @@ int main() {
 
     // Mesh parameters
     double delta = 1;                                                           // Reference length
-    double Lx = 4*M_PI*delta, Ly = 2*delta, Lz = 4./3*M_PI*delta;               // Domain size
-    int Nx = 32, Ny = 33, Nz = 32;                                              // Number of elements in each direction
-    double sx = 0, sy = 3.5, sz = 0;                                            // Hyperbolic tangent mesh stretching
+    double Lx = 2*M_PI*delta, Ly = 2*delta, Lz = M_PI*delta;                    // Domain size
+    int Nx = 48, Ny = 33, Nz = 48;                                              // Number of elements in each direction
+    double sx = 0, sy = 0, sz = 0;                                              // Hyperbolic tangent mesh stretching
 
 
     // Mesh generation
@@ -30,7 +30,7 @@ int main() {
 
 
     // Flow properties
-    double nu = 1./180;                                                         // Viscosity
+    double nu = 1./395;                                                         // Viscosity
 
 
     // y-plus of the first node in the wall direction
@@ -43,19 +43,19 @@ int main() {
 
     // File recording parameters
     int k = 0;                                                                  // Temporal iteration
-    double writeIntervalCSV = 0.5;                                              // Frequency to generate .csv data
+    double writeIntervalCSV = 1e24;                                             // Frequency to generate .csv data
     double writeIntervalCSVStatic = writeIntervalCSV;
-    double writeIntervalVTK = 10;                                               // Frequency to generate .VTK data
+    double writeIntervalVTK = 1e24;                                             // Frequency to generate .VTK data
     double writeIntervalVTKStatic = writeIntervalVTK;
 
 
     // Transient parameters
     double t = 0;                                                               // Time (dynamic)
     double t0 = t;                                                              // Initial time (static)
-    double tFinal = 0;                                                          // Final time
+    double tFinal = 20;                                                         // Final time
     double DeltaT;                                                              // Time-step
     double f = 1;                                                               // Time-step calculation correction factor
-    double steadyStateCriterion = 1e-4;                                         // Steady-state criterion
+    double steadyStateCriterion = 1e-6;                                         // Steady-state criterion
 
 
     // Turbulence modeling
@@ -143,20 +143,20 @@ int main() {
     while (temporalIterate) {
 
 
-        // Compute time-step and update time
-        DeltaT = computeTimeStepOrthogonal(theMesh, u, nu, f);
-        t += DeltaT;
-        printf("\nTime = %f s \n", t);
-
-
         // Compute the turbulent viscosity
         nut = computeTurbulentViscosity(theMesh, u, uBCs, turbulenceModel);
+
+
+        // Compute time-step and update time
+        DeltaT = computeTimeStepOrthogonal(theMesh, u, nu+nut, f);
+        t += DeltaT;
+        printf("\nTime = %f s \n", t);
 
 
         // Compute convective and diffusive term explicitly
         mDot = RhieChowInterpolation(u, p, theMesh, DeltaT, uBCs, pBCs);
         convU = fvc::convective(mDot, u, theMesh, uBCs);
-        diffU = fvc::laplacianOrthogonal(nu + nut, u, theMesh, uBCs);
+        diffU = fvc::laplacianOrthogonal(nu+nut, u, theMesh, uBCs);
 
 
         // Compute the forcing term   dp/dx = -1   in the x direction
@@ -164,7 +164,7 @@ int main() {
 
 
         // Compute R field and RPrev field (if first time iteration)
-        R = nu*diffU - convU - F;
+        R = diffU - convU - F;
 
         if (k == 0) {
 
