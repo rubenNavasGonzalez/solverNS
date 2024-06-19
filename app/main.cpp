@@ -49,9 +49,9 @@ int main() {
 
 
     // Transient parameters
-    double t = 100.000062;                                                      // Time (dynamic)
+    double t = 0;                                                               // Time (dynamic)
     double t0 = t;                                                              // Initial time (static)
-    double tFinal = 120;                                                        // Final time
+    double tFinal = 100;                                                        // Final time
     double DeltaT;                                                              // Time-step
     double f = 1;                                                               // Time-step calculation correction factor
     double steadyStateCriterion = 1e-6;                                         // Steady-state criterion
@@ -59,7 +59,7 @@ int main() {
 
     // Turbulence modeling
     modelLES turbulenceModel;
-    turbulenceModel = WALE;
+    turbulenceModel = None;
 
 
     // Velocity field initialization (field and BCs)
