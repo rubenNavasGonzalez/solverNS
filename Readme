@@ -6,6 +6,8 @@
 
 
 
+Incompressible Navier-Stokes equations solver using the FSM algorithm.
+
 app.............................Folder where the diverse mains are allocated, the present main file and the application executable
 build...........................Folder used to compile the project
 cmake-build-*...................Folder used to compile the project by CLion
