@@ -12,4 +12,6 @@
 
 double computeTimeStepOrthogonal(const PolyMesh& theMesh, const VectorField& u, const ScalarField& nu, double f);
 
+double computeTimeStepOrthogonal(const PolyMesh& theMesh, const VectorField& u, double Pr, double f);
+
 #endif //FLOWBETWEENFLATPLATES_COMPUTETIMESTEPORTHOGONAL_H

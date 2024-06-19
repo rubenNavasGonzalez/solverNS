@@ -22,19 +22,19 @@ ScalarField modelS3PQR(const PolyMesh& theMesh, const VectorField& u, const Vect
         case S3PQ: {
 
             p = -2.5;
-            C_s3pqr = 0.572;
+            //C_s3pqr = 0.572;
             break;
         }
         case S3PR: {
 
             p = -1;
-            C_s3pqr = 0.709;
+            //C_s3pqr = 0.709;
             break;
         }
         case S3QR: {
 
             p = 0;
-            C_s3pqr = 0.762;
+            //C_s3pqr = 0.762;
             break;
         }
     }

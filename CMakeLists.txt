@@ -154,4 +154,20 @@ add_executable(solverNS app/main.cpp
         src/functionObjects/computeEk/computeEk.h
         src/functionObjects/computeEnsotrophy/computeEnsotrophy.cpp
         src/functionObjects/computeEnsotrophy/computeEnsotrophy.h
+        src/finiteVolumeMethod/fvc/buyoancy.cpp
+        src/functionObjects/computeLaminarDHCResults/computeLaminarDHCResults.cpp
+        src/functionObjects/computeLaminarDHCResults/computeLaminarDHCResults.h
+        src/IO/out/differentiallyHeatedCavity/writeDifferentiallyHeatedCavityData2VTK.cpp
+        src/IO/out/differentiallyHeatedCavity/writeDifferentiallyHeatedCavityData2VTK.h
+        src/IO/out/differentiallyHeatedCavity/writeDifferentiallyHeatedCavityResults2CSV.cpp
+        src/IO/out/differentiallyHeatedCavity/writeDifferentiallyHeatedCavityResults2CSV.h
+        src/functionObjects/computeEkFull/computeEkFull.cpp
+        src/functionObjects/computeEkFull/computeEkFull.h
+        src/IO/out/differentiallyHeatedCavity/writeDifferentiallyHeatedCavitySetUp.cpp
+        src/IO/out/differentiallyHeatedCavity/writeDifferentiallyHeatedCavitySetUp.h
+        src/fields/scalarField/initialize.cpp
+        src/fields/scalarField/initializeFromSelectedTime.cpp
+        src/fields/scalarField/initializeFromSelectedTime.h
+        src/fields/scalarField/initializeFromDifferentMesh.cpp
+        src/fields/scalarField/initializeFromDifferentMesh.h
 )

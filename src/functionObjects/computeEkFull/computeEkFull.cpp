@@ -1,15 +1,13 @@
 //
-// Created by ruben on 6/03/24.
+// Created by ruben on 7/04/24.
 //
 
-#include <cmath>
 #include <iostream>
 #include <fstream>
-#include <iomanip>
-#include "computeEk.h"
+#include "computeEkFull.h"
 
 
-double computeEk(const VectorField& u, const PolyMesh& theMesh, double t) {
+double computeEkFull(const VectorField& u, const PolyMesh& theMesh, double t) {
 
 
     // Initialize Ek variable
@@ -20,12 +18,8 @@ double computeEk(const VectorField& u, const PolyMesh& theMesh, double t) {
     for (int i = 0; i < theMesh.nInteriorElements; ++i) {
 
         // Update the Ek value
-        Ek += u[i] * u[i];
+        Ek += theMesh.elements[i].Vf * u[i] * u[i] / 2;
     }
-
-
-    // Average the Ek value by the volume
-    Ek /= (2*theMesh.nInteriorElements);
 
 
     // Write the kinetic energy to .csv file along with time
@@ -41,7 +35,7 @@ double computeEk(const VectorField& u, const PolyMesh& theMesh, double t) {
         }
 
         // Append data (time, bulk velocity)
-        outfileData << std::to_string(t) << "," << std::fixed << std::setprecision(std::numeric_limits<double>::digits10 + 1) << Ek << "\n";
+        outfileData << std::to_string(t) << "," << Ek << "\n";
         outfileData.close();
     } else {
 

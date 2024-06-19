@@ -8,6 +8,7 @@
 
 ScalarField computeTurbulentViscosity(const PolyMesh& theMesh, const VectorField& u, const VectorBoundaryConditions& uBCs, modelLES turbulenceModel) {
 
+
     // Assign the turbulence viscosity depending on the turbulence model selected
     switch (turbulenceModel) {
 

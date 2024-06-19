@@ -19,6 +19,7 @@ public:
 
 
     // ScalarField methods
+    void initialize(const PolyMesh& theMesh, double t, int mode);
     double max();
     double min();
     double maxAbs();

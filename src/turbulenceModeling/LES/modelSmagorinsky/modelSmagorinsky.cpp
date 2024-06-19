@@ -12,7 +12,8 @@ ScalarField modelSmagorinsky(const PolyMesh& theMesh, const VectorField& u, cons
     // Auxiliary variables declaration
     TensorField gradU;
     double Delta, QS;
-    double Cs = 0.165;
+    double Cs = 0.1;
+    //double Cs = 0.165;
 
 
     // Initialize the turbulent viscosity field
